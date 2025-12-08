@@ -1,205 +1,689 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>咖啡準備系統</title>
-  <style>
-    /* 基本頁面樣式 */
-    body {
-      font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(to bottom, #fff8f0, #fff0d9);
-      color: #4d2600;
-    }
-    h1 {
-      text-align: center;
-      font-size: 2.5rem;
-      color: #b35c00;
-      padding: 1rem 0;
-      text-shadow: 1px 1px 3px #ffd699;
-    }
-    select {
-      display: block;
-      margin: 0.5rem auto 1rem auto;
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-      border-radius: 10px;
-      border: 2px solid #ffcc66;
-      background-color: #fff7e6;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>咖啡備餐確認系統 (純統計介面)</title>
+<style>
+    :root {
+        /* 主色板 */
+        --color-primary: #4a3b32; /* 深咖啡 */
+        --color-accent: #dda15e; /* 淺棕/黃金 */
+        --color-background: #fcfbf8; /* 柔和淺黃背景 */
+        --color-light-gray: #e9e5e0; 
+        --color-done: #f0f0f0; /* 完成品的背景色 */
+        --color-success: #6c7a42; /* 鄰居/完成進度綠 */
+        --color-danger: #d00000; /* 剩餘數紅色 */
+        --color-total-progress: #bc6c25; /* 總計進度橘 */
     }
 
-    /* 區塊容器 */
-    .container {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      padding: 0 1rem 2rem 1rem;
-      max-width: 1200px;
-      margin: auto;
+    body { 
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "Noto Sans TC", sans-serif; 
+        background: var(--color-background); 
+        padding: 0 10px 20px 10px; 
+        color: #333; 
+        max-width: 900px;
+        margin: 0 auto;
     }
-    @media (min-width: 768px) {
-      .container {
-        flex-direction: row;
-      }
+    h2 { 
+        text-align: center; 
+        color: var(--color-primary); 
+        margin: 15px 0 10px 0; 
+        font-size: 26px; 
+        font-weight: 600;
+    }
+    
+    /* ==== 懸浮標頭區塊 ==== */
+    .sticky-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--color-background); 
+        padding-top: 10px; 
+        box-shadow: 0 4px 8px -4px rgba(0, 0, 0, 0.15); 
+    }
+    
+    /* 控制區 */
+    .controls { 
+        background: #fff; 
+        padding: 12px; 
+        border-radius: 12px; 
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08); 
+        margin-bottom: 15px; 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        gap: 8px; 
+    }
+    select { 
+        padding: 10px; 
+        font-size: 16px; 
+        border-radius: 8px; 
+        border: 1px solid var(--color-light-gray); 
+        width: 40%; 
+        appearance: none; 
+        background-color: #f7f7f7;
+    }
+    .btn { 
+        background: var(--color-accent); 
+        color: white; 
+        border: none; 
+        padding: 10px 14px; 
+        border-radius: 8px; 
+        cursor: pointer; 
+        font-weight: bold; 
+        font-size: 15px; 
+        transition: background 0.2s;
+        flex-grow: 1; 
+    }
+    
+    #clearAllBtn {
+        background: #9e9e9e; 
+        color: white;
+    }
+    #clearAllBtn:hover {
+        background: #757575;
     }
 
-    /* 區塊樣式 */
-    .area {
-      flex: 1;
-      background: #fff3e0;
-      border-radius: 15px;
-      padding: 1rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+
+    /* 統計區 */
+    .stats-container { 
+        display: flex; 
+        gap: 15px; 
+        margin-bottom: 15px; 
     }
-    .area h2 {
-      text-align: center;
-      color: #b35c00;
-      margin-bottom: 0.8rem;
+    .stat-box { 
+        flex: 1; 
+        background: #fff; 
+        border-radius: 10px; 
+        padding: 10px; 
+        box-shadow: 0 3px 6px rgba(0,0,0,0.1); 
+        border-top: 5px solid var(--color-primary); 
+    }
+    .stat-box h3 { 
+        margin: 0 0 8px 0; 
+        font-size: 15px; 
+        color: var(--color-primary); 
+        font-weight: 600;
+        text-align: center; 
+        border-bottom: 1px solid var(--color-light-gray); 
+        padding-bottom: 5px;
+    }
+    .stat-row { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        font-size: 14px; 
+        margin-bottom: 4px; 
+        padding: 5px 0; 
+        cursor: pointer; 
+        transition: background-color 0.1s;
+    }
+    .stat-row:hover {
+        background-color: var(--color-light-gray);
+        border-radius: 4px;
+    }
+    .stat-row.total { 
+        color: var(--color-total-progress); 
+        border-top: 1px solid var(--color-light-gray); 
+        margin-top: 8px;
+        padding-top: 8px;
+        cursor: default; 
+    }
+    .stat-row.total:hover {
+        background-color: transparent;
+    }
+    .progress-counts {
+        display: flex;
+        align-items: center;
+        gap: 10px; 
+        font-weight: 500;
+        font-size: 14px;
+    }
+    .count-remaining b { 
+        font-size: 20px; 
+        color: var(--color-danger); 
+    }
+    .stat-row-progress {
+        width: 100%;
+        height: 6px; 
+        background-color: var(--color-light-gray);
+        border-radius: 3px;
+        margin-bottom: 10px; 
+        overflow: hidden;
+    }
+    .progress-fill { 
+        height: 100%; 
+        background-color: var(--color-success); 
+        transition: width 0.3s ease-in-out; 
+    }
+    .stat-row.total + .stat-row-progress .progress-fill { 
+        background-color: var(--color-total-progress); 
     }
 
-    /* 統計資訊 */
-    .stats {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-around;
-      gap: 0.5rem;
-      font-weight: bold;
-      font-size: 0.95rem;
-      color: #804000;
-      padding: 0.5rem;
-      background: #fff1d6;
-      border-radius: 12px;
-      margin-bottom: 1rem;
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    /* 統計詳細列表樣式 */
+    .stat-detail-list {
+        margin-top: 5px;
+        padding: 5px 0;
+        border-top: 1px dashed var(--color-light-gray);
+        display: none; /* 初始隱藏 */
+    }
+    .stat-detail-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center; /* 垂直居中對齊 */
+        font-size: 13px;
+        padding: 6px 5px;
+        border-bottom: 1px dotted #e0e0e0;
+        cursor: pointer; /* 整個項目可點擊 */
+    }
+    .stat-detail-item:last-child {
+        border-bottom: none;
+    }
+    .stat-detail-item .customer-info {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.3;
+        flex-grow: 1; /* 佔據空間 */
+    }
+    .stat-detail-item .customer-name {
+        font-weight: 600;
+        color: #333;
+    }
+    .stat-detail-item .customer-loc {
+        font-size: 11px;
+        color: #777;
+    }
+    .stat-detail-item.done .customer-name,
+    .stat-detail-item.done .customer-loc {
+        text-decoration: line-through;
+        color: #999;
     }
 
-    /* 勾選清單 */
-    .item {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.6rem;
-      background: #fff7e6;
-      border-radius: 12px;
-      margin-bottom: 0.5rem;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      cursor: pointer;
-      transition: 0.2s;
+
+    /* 統一 Checkbox 樣式 */
+    .stat-detail-item input[type="checkbox"] {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 20px; 
+        height: 20px; 
+        border: 2px solid #ccc;
+        border-radius: 4px;
+        cursor: pointer;
+        outline: none;
+        position: relative;
+        /* 確保不觸發父元素的點擊事件 */
+        pointer-events: none; /* 讓點擊穿透到父層 div */
     }
-    .item:hover {
-      background: #ffe6b3;
-      box-shadow: 0 4px 10px rgba(255,204,102,0.3);
+    .stat-detail-item:not(.done) {
+         /* 在非完成狀態下，讓項目在 hover 時有提示 */
+        background-color: transparent;
     }
-    .item input[type="checkbox"] {
-      transform: scale(1.2);
-      accent-color: #ff9900;
+    .stat-detail-item:hover:not(.done) {
+        background-color: #f7f7f7;
     }
-    .item div {
-      display: flex;
-      flex-direction: column;
+
+    .stat-detail-item input[type="checkbox"]:checked {
+        border-color: var(--color-success);
+        background-color: var(--color-success);
     }
-    .item small {
-      color: #804000;
+
+    .stat-detail-item input[type="checkbox"]:checked::after {
+        content: '✓';
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 14px;
+        color: white;
+        font-weight: bold;
     }
-  </style>
+
+
+    /* RWD 調整 */
+    @media (max-width: 768px) {
+        .controls {
+            flex-wrap: wrap; 
+        }
+        select {
+            width: 100%; 
+        }
+        .btn {
+            flex-grow: 1; 
+            width: 48%; 
+        }
+        .stats-container {
+            flex-direction: column;
+        }
+    }
+    
+    /* 移除主列表的容器 */
+    #mainListContainer {
+        display: none; 
+    }
+    
+    .walk-in-section {
+        background: #fff;
+        padding: 12px;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        margin-bottom: 15px;
+    }
+    .walk-in-section h3 {
+        color: var(--color-primary);
+        font-size: 16px;
+        margin: 0 0 8px 0;
+        border-bottom: 1px solid var(--color-light-gray);
+        padding-bottom: 5px;
+    }
+    .walk-in-section ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .walk-in-section li {
+        font-size: 13px;
+        padding: 3px 0;
+        color: #555;
+    }
+</style>
 </head>
 <body>
-  <h1>咖啡準備系統 ☕</h1>
 
-  <select id="daySelect"></select>
+<h2>☕ 備餐助理</h2>
 
-  <div class="container">
-    <div class="area" id="neighborArea">
-      <h2>鄰居區</h2>
-      <div class="stats" id="neighborStats"></div>
-      <div id="neighborItems"></div>
+<div class="sticky-header">
+    <div class="controls">
+        <select id="daySelect" onchange="renderOrders()">
+            <option value="1">星期一</option>
+            <option value="2">星期二</option>
+            <option value="3">星期三</option>
+            <option value="4">星期四</option>
+            <option value="5">星期五</option>
+            <option value="6">星期六</option>
+            <option value="0">星期日</option>
+        </select>
+        <button class="btn" onclick="renderOrders()">刷新列表</button>
+        <button class="btn" id="clearAllBtn" onclick="clearAllDone()">全部取消</button>
     </div>
 
-    <div class="area" id="otherArea">
-      <h2>其他區</h2>
-      <div class="stats" id="otherStats"></div>
-      <div id="otherItems"></div>
+    <div class="walk-in-section">
+        <h3>🏃 來店客備忘</h3>
+        <ul>
+            <li><b>超早來的畢業生：</b>冰美式</li>
+            <li><b>短髮瘦瘦：</b>19-23g粉 / 磨8or9 (冰/熱美)</li>
+            <li><b>內衣店老闆：</b>熱拿鐵</li>
+            <li><b>芭樂：</b>熱拿鐵 + 糖(3g)</li>
+            <li><b>梨山蜜蘋果 熱美式or熱拿鐵(四或五，第二趟問)</b></li>
+        </ul>
     </div>
-  </div>
+    
+    <div class="stats-container">
+        <div class="stat-box" style="border-top-color: var(--color-success);">
+            <h3>🏠 左右鄰居 總計</h3>
+            <div id="stats-neighbor"></div>
+        </div>
+        <div class="stat-box" style="border-top-color: var(--color-total-progress);">
+            <h3>🛵 其他區域 總計</h3>
+            <div id="stats-other"></div>
+        </div>
+    </div>
+</div>
 
-  <script>
-    const allItems = [
-      { area: '鄰居區', name: '怡香軒', drink: '熱美式', days: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] },
-      { area: '鄰居區', name: '油飯', drink: '熱美式(詢問)', days: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] },
-      { area: '鄰居區', name: '山城米食', drink: '拿鐵(寄杯)', days: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] },
-      { area: '鄰居區', name: '橘子攤', drink: '拿鐵', days: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] },
-      { area: '鄰居區', name: '糖果', drink: '熱拿鐵', days: ['Sat','Sun'] },
-      { area: '鄰居區', name: '布老闆', drink: '熱美式(寄杯)', days: ['Fri'] },
-      { area: '鄰居區', name: '牛肉', drink: '熱拿鐵+3g糖', days: ['Wed','Fri','Sun'] },
-      { area: '鄰居區', name: '甘蔗雞', drink: '冰美式', days: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] },
-      { area: '鄰居區', name: '國聯哥', drink: '冰美式', days: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] },
+<div id="mainListContainer" style="display:none;">
+    <div id="neighborColumn" class="list-column"></div>
+    <div id="otherColumn" class="list-column"></div>
+</div>
 
-      { area: '其他區', name: '牛肉爸爸&兒子', drink: '大熱拿×2', days: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] },
-      { area: '其他區', name: '魚老闆', drink: '大熱拿(寄杯)', days: ['Tue','Wed','Fri'] },
-      { area: '其他區', name: '水果鄰居', drink: '拿鐵', days: ['Tue','Wed','Sat','Sun'] },
-      { area: '其他區', name: '小辣椒', drink: '熱美式', days: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] },
-      { area: '其他區', name: '蝦老闆', drink: '熱美式', days: ['Tue','Thu','Fri','Sat'] },
-      { area: '其他區', name: '貢丸老闆', drink: '熱拿鐵+手沖', days: ['Wed'] },
-      { area: '其他區', name: '豐原素食', drink: '熱美式', days: ['Wed'] },
-      { area: '其他區', name: '菜老闆', drink: '熱拿鐵', days: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] },
-      { area: '其他區', name: '中山路水果', drink: '熱美式', days: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] },
-      { area: '其他區', name: '福記豬肉', drink: '熱美式(寄杯)', days: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] },
+
+<script>
+    // ----------------------------------------------------
+    // 【JS 邏輯區】 
+    // ----------------------------------------------------
+    
+    // 📢 關鍵改動：全域集合，用於追蹤哪些統計項目是展開的
+    const expandedStats = new Set();
+    
+    const customers = [
+        // 右邊鄰居
+        { loc: "右邊鄰居", name: "怡香軒", item: "熱美式", type: "hot_am", days: [] },
+        { loc: "右邊鄰居", name: "油飯", item: "熱美式", type: "hot_am", days: [], note: "每日問" },
+        { loc: "右邊鄰居", name: "山城米食", item: "熱拿鐵", type: "hot_latte", days: [], tag: "寄杯" }, 
+        { loc: "右邊鄰居", name: "橘子攤", item: "熱拿鐵", type: "hot_latte", days: [] }, 
+        { loc: "右邊鄰居", name: "糖果", item: "熱拿鐵", type: "hot_latte", days: [6, 0], tag: "付兩天" },
+
+        // 左邊鄰居
+        { loc: "左邊鄰居", name: "牛肉", item: "熱拿鐵 (加糖)", type: "hot_latte_sugar", days: [3, 5, 0], tag: "必須加3g糖" },
+        { loc: "左邊鄰居", name: "布老闆", item: "熱美式", type: "hot_am", days: [5], tag: "寄杯" },
+        { loc: "左邊鄰居", name: "甘蔗雞", item: "冰美式", type: "ice_am", days: [] },
+        { loc: "左邊鄰居", name: "國聯哥", item: "冰美式", type: "ice_am", days: [] },
+
+        // 其他區域
+        { loc: "近十字路口", name: "新鮮牛肉爸爸兒子", item: "大拿鐵x2", count: 2, type: "large_hot_latte", days: [], note: "爸爸粉20g" },
+        { loc: "過十字路口直行", name: "魚老闆", item: "大拿鐵", type: "large_hot_latte", days: [2, 3, 5], tag: "寄杯" },
+        { loc: "過十字路口直行", name: "魚老闆鄰居(水果)", item: "拿鐵", type: "hot_latte", days: [2, 3, 6, 0] }, 
+        { loc: "過十字路口直行", name: "小辣椒", item: "熱美式", type: "hot_am", days: [] },
+        { loc: "過十字路口直行", name: "蝦老闆", item: "熱美式",type: "hot_am", days: [2, 4, 5, 6, 0] },
+
+        { loc: "過十字路口直行", name: "城隍廟口鐵鍋行", item: "冰美式x2",  count: 2, type: "ice_am", days: [5] },
+        
+        // 梨山蜜蘋果 (待確認品項)
+        { 
+            loc: "梨山蜜蘋果", 
+            name: "梨山蜜蘋果", 
+            item: "熱美式/熱拿鐵 (擇一)", 
+            type: "potential_item", 
+            count: 1,              
+            days: [4, 5], 
+            tag: "第二趟問", 
+            note: "請務必先詢問，僅做為備忘提醒" 
+        },
+
+
+        { loc: "過十字路口直行", name: "豐原素食", item: "熱美式", type: "hot_am", days: [3] },
+        { loc: "過十字路口直行", name: "近中山路水果攤", item: "熱美式", type: "hot_am", days: [] },
+        { loc: "過十字路口右轉", name: "福記對面豬肉", item: "熱美式", type: "hot_am", days: [], tag: "寄杯" },
+                // 貢丸老闆：將這兩筆資料視為一組進行合併渲染
+        { loc: "過十字路口直行", name: "貢丸老闆 (拿鐵)", item: "熱拿鐵", type: "hot_latte", days: [3, 0] },
+        { loc: "過十字路口直行", name: "貢丸老闆 (手沖)", item: "熱手沖", type: "hand_drip", days: [3, 0], note: "總計$185" },
+        { loc: "過十字路口直行", name: "菜老闆", item: "熱拿鐵", type: "hot_latte", days: [] },
+
     ];
 
-    const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-    const daySelect = document.getElementById('daySelect');
-    days.forEach(d => {
-      const option = document.createElement('option');
-      option.value=d;
-      option.textContent=d;
-      daySelect.appendChild(option);
-    });
+    const typeNames = {
+        hot_am: '☕ 熱美式', ice_am: '🧊 冰美式', 
+        hot_latte: '🔥 熱拿鐵', 
+        hot_latte_sugar: '🍬 熱拿鐵 (加糖)', 
+        ice_latte: '❄️ 冰拿鐵', 
+        large_hot_latte: '🥤 大熱拿', 
+        hand_drip: '💧 手沖',
+        potential_item: '❓ 待確認品項', 
+    };
 
-    function countSummary(list) {
-      let summary = { '熱美式':0,'冰美式':0,'熱拿鐵':0,'大熱拿':0,'手沖':0 };
-      list.forEach(i => {
-        const d = i.drink;
-        if(d.includes('熱美式')) summary['熱美式']++;
-        if(d.includes('冰美式')) summary['冰美式']++;
-        if(d.includes('熱拿鐵') && !d.includes('大熱')) summary['熱拿鐵']++;
-        if(d.includes('大熱')) {
-          const match=d.match(/×(\d+)/);
-          summary['大熱拿'] += match ? parseInt(match[1]) : 1;
+    function getTodayDateString() {
+        const today = new Date();
+        const yyyy = today.getFullYear().toString();
+        const mm = (today.getMonth() + 1).toString().padStart(2, '0');
+        const dd = today.getDate().toString().padStart(2, '0');
+        return yyyy + mm + dd;
+    }
+
+    function sanitizeKeyPart(s) {
+        if (!s) return '';
+        return s.replace(/[^a-zA-Z0-9\u4e00-\u9fa5_]/g, ''); 
+    }
+
+    // 建立唯一的儲存鍵 (Name, Item, Location)
+    function getStorageKey(name, item, loc) {
+        return `${getTodayDateString()}_${sanitizeKeyPart(name)}_${sanitizeKeyPart(item)}_${sanitizeKeyPart(loc)}`;
+    }
+
+    function escapeJsString(s) {
+        if (!s) return '';
+        return s.replace(/\\/g, '\\\\') 
+                .replace(/'/g, '\\\'');
+    }
+
+    /**
+     * 切換訂單完成狀態，並重新渲染整個統計區。
+     * @param {string} name - 客戶名稱 (用於儲存鍵)
+     * @param {string} item - 品項名稱 (用於儲存鍵)
+     * @param {string} loc - 位置 (用於儲存鍵)
+     */
+    window.toggleDone = function(name, item, loc) {
+        const key = getStorageKey(name, item, loc);
+        const isDone = localStorage.getItem(key) === 'true';
+        
+        if (isDone) {
+            localStorage.removeItem(key); 
+        } else {
+            localStorage.setItem(key, 'true'); 
         }
-        if(d.includes('手沖')) summary['手沖']++;
-      });
-      return summary;
+        // 關鍵：切換後必須重新渲染統計數據，但同時保留 expandedStats 狀態
+        renderOrders(); 
     }
 
-    function render() {
-      const day = daySelect.value;
-      const todayList = allItems.filter(i => i.days.includes(day));
-      const neighborArea = todayList.filter(i => i.area==='鄰居區');
-      const otherArea = todayList.filter(i => i.area==='其他區');
+    function isItemDone(name, item, loc) {
+        const key = getStorageKey(name, item, loc);
+        return localStorage.getItem(key) === 'true';
+    }
+    
+    // --------------------------------------------------
+    // 【核心邏輯：全部取消】
+    // --------------------------------------------------
+    window.clearAllDone = function() {
+        if (!confirm("確定要清除所有已完成的備餐狀態嗎？\n(這將重置當前日期的所有訂單)")) {
+            return;
+        }
 
-      function renderArea(areaList, statsId, itemsId){
-        const stats = countSummary(areaList);
-        const statsDiv = document.getElementById(statsId);
-        statsDiv.textContent = `熱美式: ${stats['熱美式']} | 冰美式: ${stats['冰美式']} | 熱拿鐵: ${stats['熱拿鐵']} | 大熱拿: ${stats['大熱拿']} | 手沖: ${stats['手沖']}`;
+        const day = parseInt(document.getElementById('daySelect').value);
+        const todaysOrders = customers.filter(c => c.days.length === 0 || c.days.includes(day));
 
-        const itemsDiv = document.getElementById(itemsId);
-        itemsDiv.innerHTML = '';
-        areaList.forEach(item => {
-          const label = document.createElement('label');
-          label.className='item';
-          label.innerHTML=`<input type='checkbox'> <div><strong>${item.name}</strong><br><small>${item.drink}</small></div>`;
-          itemsDiv.appendChild(label);
+        todaysOrders.forEach(c => {
+            if (c.name.startsWith("貢丸老闆")) {
+                 localStorage.removeItem(getStorageKey("貢丸老闆 (拿鐵)", "熱拿鐵", c.loc));
+                 localStorage.removeItem(getStorageKey("貢丸老闆 (手沖)", "熱手沖", c.loc));
+            } else {
+                localStorage.removeItem(getStorageKey(c.name, c.item, c.loc));
+            }
         });
-      }
 
-      renderArea(neighborArea, 'neighborStats', 'neighborItems');
-      renderArea(otherArea, 'otherStats', 'otherItems');
+        // 清除所有展開狀態
+        expandedStats.clear(); 
+        renderOrders();
+        alert("所有備餐狀態已清除！");
     }
 
-    daySelect.addEventListener('change', render);
-    render();
-  </script>
+    // --------------------------------------------------
+    // 【核心邏輯：清單渲染 (僅處理統計)】
+    // --------------------------------------------------
+    function renderOrders() {
+        const day = parseInt(document.getElementById('daySelect').value);
+        const statsNeighborDiv = document.getElementById('stats-neighbor');
+        const statsOtherDiv = document.getElementById('stats-other');
+        
+        if (day === 1) { 
+            const restHtml = '<div style="text-align:center;color:#999;font-size:12px;">休息中</div>';
+            statsNeighborDiv.innerHTML = restHtml;
+            statsOtherDiv.innerHTML = restHtml;
+            document.getElementById('clearAllBtn').disabled = true;
+            return; 
+        }
+        document.getElementById('clearAllBtn').disabled = false;
+
+
+        const initialStatsTemplate = { total: 0, done: 0, orders: [] }; 
+        const initialStats = {};
+        for (const key in typeNames) {
+            initialStats[key] = { ...initialStatsTemplate };
+        }
+
+        let sNeigh = JSON.parse(JSON.stringify(initialStats));
+        let sOther = JSON.parse(JSON.stringify(initialStats));
+
+        const todaysOrders = customers.filter(c => c.days.length === 0 || c.days.includes(day));
+
+        // 階段一：處理合併訂單 (貢丸老闆)
+        const simplifiedOrders = [];
+        let i = 0;
+        while (i < todaysOrders.length) {
+            let c = todaysOrders[i];
+            
+            if (c.name === "貢丸老闆 (拿)" && i + 1 < todaysOrders.length && todaysOrders[i + 1].name === "貢丸老闆 (手)") {
+                let c2 = todaysOrders[i + 1];
+                
+                simplifiedOrders.push({
+                    ...c, 
+                    type: c.type, 
+                    parentName: "貢丸老闆", 
+                    isMulti: true 
+                });
+                simplifiedOrders.push({
+                    ...c2, 
+                    type: c2.type, 
+                    parentName: "貢丸老闆", 
+                    isMulti: true 
+                });
+                i += 2; 
+            } else {
+                simplifiedOrders.push(c);
+                i++;
+            }
+        }
+        
+        // 階段二：執行統計
+        simplifiedOrders.forEach((c) => {
+            let qty = c.count || 1;
+            let isNeighbor = (c.loc === "右邊鄰居" || c.loc === "左邊鄰居");
+            let targetStats = isNeighbor ? sNeigh : sOther;
+            
+            if (typeNames.hasOwnProperty(c.type)) {
+                const isDone = isItemDone(c.name, c.item, c.loc); 
+                
+                if (targetStats[c.type]) {
+                    targetStats[c.type].total += qty;
+                    if (isDone) {
+                        targetStats[c.type].done += qty;
+                    }
+                    
+                    for(let k = 0; k < qty; k++) {
+                        targetStats[c.type].orders.push({
+                            name: c.isMulti ? c.parentName + ` (${c.item.replace('熱', '').replace('沖', '')})` : c.name,
+                            loc: c.loc,
+                            item: c.item, 
+                            originalName: c.name, 
+                            originalLoc: c.loc, 
+                            isDone: isDone 
+                        });
+                    }
+                }
+            }
+        });
+
+        // 輔助函數：渲染詳細列表 (包含 Checkbox)
+        function renderDetailList(orders) {
+            if (orders.length === 0) return '';
+            
+            let detailHtml = orders.map(order => {
+                const doneClass = order.isDone ? 'done' : '';
+                const checkedAttr = order.isDone ? 'checked' : '';
+                const safeName = escapeJsString(order.originalName);
+                const safeItem = escapeJsString(order.item);
+                const safeLoc = escapeJsString(order.originalLoc);
+                
+                // 📢 關鍵改動：點擊事件移到 stat-detail-item 上，但用 event.preventDefault() 阻止其傳遞
+                return `
+                    <div class="stat-detail-item ${doneClass}"
+                        onclick="toggleDone('${safeName}', '${safeItem}', '${safeLoc}')">
+                        <div class="customer-info">
+                            <span class="customer-name">${order.name}</span>
+                            <span class="customer-loc">(${order.loc})</span>
+                        </div>
+                        <input type="checkbox" ${checkedAttr}>
+                    </div>
+                `;
+            }).join('');
+            
+            return detailHtml;
+        }
+
+
+        // 產生統計 HTML
+        function makeStatHtml(stats, idPrefix) {
+            let html = '';
+            let totalCupsNeeded = 0;
+            let totalCupsDone = 0;
+            
+            for (const typeKey in typeNames) {
+                const itemStats = stats[typeKey];
+                if (itemStats.total > 0) {
+                    const remaining = itemStats.total - itemStats.done;
+                    const percent = Math.round((itemStats.done / itemStats.total) * 100);
+                    
+                    const remainingColor = remaining === 0 ? 'color: var(--color-success);' : '';
+                    
+                    const detailId = `detail_${idPrefix}_${typeKey}`;
+
+                    // 單品項統計行 (添加 onclick 事件)
+                    html += `
+                        <div class="stat-row" onclick="toggleStatDetail('${detailId}')">
+                            <span>${typeNames[typeKey]} <span style="font-size:10px; margin-left: 5px;"> (點擊展開)</span></span> 
+                            <div class="progress-counts">
+                                <span class="count-total">總計: ${itemStats.total}</span>
+                                <span class="count-remaining">剩: <b style="${remainingColor}">${remaining}</b></span>
+                            </div>
+                        </div>
+                        <div class="stat-row-progress">
+                            <div class="progress-fill" style="width: ${percent}%;"></div>
+                        </div>
+                        <div id="${detailId}" class="stat-detail-list">
+                            ${renderDetailList(itemStats.orders)}
+                        </div>
+                    `;
+                    totalCupsNeeded += itemStats.total;
+                    totalCupsDone += itemStats.done;
+                }
+            }
+            
+            if(totalCupsNeeded > 0) {
+                const totalRemaining = totalCupsNeeded - totalCupsDone;
+                const totalPercent = Math.round((totalCupsDone / totalCupsNeeded) * 100);
+
+                // 總計統計行 (不可點擊)
+                html += `<div class="stat-row total">
+                            <span>🏆 總計</span> 
+                            <div class="progress-counts">
+                                <span class="count-total">總計: ${totalCupsNeeded}</span>
+                                <span class="count-remaining">剩: <b>${totalRemaining}</b></span>
+                            </div>
+                         </div>
+                         <div class="stat-row-progress">
+                            <div class="progress-fill" style="width: ${totalPercent}%;"></div>
+                         </div>
+                `;
+            } else {
+                 html = '<div style="text-align:center;color:#999;font-size:12px;">無訂單統計</div>';
+            }
+            return html;
+        }
+
+        statsNeighborDiv.innerHTML = makeStatHtml(sNeigh, 'neigh'); 
+        statsOtherDiv.innerHTML = makeStatHtml(sOther, 'other');
+
+        // 📢 關鍵：重新渲染後，根據 expandedStats 集合，恢復展開狀態
+        expandedStats.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.style.display = 'block';
+            }
+        });
+    }
+
+    // --------------------------------------------------
+    // 【展開/收合詳細列表】
+    // --------------------------------------------------
+    window.toggleStatDetail = function(detailId) {
+        const detailDiv = document.getElementById(detailId);
+        if (detailDiv) {
+            if (detailDiv.style.display === 'block') {
+                detailDiv.style.display = 'none';
+                expandedStats.delete(detailId); // 📢 收合時從 Set 中移除
+            } else {
+                detailDiv.style.display = 'block';
+                expandedStats.add(detailId); // 📢 展開時加入 Set
+            }
+        }
+    }
+
+
+    /**
+     * 初始化：自動選擇今天星期幾 (0=週日, 1=週一... 6=週六)
+     */
+    const today = new Date().getDay(); 
+    document.getElementById('daySelect').value = today;
+    renderOrders();
+
+</script>
 </body>
 </html>

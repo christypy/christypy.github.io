@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>咖啡備餐確認系統</title>
+<title>咖啡備餐確認系統 (純統計介面)</title>
 <style>
     :root {
         /* 主色板 */
@@ -86,7 +86,7 @@
     }
 
 
-    /* 統計區 (保持不變) */
+    /* 統計區 */
     .stats-container { 
         display: flex; 
         gap: 15px; 
@@ -115,12 +115,23 @@
         align-items: center; 
         font-size: 14px; 
         margin-bottom: 4px; 
+        padding: 5px 0; 
+        cursor: pointer; 
+        transition: background-color 0.1s;
+    }
+    .stat-row:hover {
+        background-color: var(--color-light-gray);
+        border-radius: 4px;
     }
     .stat-row.total { 
         color: var(--color-total-progress); 
         border-top: 1px solid var(--color-light-gray); 
         margin-top: 8px;
         padding-top: 8px;
+        cursor: default; 
+    }
+    .stat-row.total:hover {
+        background-color: transparent;
     }
     .progress-counts {
         display: flex;
@@ -129,25 +140,9 @@
         font-weight: 500;
         font-size: 14px;
     }
-    .count-total {
-        color: #777;
-    }
-    .count-remaining {
-        display: flex;
-        align-items: center;
-        gap: 4px; 
-    }
     .count-remaining b { 
         font-size: 20px; 
         color: var(--color-danger); 
-    }
-    .stat-row.total .count-remaining b {
-        font-size: 22px; 
-        color: var(--color-total-progress); 
-    }
-    .stat-row.total .count-total {
-        color: var(--color-primary); 
-        font-weight: 700;
     }
     .stat-row-progress {
         width: 100%;
@@ -166,35 +161,88 @@
         background-color: var(--color-total-progress); 
     }
 
+    /* 統計詳細列表樣式 */
+    .stat-detail-list {
+        margin-top: 5px;
+        padding: 5px 0;
+        border-top: 1px dashed var(--color-light-gray);
+        display: none; /* 初始隱藏 */
+    }
+    .stat-detail-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center; /* 垂直居中對齊 */
+        font-size: 13px;
+        padding: 6px 5px;
+        border-bottom: 1px dotted #e0e0e0;
+        cursor: pointer; /* 整個項目可點擊 */
+    }
+    .stat-detail-item:last-child {
+        border-bottom: none;
+    }
+    .stat-detail-item .customer-info {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.3;
+        flex-grow: 1; /* 佔據空間 */
+    }
+    .stat-detail-item .customer-name {
+        font-weight: 600;
+        color: #333;
+    }
+    .stat-detail-item .customer-loc {
+        font-size: 11px;
+        color: #777;
+    }
+    .stat-detail-item.done .customer-name,
+    .stat-detail-item.done .customer-loc {
+        text-decoration: line-through;
+        color: #999;
+    }
 
-    /* 清單兩欄佈局 */
-    #mainListContainer {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
-        margin-bottom: 20px;
+
+    /* 統一 Checkbox 樣式 */
+    .stat-detail-item input[type="checkbox"] {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 20px; 
+        height: 20px; 
+        border: 2px solid #ccc;
+        border-radius: 4px;
+        cursor: pointer;
+        outline: none;
+        position: relative;
+        /* 確保不觸發父元素的點擊事件 */
+        pointer-events: none; /* 讓點擊穿透到父層 div */
     }
-    .list-column {
-        padding: 10px 10px 0 10px; 
-        background: #fff; 
-        border-radius: 12px; 
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
-        border: 1px solid var(--color-light-gray);
+    .stat-detail-item:not(.done) {
+         /* 在非完成狀態下，讓項目在 hover 時有提示 */
+        background-color: transparent;
     }
-    .column-title {
-        font-size: 18px;
-        font-weight: 700;
-        color: var(--color-primary);
-        text-align: center;
-        padding: 8px 0;
-        margin-bottom: 10px;
-        border-bottom: 3px solid var(--color-accent); 
+    .stat-detail-item:hover:not(.done) {
+        background-color: #f7f7f7;
     }
-    
+
+    .stat-detail-item input[type="checkbox"]:checked {
+        border-color: var(--color-success);
+        background-color: var(--color-success);
+    }
+
+    .stat-detail-item input[type="checkbox"]:checked::after {
+        content: '✓';
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 14px;
+        color: white;
+        font-weight: bold;
+    }
+
+
+    /* RWD 調整 */
     @media (max-width: 768px) {
-        #mainListContainer {
-            grid-template-columns: 1fr; 
-        }
         .controls {
             flex-wrap: wrap; 
         }
@@ -205,169 +253,39 @@
             flex-grow: 1; 
             width: 48%; 
         }
+        .stats-container {
+            flex-direction: column;
+        }
     }
     
-    /* ======== 列表卡片美化區塊 ======== */
-    .card { 
+    /* 移除主列表的容器 */
+    #mainListContainer {
+        display: none; 
+    }
+    
+    .walk-in-section {
         background: #fff;
-        padding: 10px; 
-        border-radius: 8px;
-        margin-bottom: 8px; 
-        border-left: 6px solid #ddd; 
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
-        display: flex; 
-        align-items: flex-start; /* 頂部對齊 */
-        transition: background 0.1s;
+        padding: 12px;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        margin-bottom: 15px;
     }
-    
-    /* 資訊欄 */
-    .info-col {
-        flex-grow: 1;
-        padding-right: 10px;
-        min-width: 60%; /* 確保客戶名稱有足夠空間 */
+    .walk-in-section h3 {
+        color: var(--color-primary);
+        font-size: 16px;
+        margin: 0 0 8px 0;
+        border-bottom: 1px solid var(--color-light-gray);
+        padding-bottom: 5px;
     }
-    .item-name { 
-        font-weight: 600; 
-        font-size: 16px; 
-        color: #222; 
-    } 
-    .item-detail { 
-        font-size: 10px; 
-        margin-top: 3px; 
+    .walk-in-section ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
     }
-    .note-text { 
-        font-size: 10px; 
-        color: var(--color-danger); 
-        font-weight: 600; 
-    }
-    
-    /* 勾選/品項欄 */
-    .right-col {
-        display: flex;
-        flex-direction: column; /* 垂直堆疊 */
-        align-items: flex-end; /* 右對齊 */
-        min-width: 40%;
-        text-align: right;
-    }
-    .item-desc { 
-        font-weight: 600; 
-        font-size: 15px; 
-        color: var(--color-primary); 
-        margin-bottom: 5px; /* 增加與勾選框的間距 */
-        line-height: 1.2;
-    } 
-
-    /* 單品項勾選框美化 */
-    input[type="checkbox"] {
-        /* 隱藏原生勾選框 */
-        appearance: none;
-        -webkit-appearance: none;
-        width: 30px; 
-        height: 30px; 
-        border: 3px solid #ccc;
-        border-radius: 6px;
-        cursor: pointer;
-        outline: none;
-        position: relative;
-        transition: all 0.2s;
-        margin-top: 0;
-    }
-
-    input[type="checkbox"]:checked {
-        border-color: var(--color-success);
-        background-color: var(--color-success);
-    }
-
-    input[type="checkbox"]:checked::after {
-        /* 勾勾圖案 (使用 unicode) */
-        content: '✓';
-        display: block;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 20px;
-        color: white;
-        font-weight: bold;
-    }
-
-    /* 完成狀態 */
-    .card.done { 
-        opacity: 0.7; 
-        border-left-color: var(--color-light-gray) !important; 
-        background: var(--color-done); 
-    }
-    .card.done input[type="checkbox"] {
-        border-color: var(--color-success);
-    }
-    .card.done .item-name, .card.done .item-desc {
-        text-decoration: line-through;
-        color: #777;
-    }
-
-    /* 多品項卡片 (貢丸老闆) 美化 */
-    .item-multi-display {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-    }
-    .item-multi-display > div {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-        margin-top: 4px;
-    }
-    .item-multi-display input[type="checkbox"] {
-        width: 20px; /* 多品項的勾選框可以小一點 */
-        height: 20px;
-        border-width: 2px;
-        margin-left: 5px;
-    }
-    .item-multi-display input[type="checkbox"]:checked::after {
-        font-size: 14px;
-    }
-    /* 確保多品項的商品名稱對齊 */
-    .item-multi-display span {
-        font-size: 14px;
+    .walk-in-section li {
+        font-size: 13px;
+        padding: 3px 0;
         color: #555;
-        font-weight: 500;
-        text-align: right;
-    }
-
-
-    /* 特殊樣式 (保持不變) */
-    .card.hot_latte_sugar {
-        border-left-color: #f77a7a !important; 
-        background: #fffafa; 
-    }
-    .card.uncertain {
-        border-left-color: #fca311 !important; 
-        background: #fff8e1; 
-    }
-    .card.uncertain.done { 
-        opacity: 0.8; 
-        background: #fcf6e4;
-        border-left-color: #e8c784 !important; 
-    }
-    
-    .tag { 
-        padding: 2px 6px; 
-        font-size: 10px; 
-        margin-left: 4px; 
-        border-radius: 4px; 
-        background: #ffe0b2; 
-        color: #6d4c41; 
-        font-weight: 600; 
-    }
-    h4 {
-        font-size: 15px;
-        font-weight: 600;
-        color: var(--color-total-progress);
-        margin: 12px 0 6px 0 !important;
-        border-bottom: 1px dashed var(--color-light-gray);
-        padding-bottom: 4px;
-        padding-left: 5px;
     }
 </style>
 </head>
@@ -389,17 +307,18 @@
         <button class="btn" onclick="renderOrders()">刷新列表</button>
         <button class="btn" id="clearAllBtn" onclick="clearAllDone()">全部取消</button>
     </div>
-<div class="walk-in-section">
-    <h3>🏃 來店客備忘</h3>
-    <ul>
-        <li><b>超早來的畢業生：</b>冰美式</li>
-        <li><b>短髮瘦瘦：</b>19-23g粉 / 磨8or9 (冰/熱美)</li>
-        <li><b>內衣店老闆：</b>熱拿鐵</li>
-        <li><b>芭樂：</b>熱拿鐵 + 糖(3g)</li>
-        <li><b>梨山蜜蘋果 熱美式or熱拿鐵(四或五，第二趟問)</b></li>
-        
-    </ul>
-</div>
+
+    <div class="walk-in-section">
+        <h3>🏃 來店客備忘</h3>
+        <ul>
+            <li><b>超早來的畢業生：</b>冰美式</li>
+            <li><b>短髮瘦瘦：</b>19-23g粉 / 磨8or9 (冰/熱美)</li>
+            <li><b>內衣店老闆：</b>熱拿鐵</li>
+            <li><b>芭樂：</b>熱拿鐵 + 糖(3g)</li>
+            <li><b>梨山蜜蘋果 熱美式or熱拿鐵(四或五，第二趟問)</b></li>
+        </ul>
+    </div>
+    
     <div class="stats-container">
         <div class="stat-box" style="border-top-color: var(--color-success);">
             <h3>🏠 左右鄰居 總計</h3>
@@ -411,21 +330,21 @@
         </div>
     </div>
 </div>
-<div id="mainListContainer">
-    <div id="neighborColumn" class="list-column">
-        <div class="column-title">🏠 左右鄰居訂單</div>
-        </div>
-    <div id="otherColumn" class="list-column">
-        <div class="column-title">🛵 其他區域訂單</div>
-        </div>
-</div>
 
+<div id="mainListContainer" style="display:none;">
+    <div id="neighborColumn" class="list-column"></div>
+    <div id="otherColumn" class="list-column"></div>
+</div>
 
 
 <script>
     // ----------------------------------------------------
     // 【JS 邏輯區】 
     // ----------------------------------------------------
+    
+    // 📢 關鍵改動：全域集合，用於追蹤哪些統計項目是展開的
+    const expandedStats = new Set();
+    
     const customers = [
         // 右邊鄰居
         { loc: "右邊鄰居", name: "怡香軒", item: "熱美式", type: "hot_am", days: [] },
@@ -441,7 +360,7 @@
         { loc: "左邊鄰居", name: "國聯哥", item: "冰美式", type: "ice_am", days: [] },
 
         // 其他區域
-        { loc: "近十字路口", name: "牛肉爸爸兒子", item: "大拿鐵x2", count: 2, type: "large_hot_latte", days: [], note: "爸爸粉20g" },
+        { loc: "近十字路口", name: "新鮮牛肉爸爸兒子", item: "大拿鐵x2", count: 2, type: "large_hot_latte", days: [], note: "爸爸粉20g" },
         { loc: "過十字路口直行", name: "魚老闆", item: "大拿鐵", type: "large_hot_latte", days: [2, 3, 5], tag: "寄杯" },
         { loc: "過十字路口直行", name: "魚老闆鄰居(水果)", item: "拿鐵", type: "hot_latte", days: [2, 3, 6, 0] }, 
         { loc: "過十字路口直行", name: "小辣椒", item: "熱美式", type: "hot_am", days: [] },
@@ -466,8 +385,8 @@
         { loc: "過十字路口直行", name: "近中山路水果攤", item: "熱美式", type: "hot_am", days: [] },
         { loc: "過十字路口右轉", name: "福記對面豬肉", item: "熱美式", type: "hot_am", days: [], tag: "寄杯" },
                 // 貢丸老闆：將這兩筆資料視為一組進行合併渲染
-        { loc: "過十字路口直行", name: "貢丸老闆 (拿)", item: "熱拿鐵", type: "hot_latte", days: [3, 0] },
-        { loc: "過十字路口直行", name: "貢丸老闆 (手)", item: "熱手沖", type: "hand_drip", days: [3, 0], note: "總計$185" },
+        { loc: "過十字路口直行", name: "貢丸老闆 (拿鐵)", item: "熱拿鐵", type: "hot_latte", days: [3, 0] },
+        { loc: "過十字路口直行", name: "貢丸老闆 (手沖)", item: "熱手沖", type: "hand_drip", days: [3, 0], note: "總計$185" },
         { loc: "過十字路口直行", name: "菜老闆", item: "熱拿鐵", type: "hot_latte", days: [] },
 
     ];
@@ -495,8 +414,8 @@
         return s.replace(/[^a-zA-Z0-9\u4e00-\u9fa5_]/g, ''); 
     }
 
+    // 建立唯一的儲存鍵 (Name, Item, Location)
     function getStorageKey(name, item, loc) {
-        // 確保 key 包含當日日期，這樣隔天就不會影響
         return `${getTodayDateString()}_${sanitizeKeyPart(name)}_${sanitizeKeyPart(item)}_${sanitizeKeyPart(loc)}`;
     }
 
@@ -506,6 +425,12 @@
                 .replace(/'/g, '\\\'');
     }
 
+    /**
+     * 切換訂單完成狀態，並重新渲染整個統計區。
+     * @param {string} name - 客戶名稱 (用於儲存鍵)
+     * @param {string} item - 品項名稱 (用於儲存鍵)
+     * @param {string} loc - 位置 (用於儲存鍵)
+     */
     window.toggleDone = function(name, item, loc) {
         const key = getStorageKey(name, item, loc);
         const isDone = localStorage.getItem(key) === 'true';
@@ -515,7 +440,8 @@
         } else {
             localStorage.setItem(key, 'true'); 
         }
-        renderOrders();
+        // 關鍵：切換後必須重新渲染統計數據，但同時保留 expandedStats 狀態
+        renderOrders(); 
     }
 
     function isItemDone(name, item, loc) {
@@ -534,51 +460,40 @@
         const day = parseInt(document.getElementById('daySelect').value);
         const todaysOrders = customers.filter(c => c.days.length === 0 || c.days.includes(day));
 
-        // 遍歷所有今天的訂單並清除 localStorage 記錄
         todaysOrders.forEach(c => {
-            // 處理多品項的合併訂單
             if (c.name.startsWith("貢丸老闆")) {
-                 // 貢丸老闆有兩筆原始記錄，要分別清除
-                 localStorage.removeItem(getStorageKey("貢丸老闆 (拿)", "熱拿鐵", c.loc));
-                 localStorage.removeItem(getStorageKey("貢丸老闆 (手)", "熱手沖", c.loc));
+                 localStorage.removeItem(getStorageKey("貢丸老闆 (拿鐵)", "熱拿鐵", c.loc));
+                 localStorage.removeItem(getStorageKey("貢丸老闆 (手沖)", "熱手沖", c.loc));
             } else {
                 localStorage.removeItem(getStorageKey(c.name, c.item, c.loc));
             }
         });
 
-        // 重新渲染列表以更新狀態和統計數據
+        // 清除所有展開狀態
+        expandedStats.clear(); 
         renderOrders();
         alert("所有備餐狀態已清除！");
     }
 
     // --------------------------------------------------
-    // 【核心邏輯：清單渲染】
+    // 【核心邏輯：清單渲染 (僅處理統計)】
     // --------------------------------------------------
     function renderOrders() {
         const day = parseInt(document.getElementById('daySelect').value);
-        const neighborColumn = document.getElementById('neighborColumn');
-        const otherColumn = document.getElementById('otherColumn');
         const statsNeighborDiv = document.getElementById('stats-neighbor');
         const statsOtherDiv = document.getElementById('stats-other');
         
-        // V15.0 新增: 處理固定休息日 (星期一)
         if (day === 1) { 
-            const restHtml = '<p style="text-align:center; color:var(--color-danger); font-size:18px; padding: 50px 0;">🎉 星期一固定休息日，無備餐訂單！</p>';
-            neighborColumn.innerHTML = `<div class="column-title">🏠 左右鄰居訂單</div>${restHtml}`;
-            otherColumn.innerHTML = `<div class="column-title">🛵 其他區域訂單</div>`;
-            statsNeighborDiv.innerHTML = '<div style="text-align:center;color:#999;font-size:12px;">休息中</div>';
-            statsOtherDiv.innerHTML = '<div style="text-align:center;color:#999;font-size:12px;">休息中</div>';
-            document.getElementById('clearAllBtn').disabled = true; // 休息日禁用
+            const restHtml = '<div style="text-align:center;color:#999;font-size:12px;">休息中</div>';
+            statsNeighborDiv.innerHTML = restHtml;
+            statsOtherDiv.innerHTML = restHtml;
+            document.getElementById('clearAllBtn').disabled = true;
             return; 
         }
-        document.getElementById('clearAllBtn').disabled = false; // 非休息日啟用
-        // ------------------------------------
+        document.getElementById('clearAllBtn').disabled = false;
 
-        neighborColumn.innerHTML = `<div class="column-title">🏠 左右鄰居訂單</div>`;
-        otherColumn.innerHTML = `<div class="column-title">🛵 其他區域訂單</div>`;
 
-        
-        const initialStatsTemplate = { total: 0, done: 0 };
+        const initialStatsTemplate = { total: 0, done: 0, orders: [] }; 
         const initialStats = {};
         for (const key in typeNames) {
             initialStats[key] = { ...initialStatsTemplate };
@@ -589,8 +504,8 @@
 
         const todaysOrders = customers.filter(c => c.days.length === 0 || c.days.includes(day));
 
-        // 階段一：建立最終的渲染列表 (處理合併)
-        const finalOrders = [];
+        // 階段一：處理合併訂單 (貢丸老闆)
+        const simplifiedOrders = [];
         let i = 0;
         while (i < todaysOrders.length) {
             let c = todaysOrders[i];
@@ -598,173 +513,84 @@
             if (c.name === "貢丸老闆 (拿)" && i + 1 < todaysOrders.length && todaysOrders[i + 1].name === "貢丸老闆 (手)") {
                 let c2 = todaysOrders[i + 1];
                 
-                finalOrders.push({
-                    loc: c.loc,
-                    name: "貢丸老闆", 
-                    type: "multi", 
-                    note: c2.note || c.note, 
-                    originalItems: [
-                        // 注意這裡儲存的 name 和 item 必須是原始的，以便後續的 isItemDone 和 toggleDone 能正確查找
-                        { name: c.name, item: c.item, type: c.type, loc: c.loc, count: c.count || 1, tag: c.tag },
-                        { name: c2.name, item: c2.item, type: c2.type, loc: c2.loc, count: c2.count || 1, tag: c2.tag }
-                    ]
+                simplifiedOrders.push({
+                    ...c, 
+                    type: c.type, 
+                    parentName: "貢丸老闆", 
+                    isMulti: true 
+                });
+                simplifiedOrders.push({
+                    ...c2, 
+                    type: c2.type, 
+                    parentName: "貢丸老闆", 
+                    isMulti: true 
                 });
                 i += 2; 
             } else {
-                finalOrders.push(c);
+                simplifiedOrders.push(c);
                 i++;
             }
         }
         
-        // 階段二：統計與渲染
-        let neighborHtml = '';
-        let otherHtml = '';
-        let currentNeighborLoc = ''; 
-        let currentOtherLoc = '';    
-
-
-        finalOrders.forEach((c) => {
-            let itemsToRender = [];
+        // 階段二：執行統計
+        simplifiedOrders.forEach((c) => {
+            let qty = c.count || 1;
+            let isNeighbor = (c.loc === "右邊鄰居" || c.loc === "左邊鄰居");
+            let targetStats = isNeighbor ? sNeigh : sOther;
             
-            if (c.type === "multi" && c.originalItems) {
-                itemsToRender = c.originalItems;
-                c.cardClass = 'multi';
-            } else {
-                itemsToRender = [c];
-                let cardClass = '';
-                // 決定卡片顏色樣式 (單品項)
-                if(c.type === 'potential_item') cardClass = 'uncertain';
-                else if(c.type === 'hot_latte_sugar') cardClass = 'hot_latte_sugar'; 
-                else if(c.type && c.type.includes('am')) cardClass = 'americano';
-                else if(c.type && c.type.includes('latte')) cardClass = 'latte';
-                else if(c.type && c.type.includes('drip')) cardClass = 'drip';
-                c.cardClass = cardClass;
-            }
-
-            // 執行統計 (這裡會處理 potential_item 的計數)
-            let allItemsDone = true; // 用於檢查 multi card 是否完成
-            itemsToRender.forEach(item => {
-                let qty = item.count || 1;
-                let isNeighbor = (item.loc === "右邊鄰居" || item.loc === "左邊鄰居");
-                let targetStats = isNeighbor ? sNeigh : sOther;
+            if (typeNames.hasOwnProperty(c.type)) {
+                const isDone = isItemDone(c.name, c.item, c.loc); 
                 
-                // 檢查是否是統計類型中的一種
-                if (typeNames.hasOwnProperty(item.type)) {
-                    // 必須使用 item.name 和 item.item 來檢查，即使是在 multi-card 內部
-                    const isDone = isItemDone(item.name, item.item, item.loc); 
+                if (targetStats[c.type]) {
+                    targetStats[c.type].total += qty;
+                    if (isDone) {
+                        targetStats[c.type].done += qty;
+                    }
                     
-                    if (!isDone) allItemsDone = false; // 只要有一個未完成，則多品項卡片就未完成
-
-                    if (targetStats[item.type]) {
-                        targetStats[item.type].total += qty;
-                        if (isDone) {
-                            targetStats[item.type].done += qty;
-                        }
+                    for(let k = 0; k < qty; k++) {
+                        targetStats[c.type].orders.push({
+                            name: c.isMulti ? c.parentName + ` (${c.item.replace('熱', '').replace('沖', '')})` : c.name,
+                            loc: c.loc,
+                            item: c.item, 
+                            originalName: c.name, 
+                            originalLoc: c.loc, 
+                            isDone: isDone 
+                        });
                     }
                 }
-            });
-
-            // 渲染列表
-            let targetHtml = '';
-            let targetCurrentLoc = '';
-
-            const isNeighbor = (c.loc === "右邊鄰居" || c.loc === "左邊鄰居");
-            
-            if (isNeighbor) {
-                targetHtml = neighborHtml;
-                targetCurrentLoc = currentNeighborLoc;
-            } else {
-                targetHtml = otherHtml;
-                targetCurrentLoc = currentOtherLoc;
-            }
-
-            // 加上位置小標題
-            if (c.loc !== targetCurrentLoc) {
-                targetHtml += `<h4>${c.loc}</h4>`;
-                targetCurrentLoc = c.loc;
-            }
-
-            // 渲染卡片
-            let tagsHtml = c.tag ? `<span class="tag tag-pre">${c.tag}</span>` : '';
-            let noteHtml = c.note ? `<span class="note-text">⚠️ ${c.note}</span>` : '';
-
-            if (c.type !== "multi") {
-                const isDone = isItemDone(c.name, c.item, c.loc);
-                const doneClass = isDone ? 'done' : '';
-                const checkedAttr = isDone ? 'checked' : '';
-                const safeName = escapeJsString(c.name);
-                const safeItem = escapeJsString(c.item);
-                const safeLoc = escapeJsString(c.loc);
-                
-                const cardClass = c.cardClass;
-
-                targetHtml += `
-                    <div class="card ${cardClass} ${doneClass}">
-                        <div class="info-col">
-                            <div class="item-name">${c.name} ${tagsHtml}</div>
-                            <div class="item-detail">${noteHtml}</div>
-                        </div>
-                        <div class="right-col">
-                            <div class="item-desc">${c.item}</div>
-                            <input type="checkbox" ${checkedAttr} onclick="toggleDone('${safeName}', '${safeItem}', '${safeLoc}')">
-                        </div>
-                    </div>
-                `;
-            } else {
-                const doneClass = allItemsDone ? 'done' : '';
-                // 移除 itemDescHtml，改為在 item-multi-display 內渲染
-                
-                // 【修改點】調整多品項的 checkboxHtml 結構，以配合新的 CSS
-                let checkboxHtml = c.originalItems.map(item => {
-                    // 這裡的 isDone/toggleDone 必須使用 originalItem 的 name/item
-                    const isDone = isItemDone(item.name, item.item, item.loc);
-                    const checkedAttr = isDone ? 'checked' : '';
-                    const safeName = escapeJsString(item.name);
-                    const safeItem = escapeJsString(item.item);
-                    const safeLoc = escapeJsString(item.loc);
-                    
-                    return `
-                        <div>
-                            <span>${item.item}</span>
-                            <input type="checkbox" ${checkedAttr} onclick="toggleDone('${safeName}', '${safeItem}', '${safeLoc}')">
-                        </div>
-                    `;
-                }).join('');
-
-                targetHtml += `
-                    <div class="card ${c.cardClass} ${doneClass}">
-                        <div class="info-col">
-                            <div class="item-name">${c.name} ${tagsHtml}</div>
-                            <div class="item-detail">${noteHtml}</div>
-                        </div>
-                        <div class="right-col">
-                            <div class="item-multi-display">
-                                ${checkboxHtml}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-
-            if (isNeighbor) {
-                neighborHtml = targetHtml;
-                currentNeighborLoc = targetCurrentLoc;
-            } else {
-                otherHtml = targetHtml;
-                currentOtherLoc = targetCurrentLoc;
             }
         });
 
-        // 實際渲染到 DOM
-        neighborColumn.innerHTML += neighborHtml;
-        otherColumn.innerHTML += otherHtml;
-        
-        if (neighborHtml === '') neighborColumn.innerHTML += '<p style="text-align:center;color:#999;font-size:12px; margin-top: 20px;">今日鄰居無固定訂單</p>';
-        if (otherHtml === '') otherColumn.innerHTML += '<p style="text-align:center;color:#999;font-size:12px; margin-top: 20px;">今日其他區域無固定訂單</p>';
+        // 輔助函數：渲染詳細列表 (包含 Checkbox)
+        function renderDetailList(orders) {
+            if (orders.length === 0) return '';
+            
+            let detailHtml = orders.map(order => {
+                const doneClass = order.isDone ? 'done' : '';
+                const checkedAttr = order.isDone ? 'checked' : '';
+                const safeName = escapeJsString(order.originalName);
+                const safeItem = escapeJsString(order.item);
+                const safeLoc = escapeJsString(order.originalLoc);
+                
+                // 📢 關鍵改動：點擊事件移到 stat-detail-item 上，但用 event.preventDefault() 阻止其傳遞
+                return `
+                    <div class="stat-detail-item ${doneClass}"
+                        onclick="toggleDone('${safeName}', '${safeItem}', '${safeLoc}')">
+                        <div class="customer-info">
+                            <span class="customer-name">${order.name}</span>
+                            <span class="customer-loc">(${order.loc})</span>
+                        </div>
+                        <input type="checkbox" ${checkedAttr}>
+                    </div>
+                `;
+            }).join('');
+            
+            return detailHtml;
+        }
 
 
-        // 產生統計 HTML (已修改為顯示總數與剩餘數)
-        function makeStatHtml(stats) {
+        // 產生統計 HTML
+        function makeStatHtml(stats, idPrefix) {
             let html = '';
             let totalCupsNeeded = 0;
             let totalCupsDone = 0;
@@ -776,11 +602,13 @@
                     const percent = Math.round((itemStats.done / itemStats.total) * 100);
                     
                     const remainingColor = remaining === 0 ? 'color: var(--color-success);' : '';
+                    
+                    const detailId = `detail_${idPrefix}_${typeKey}`;
 
-                    // 單品項統計行
+                    // 單品項統計行 (添加 onclick 事件)
                     html += `
-                        <div class="stat-row">
-                            <span>${typeNames[typeKey]}</span> 
+                        <div class="stat-row" onclick="toggleStatDetail('${detailId}')">
+                            <span>${typeNames[typeKey]} <span style="font-size:10px; margin-left: 5px;"> (點擊展開)</span></span> 
                             <div class="progress-counts">
                                 <span class="count-total">總計: ${itemStats.total}</span>
                                 <span class="count-remaining">剩: <b style="${remainingColor}">${remaining}</b></span>
@@ -788,6 +616,9 @@
                         </div>
                         <div class="stat-row-progress">
                             <div class="progress-fill" style="width: ${percent}%;"></div>
+                        </div>
+                        <div id="${detailId}" class="stat-detail-list">
+                            ${renderDetailList(itemStats.orders)}
                         </div>
                     `;
                     totalCupsNeeded += itemStats.total;
@@ -799,7 +630,7 @@
                 const totalRemaining = totalCupsNeeded - totalCupsDone;
                 const totalPercent = Math.round((totalCupsDone / totalCupsNeeded) * 100);
 
-                // 總計統計行
+                // 總計統計行 (不可點擊)
                 html += `<div class="stat-row total">
                             <span>🏆 總計</span> 
                             <div class="progress-counts">
@@ -817,9 +648,34 @@
             return html;
         }
 
-        statsNeighborDiv.innerHTML = makeStatHtml(sNeigh);
-        statsOtherDiv.innerHTML = makeStatHtml(sOther);
+        statsNeighborDiv.innerHTML = makeStatHtml(sNeigh, 'neigh'); 
+        statsOtherDiv.innerHTML = makeStatHtml(sOther, 'other');
+
+        // 📢 關鍵：重新渲染後，根據 expandedStats 集合，恢復展開狀態
+        expandedStats.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.style.display = 'block';
+            }
+        });
     }
+
+    // --------------------------------------------------
+    // 【展開/收合詳細列表】
+    // --------------------------------------------------
+    window.toggleStatDetail = function(detailId) {
+        const detailDiv = document.getElementById(detailId);
+        if (detailDiv) {
+            if (detailDiv.style.display === 'block') {
+                detailDiv.style.display = 'none';
+                expandedStats.delete(detailId); // 📢 收合時從 Set 中移除
+            } else {
+                detailDiv.style.display = 'block';
+                expandedStats.add(detailId); // 📢 展開時加入 Set
+            }
+        }
+    }
+
 
     /**
      * 初始化：自動選擇今天星期幾 (0=週日, 1=週一... 6=週六)
@@ -831,4 +687,3 @@
 </script>
 </body>
 </html>
-
