@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>咖啡備餐確認系統 (手機優化/菜單可見)</title>
+<title>咖啡備餐確認系統 (欄位優化)</title>
 <style>
     :root {
         /* 主色板 */
@@ -190,8 +190,9 @@
         margin-bottom: 15px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         border-radius: 8px;
-        overflow: hidden;
+        /* 移除 overflow: hidden 讓表格更寬鬆 */
     }
+    
     .menu-group-full thead th {
         background-color: var(--color-menu-header);
         color: white;
@@ -218,7 +219,13 @@
         padding-left: 10px;
         font-weight: 600;
         color: var(--color-primary);
+        width: 25%; /* 給品項名稱多一點寬度 */
     }
+    /* 價格欄位壓縮寬度，貼合內容 */
+    .menu-group-full td:not(:first-child) {
+        width: 18.75%; 
+    }
+    
     .menu-price {
         color: var(--color-danger);
         font-weight: bold;
@@ -237,6 +244,7 @@
         font-size: 16px;
         text-align: center;
         margin-top: 20px;
+        margin-bottom: 15px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     .quick-price-box-footer b {
@@ -268,12 +276,19 @@
         .stats-container {
             flex-direction: column;
         }
-        .menu-group-full {
-            font-size: 12px;
+        
+        .menu-group-full thead th {
+             font-size: 13px; /* 縮小手機版表頭文字 */
+             padding: 8px 3px;
         }
-        .menu-group-full th, .menu-group-full td {
-            padding: 6px 3px;
+        .menu-group-full tbody td {
+             font-size: 13px;
+             padding: 6px 3px;
         }
+        .menu-group-full td:first-child {
+            padding-left: 5px;
+        }
+
         .quick-price-box-footer {
             font-size: 14px;
         }
@@ -329,14 +344,16 @@
     <div id="neighborColumn" class="list-column"></div>
     <div id="otherColumn" class="list-column"></div>
 </div>
+
 <div class="quick-price-box-footer">
     <b>☕ 義式基礎飲品價格</b>
     熱美式: <span>$70</span> | 冰美式: <span>$75</span> | 
     熱拿鐵: <span>$85</span> | 冰拿鐵: <span>$85</span> | 
     大拿鐵: <span>$95</span>
 </div>
+
 <div class="info-section" id="menuReference">
-    <h3>📋 豆單</h3>
+    <h3>📋 單品豆單 </h3>
     
     <table class="menu-group-full">
         <thead>
@@ -350,63 +367,63 @@
         </thead>
         <tbody>
             <tr>
-                <td>寶 </td>
+                <td>寶</td>
                 <td><span class="menu-price">180</span></td>
                 <td><span class="menu-price">200</span></td>
                 <td><span class="menu-price">850</span></td>
                 <td><span class="menu-price">55</span></td>
             </tr>
             <tr>
-                <td>花 </td>
+                <td>花</td>
                 <td><span class="menu-price">180</span></td>
                 <td><span class="menu-price">230</span></td>
                 <td><span class="menu-price">850</span></td>
                 <td><span class="menu-price">55</span></td>
             </tr>
             <tr>
-                <td>雅 </td>
+                <td>雅</td>
                 <td><span class="menu-price">130</span></td>
                 <td><span class="menu-price">180</span></td>
                 <td><span class="menu-price">650</span></td>
                 <td><span class="menu-price">45</span></td>
             </tr>
             <tr>
-                <td>果 </td>
+                <td>果</td>
                 <td><span class="menu-price">130</span></td>
                 <td><span class="menu-price">180</span></td>
                 <td><span class="menu-price">600</span></td>
                 <td><span class="menu-price">45</span></td>
             </tr>
             <tr>
-                <td>菩 </td>
+                <td>菩</td>
                 <td><span class="menu-price">130</span></td>
                 <td><span class="menu-price">180</span></td>
                 <td><span class="menu-price">700</span></td>
                 <td><span class="menu-price">45</span></td>
             </tr>
             <tr>
-                <td>靜 </td>
+                <td>靜</td>
                 <td><span class="menu-price">130</span></td>
                 <td><span class="menu-price">180</span></td>
                 <td><span class="menu-price">650</span></td>
                 <td><span class="menu-note">無</span></td>
             </tr>
             <tr>
-                <td>覺 </td>
+                <td>覺</td>
                 <td><span class="menu-price">200</span></td>
                 <td><span class="menu-price">250</span></td>
                 <td><span class="menu-price">950</span></td>
                 <td><span class="menu-note">無</span></td>
             </tr>
             <tr>
-                <td>福 (義式基礎/單品)</td>
+                <td>福 </td>
                 <td><span class="menu-price">130</span></td>
                 <td><span class="menu-price">180</span></td>
                 <td><span class="menu-price">550</span></td>
                 <td><span class="menu-price">35</span></td>
             </tr>
             <tr>
-                <td>柔 (義式基礎/單品)</td>
+                <td>柔 </td>
                 <td><span class="menu-price">130</span></td>
                 <td><span class="menu-price">180</span></td>
                 <td><span class="menu-note">無</span></td>
@@ -414,8 +431,6 @@
             </tr>
         </tbody>
     </table>
-
- 
 </div>
 
 
