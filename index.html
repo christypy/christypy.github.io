@@ -75,6 +75,48 @@
         color: var(--color-danger); /* 備註中關鍵人名使用紅色強調 */
         font-weight: 700;
     }
+    
+    /* 動態備忘的樣式強調 */
+    /* *** 調整：使用 Flexbox 讓備忘錄水平排列 *** */
+    #dynamicMemoList {
+        display: flex;
+        flex-wrap: wrap; /* 允許換行 */
+        gap: 15px; /* 項目之間的間隔 */
+        padding-top: 5px;
+    }
+    .dynamic-memo-title {
+        /* 將標題獨立出來，避免被 flex 影響 */
+        width: 100%; 
+        margin-top: 10px; 
+        padding-bottom: 5px; 
+        color: var(--color-danger); 
+        font-weight: bold; 
+        border-top: 2px dashed var(--color-danger);
+    }
+    .dynamic-memo-item {
+        /* 備忘項目本身的樣式 */
+        color: var(--color-primary);
+        font-weight: 600;
+        padding: 2px 0;
+        border: none;
+        margin: 0;
+        white-space: nowrap; /* 不讓項目名稱換行 */
+    }
+    .dynamic-memo-item .memo-tag {
+        font-style: normal; /* 取消斜體 */
+        color: white; /* 標籤文字為白色 */
+        background-color: var(--color-total-progress); /* 特殊提醒使用橘色背景 */
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: bold;
+        margin-left: 5px;
+        font-size: 12px;
+    }
+    /* 靜態備忘和動態備忘的分隔線 */
+    #staticMemoList.has-dynamic {
+        margin-bottom: 10px;
+    }
+
 
     /* 控制區 (Select/Button) */
     .controls { 
@@ -228,6 +270,12 @@
         color: #888;
         text-decoration: line-through;
     }
+    .customer-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        flex-grow: 1;
+    }
     .customer-name {
         font-weight: 600;
         color: var(--color-primary);
@@ -238,8 +286,25 @@
     .customer-loc {
         font-size: 12px;
         color: #777;
-        margin-left: 5px;
+        margin-top: 2px;
     }
+
+    .customer-tag { /* 新增標籤樣式 */
+        font-size: 11px;
+        background-color: var(--color-accent);
+        color: var(--color-primary);
+        padding: 1px 4px;
+        border-radius: 3px;
+        font-weight: bold;
+        margin-left: 8px;
+        flex-shrink: 0;
+        line-height: 1.4;
+    }
+    .stat-detail-item.done .customer-tag {
+        background-color: #d8d8d8;
+        color: #999;
+    }
+
     
     /* Checkbox 樣式美化 */
     .stat-detail-item input[type="checkbox"] {
@@ -397,6 +462,16 @@
         .menu-group-full td:first-child {
             padding-left: 8px;
         }
+        .customer-info {
+            max-width: 80%; /* 防止過長時擠壓 checkbox */
+        }
+        .customer-loc {
+            word-break: break-all;
+        }
+        /* RWD 下備忘錄換行更友好 */
+        #dynamicMemoList {
+            gap: 10px;
+        }
     }
 </style>
 </head>
@@ -418,13 +493,14 @@
     </div>
 <div class="info-section">
     <h3>📝 備忘</h3>
-    <ul>
-        <li><b>超早來的畢業生：</b>冰美式</li>
-        <li><b>短髮瘦瘦：</b>19-23g粉 / 磨8or9 (冰/熱美)</li>
+    <ul id="staticMemoList">
+        <li><b>每天超早來的畢業生：</b>冰美式</li>
+        <li><b>短髮帽子姊姊：</b>選豆美式</li>
         <li><b>內衣店老闆：</b>熱拿鐵</li>
         <li><b>芭樂：</b>熱拿鐵 + 糖(3g)</li>
-        <li><b>梨山蜜蘋果 :</b>熱美式or熱拿鐵(四或五，第二趟問)</li>
     </ul>
+    <ul id="dynamicMemoList">
+        </ul>
 </div>
 
 <div class="header-content">
@@ -446,7 +522,7 @@
     <b>☕ 義式基礎飲品</b>
     熱美式: <span>$70</span> | 冰美式: <span>$75</span> | 
     熱拿鐵: <span>$85</span> | 冰拿鐵: <span>$85</span> | 
-    大拿鐵: <span>$95</span>
+     大拿鐵: <span>$95</span>
 </div>
 
 <div class="info-section" id="menuReference">
@@ -533,54 +609,47 @@
 
 <script>
     // ----------------------------------------------------
-    // 【JS 邏輯區 - 保持不變】 
+    // 【JS 邏輯區 - 優化版 - 排除寄杯標籤 + 水平備忘】 
     // ----------------------------------------------------
     
     const expandedStats = new Set();
     
+    // 將所有 count 設為明確的 1，避免在後續使用 || 1
     const customers = [
         // 右邊鄰居
-        { loc: "右邊鄰居", name: "怡香軒", item: "熱美式", type: "hot_am", days: [] },
-        { loc: "右邊鄰居", name: "油飯", item: "熱美式", type: "hot_am", days: [], note: "每日問" },
-        { loc: "右邊鄰居", name: "山城米食", item: "熱拿鐵", type: "hot_latte", days: [], tag: "寄杯" }, 
-        { loc: "右邊鄰居", name: "橘子攤", item: "熱拿鐵", type: "hot_latte", days: [] }, 
-        { loc: "右邊鄰居", name: "糖果", item: "熱拿鐵", type: "hot_latte", days: [6, 0], tag: "付兩天" },
+        { loc: "右邊鄰居", name: "怡香軒", item: "熱美式", type: "hot_am", days: [], count: 1 },
+        { loc: "右邊鄰居", name: "油飯", item: "熱美式", tag: "當日問",type: "hot_am", days: [], count: 1, note: "請先問油飯" },
+        { loc: "右邊鄰居", name: "山城米食", item: "熱拿鐵", type: "hot_latte", days: [], count: 1, tag: "寄杯" }, 
+        { loc: "右邊鄰居", name: "橘子攤", item: "熱拿鐵", type: "hot_latte", days: [], count: 1 }, 
+        { loc: "右邊鄰居", name: "糖果", item: "熱拿鐵", type: "hot_latte", days: [6, 0], count: 1, tag: "付兩天" },
 
         // 左邊鄰居
-        { loc: "左邊鄰居", name: "牛肉", item: "熱拿鐵 (加糖)", type: "hot_latte_sugar", days: [3, 5, 0], tag: "必須加3g糖" },
-        { loc: "左邊鄰居", name: "布老闆", item: "熱美式", type: "hot_am", days: [5], tag: "寄杯" },
-        { loc: "左邊鄰居", name: "甘蔗雞", item: "冰美式", type: "ice_am", days: [] },
-        { loc: "左邊鄰居", name: "國聯哥", item: "冰美式", type: "ice_am", days: [] },
+        { loc: "左邊鄰居", name: "牛肉", item: "熱拿鐵 (加糖)", type: "hot_latte_sugar", days: [3, 5, 0], count: 1, tag: "必須加3g糖", note: "注意：加糖" },
+        { loc: "左邊鄰居", name: "布老闆", item: "熱美式", type: "hot_am", days: [5], count: 1, tag: "寄杯" },
+        { loc: "左邊鄰居", name: "甘蔗雞", item: "冰美式", type: "ice_am", days: [], count: 1 },
+        { loc: "左邊鄰居", name: "國聯哥", item: "冰美式", type: "ice_am", days: [], count: 1 },
 
         // 其他區域
         { loc: "近十字路口", name: "牛肉爸爸兒子", item: "大拿鐵x2", count: 2, type: "large_hot_latte", days: [], note: "爸爸粉20g" },
-        { loc: "過十字路口直行", name: "魚老闆", item: "大拿鐵", type: "large_hot_latte", days: [2, 3, 5], tag: "寄杯" },
-        { loc: "過十字路口直行", name: "魚老闆鄰居(水果)", item: "拿鐵", type: "hot_latte", days: [2, 3, 6, 0] }, 
-        { loc: "過十字路口直行", name: "小辣椒", item: "熱美式", type: "hot_am", days: [] },
-        { loc: "過十字路口直行", name: "蝦老闆", item: "熱美式",type: "hot_am", days: [2, 4, 5, 6, 0] },
+        { loc: "過十字路口直行", name: "魚老闆", item: "大拿鐵", type: "large_hot_latte", days: [2, 3, 5], count: 1, tag: "寄杯" },
+        { loc: "過十字路口直行", name: "魚老闆鄰居(水果)", item: "熱拿鐵", type: "hot_latte", days: [2, 3, 6, 0], count: 1 }, 
+        { loc: "過十字路口直行", name: "小辣椒", item: "熱美式", type: "hot_am", days: [], count: 1 },
+        { loc: "過十字路口直行", name: "蝦老闆", item: "熱美式",type: "hot_am", days: [2, 4, 5, 6, 0], count: 1 },
+        { loc: "過十字路口直行", name: "梨山蜜蘋果", item: "熱拿鐵",tag: "當日問", type: "hot_latte", days: [4,5], count: 1 }, 
 
         { loc: "過十字路口直行", name: "城隍廟口鐵鍋行", item: "冰美式x2",  count: 2, type: "ice_am", days: [5] },
         
-        // 梨山蜜蘋果 (待確認品項)
-        { 
-            loc: "梨山蜜蘋果", 
-            name: "梨山蜜蘋果", 
-            item: "熱美式/熱拿鐵 (擇一)", 
-            type: "potential_item", 
-            count: 1,              
-            days: [4, 5], 
-            tag: "第二趟問", 
-            note: "請務必先詢問，僅做為備忘提醒" 
-        },
+        { loc: "過十字路口直行", name: "眼鏡白髮小菜老闆", item: "冰手沖|雅", type: "hand_drip",tag: "當日問", days: [4], count: 1, note: "老客戶手沖100"  },
+        { loc: "過十字路口直行", name: "抓餅女老闆", item: "熱美式",tag: "當日問", type: "hot_am", days: [2,4], count: 1 },
 
+        { loc: "過十字路口直行", name: "豐原素食", item: "熱美式", type: "hot_am", days: [3], count: 1 },
 
-        { loc: "過十字路口直行", name: "豐原素食", item: "熱美式", type: "hot_am", days: [3] },
-        { loc: "過十字路口直行", name: "近中山路水果攤", item: "熱美式", type: "hot_am", days: [] },
-        { loc: "過十字路口右轉", name: "福記對面豬肉", item: "熱美式", type: "hot_am", days: [], tag: "寄杯" },
+        { loc: "過十字路口直行", name: "近中山路水果攤", item: "熱美式", type: "hot_am", days: [], count: 1 },
+        { loc: "過十字路口右轉", name: "福記對面豬肉", item: "熱美式", type: "hot_am", days: [], count: 1, tag: "寄杯" },
                 // 貢丸老闆：將這兩筆資料視為一組進行合併渲染
-        { loc: "過十字路口直行", name: "貢丸老闆 (拿)", item: "熱拿鐵", type: "hot_latte", days: [3, 0] },
-        { loc: "過十字路口直行", name: "貢丸老闆 (手)", item: "熱手沖", type: "hand_drip", days: [3, 0], note: "總計$185" },
-        { loc: "過十字路口直行", name: "菜老闆", item: "熱拿鐵", type: "hot_latte", days: [] },
+        { loc: "過十字路口直行", name: "貢丸老闆 (拿)", item: "熱拿鐵", type: "hot_latte", days: [3, 0], count: 1 },
+        { loc: "過十字路口直行", name: "貢丸老闆 (手)", item: "熱手沖", type: "hand_drip", days: [3, 0], count: 1, note: "總計$185" },
+        { loc: "過十字路口直行", name: "菜老闆", item: "熱拿鐵", type: "hot_latte", days: [], count: 1 },
 
     ];
 
@@ -604,7 +673,8 @@
 
     function sanitizeKeyPart(s) {
         if (!s) return '';
-        return s.replace(/[^a-zA-Z0-9\u4e00-\u9fa5_]/g, ''); 
+        // 僅保留英文、數字、中文、空格。將空格轉為底線，並過濾其他符號。
+        return s.replace(/ /g, '_').replace(/[^a-zA-Z0-9\u4e00-\u9fa5_]/g, ''); 
     }
 
     function getStorageKey(name, item, loc) {
@@ -644,18 +714,53 @@
         const todaysOrders = customers.filter(c => c.days.length === 0 || c.days.includes(day));
 
         todaysOrders.forEach(c => {
-            if (c.name.startsWith("貢丸老闆")) {
-                 localStorage.removeItem(getStorageKey("貢丸老闆 (拿)", "熱拿鐵", c.loc));
-                 localStorage.removeItem(getStorageKey("貢丸老闆 (手)", "熱手沖", c.loc));
-            } else {
-                localStorage.removeItem(getStorageKey(c.name, c.item, c.loc));
-            }
+             localStorage.removeItem(getStorageKey(c.name, c.item, c.loc));
         });
 
         expandedStats.clear(); 
         renderOrders();
         alert("所有備餐狀態已清除！");
     }
+
+    /**
+     * 新增：渲染動態備忘錄
+     * 篩選當天有 tag 且【非寄杯】且未完成的訂單。
+     */
+    function renderMemos(todaysOrders) {
+        const memoList = document.getElementById('dynamicMemoList');
+        const staticList = document.getElementById('staticMemoList');
+        let memoHtml = '';
+        
+        // 【調整點】: 篩選只帶有 tag、且不包含'寄杯'、且未完成的訂單。
+        const dynamicMemos = todaysOrders.filter(c => 
+            c.tag && !c.tag.includes('寄杯') && !isItemDone(c.name, c.item, c.loc)
+        );
+
+        if (dynamicMemos.length > 0) {
+            // 標題部分
+            memoHtml += '<li class="dynamic-memo-title">🎯 今日需詢問確認：</li>';
+            
+            // 水平排列項目
+            dynamicMemos.forEach(c => {
+                // 簡化顯示內容：只顯示客戶名稱和 tag
+                memoHtml += `
+                    <li class="dynamic-memo-item">
+                        <b>${c.name.replace(/\s*\(.*\)\s*/g, '')}</b> 
+                        <span class="memo-tag">${c.item}</span>
+                    </li>
+                `;
+            });
+            // 設置靜態列表底部間距，標示有動態提醒
+            staticList.classList.add('has-dynamic');
+
+        } else {
+             // 如果沒有動態備忘，則清空內容並移除標記
+             staticList.classList.remove('has-dynamic');
+        }
+        
+        memoList.innerHTML = memoHtml;
+    }
+
 
     function renderOrders() {
         const day = parseInt(document.getElementById('daySelect').value);
@@ -667,6 +772,8 @@
             statsNeighborDiv.innerHTML = restHtml;
             statsOtherDiv.innerHTML = restHtml;
             document.getElementById('clearAllBtn').disabled = true;
+            document.getElementById('dynamicMemoList').innerHTML = '<li style="color:#999; width: 100%;">本日休息，無動態訂單備忘。</li>';
+            document.getElementById('staticMemoList').classList.remove('has-dynamic');
             return; 
         }
         document.getElementById('clearAllBtn').disabled = false;
@@ -683,37 +790,12 @@
 
         const todaysOrders = customers.filter(c => c.days.length === 0 || c.days.includes(day));
 
-        // 階段一：處理合併訂單 (貢丸老闆)
-        const simplifiedOrders = [];
-        let i = 0;
-        while (i < todaysOrders.length) {
-            let c = todaysOrders[i];
-            
-            if (c.name === "貢丸老闆 (拿)" && i + 1 < todaysOrders.length && todaysOrders[i + 1].name === "貢丸老闆 (手)") {
-                let c2 = todaysOrders[i + 1];
-                
-                simplifiedOrders.push({
-                    ...c, 
-                    type: c.type, 
-                    parentName: "貢丸老闆", 
-                    isMulti: true 
-                });
-                simplifiedOrders.push({
-                    ...c2, 
-                    type: c2.type, 
-                    parentName: "貢丸老闆", 
-                    isMulti: true 
-                });
-                i += 2; 
-            } else {
-                simplifiedOrders.push(c);
-                i++;
-            }
-        }
-        
-        // 階段二：執行統計
-        simplifiedOrders.forEach((c) => {
-            let qty = c.count || 1;
+        // 步驟 1: 渲染動態備忘錄
+        renderMemos(todaysOrders);
+
+        // 步驟 2：執行統計
+        todaysOrders.forEach((c) => {
+            let qty = c.count; // 使用明確的 count 屬性
             let isNeighbor = (c.loc === "右邊鄰居" || c.loc === "左邊鄰居");
             let targetStats = isNeighbor ? sNeigh : sOther;
             
@@ -727,12 +809,22 @@
                     }
                     
                     for(let k = 0; k < qty; k++) {
+                        // 統一顯示名稱邏輯
+                        let displayName = c.name;
+                        if (c.name.startsWith("貢丸老闆")) {
+                            // 貢丸老闆只顯示 品項
+                            displayName = c.name.replace('貢丸老闆', '貢丸').replace(/\(拿\)/g, '(拿)').replace(/\(手\)/g, '(手)');
+                        }
+
+
                         targetStats[c.type].orders.push({
-                            name: c.isMulti ? c.parentName + ` (${c.item.replace('熱', '').replace('沖', '')})` : c.name,
+                            display_name: displayName,
                             loc: c.loc,
                             item: c.item, 
                             originalName: c.name, 
                             originalLoc: c.loc, 
+                            tag: c.tag || null, 
+                            note: c.note || null,
                             isDone: isDone 
                         });
                     }
@@ -750,13 +842,18 @@
                 const safeItem = escapeJsString(order.item);
                 const safeLoc = escapeJsString(order.originalLoc);
                 
-                /* 修正: 點擊整行 div 觸發 toggleDone。Checkbox 本身只需 checked 屬性，交給瀏覽器處理其勾選/取消勾選的視覺狀態 */
+                // 優先顯示 Tag，其次 Note
+                const reminder = order.tag || order.note;
+                const tagHtml = reminder 
+                    ? `<span class="customer-tag">${reminder}</span>` 
+                    : '';
+
                 return `
                     <div class="stat-detail-item ${doneClass}"
                         onclick="toggleDone('${safeName}', '${safeItem}', '${safeLoc}')">
                         <div class="customer-info">
-                            <span class="customer-name">${order.name}</span>
-                            <span class="customer-loc">(${order.loc})</span>
+                            <span class="customer-name">${order.display_name} ${tagHtml}</span>
+                            <span class="customer-loc">${order.item} (${order.loc})</span>
                         </div>
                         <input type="checkbox" ${checkedAttr}>
                     </div>
