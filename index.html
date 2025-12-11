@@ -609,7 +609,7 @@
 
 <script>
     // ----------------------------------------------------
-    // 【JS 邏輯區 - 優化版 - 排除寄杯標籤 + 水平備忘】 
+    // 【JS 邏輯區 - 優化版 - 多杯訂單獨立完成】 
     // ----------------------------------------------------
     
     const expandedStats = new Set();
@@ -618,26 +618,27 @@
     const customers = [
         // 右邊鄰居
         { loc: "右邊鄰居", name: "怡香軒", item: "熱美式", type: "hot_am", days: [], count: 1 },
-        { loc: "右邊鄰居", name: "油飯", item: "熱美式", tag: "當日問",type: "hot_am", days: [], count: 1, note: "請先問油飯" },
-        { loc: "右邊鄰居", name: "山城米食", item: "熱拿鐵", type: "hot_latte", days: [], count: 1, tag: "寄杯" }, 
+        { loc: "右邊鄰居", name: "油飯", item: "熱美式", tag: "當日問",type: "hot_am", days: [], count: 1},
+        { loc: "右邊鄰居", name: "山城米食", item: "熱拿鐵", type: "hot_latte", days: [], count: 1, note: "寄杯" }, 
         { loc: "右邊鄰居", name: "橘子攤", item: "熱拿鐵", type: "hot_latte", days: [], count: 1 }, 
-        { loc: "右邊鄰居", name: "糖果", item: "熱拿鐵", type: "hot_latte", days: [6, 0], count: 1, tag: "付兩天" },
+        { loc: "右邊鄰居", name: "糖果", item: "熱拿鐵", type: "hot_latte", days: [6, 0], count: 1, note: "付兩天" },
 
         // 左邊鄰居
-        { loc: "左邊鄰居", name: "牛肉", item: "熱拿鐵 (加糖)", type: "hot_latte_sugar", days: [3, 5, 0], count: 1, tag: "加3g糖" },
-        { loc: "左邊鄰居", name: "布老闆", item: "熱美式", type: "hot_am", days: [5], count: 1, tag: "寄杯" },
+        { loc: "左邊鄰居", name: "牛肉", item: "熱拿鐵", type: "hot_latte_sugar", days: [3, 5, 0], count: 1, note: "加3g糖" },
+        { loc: "左邊鄰居", name: "布老闆", item: "熱美式", type: "hot_am", days: [5], count: 1, note: "寄杯" },
         { loc: "左邊鄰居", name: "甘蔗雞", item: "冰美式", type: "ice_am", days: [], count: 1 },
         { loc: "左邊鄰居", name: "國聯哥", item: "冰美式", type: "ice_am", days: [], count: 1 },
 
         // 其他區域
-        { loc: "近十字路口", name: "牛肉爸爸兒子", item: "大拿鐵x2", count: 2, type: "large_hot_latte", days: [], note: "爸爸粉20g" },
-        { loc: "過十字路口直行", name: "魚老闆", item: "大拿鐵", type: "large_hot_latte", days: [2, 3, 5], count: 1, tag: "寄杯" },
+        { loc: "近十字路口", name: "牛肉爸爸兒子", item: "大拿鐵", count: 2, type: "large_hot_latte", days: [], note: "爸爸粉20g" },
+        { loc: "過十字路口直行", name: "魚老闆", item: "大拿鐵", type: "large_hot_latte", days: [2, 3, 5], count: 1, note: "寄杯" },
         { loc: "過十字路口直行", name: "魚老闆鄰居(水果)", item: "熱拿鐵", type: "hot_latte", days: [2, 3, 6, 0], count: 1 }, 
         { loc: "過十字路口直行", name: "小辣椒", item: "熱美式", type: "hot_am", days: [], count: 1 },
         { loc: "過十字路口直行", name: "蝦老闆", item: "熱美式",type: "hot_am", days: [2, 4, 5, 6, 0], count: 1 },
         { loc: "過十字路口直行", name: "梨山蜜蘋果", item: "熱拿鐵",tag: "當日問", type: "hot_latte", days: [4,5], count: 1 }, 
 
-        { loc: "過十字路口直行", name: "城隍廟口鐵鍋行", item: "冰美式x2",  count: 2, type: "ice_am", days: [5] },
+        // *** 關鍵修改處：這裡的多杯訂單需要被拆分，使用 count > 1 標記 ***
+        { loc: "過十字路口直行", name: "城隍廟口鐵鍋行", item: "冰美式",  count: 2, type: "ice_am", days: [5] }, 
         
         { loc: "過十字路口直行", name: "眼鏡白髮小菜老闆", item: "冰手沖|雅", type: "hand_drip",tag: "當日問", days: [4], count: 1, note: "老客戶手沖100"  },
         { loc: "過十字路口直行", name: "抓餅女老闆", item: "熱美式",tag: "當日問", type: "hot_am", days: [2,4], count: 1 },
@@ -645,8 +646,8 @@
         { loc: "過十字路口直行", name: "豐原素食", item: "熱美式", type: "hot_am", days: [3], count: 1 },
 
         { loc: "過十字路口直行", name: "近中山路水果攤", item: "熱美式", type: "hot_am", days: [], count: 1 },
-        { loc: "過十字路口右轉", name: "福記對面豬肉", item: "熱美式", type: "hot_am", days: [], count: 1, tag: "寄杯" },
-                // 貢丸老闆：將這兩筆資料視為一組進行合併渲染
+        { loc: "過十字路口右轉", name: "福記對面豬肉", item: "熱美式", type: "hot_am", days: [], count: 1, note: "寄杯" },
+        // 貢丸老闆：將這兩筆資料視為一組進行合併渲染
         { loc: "過十字路口直行", name: "貢丸老闆 (拿)", item: "熱拿鐵", type: "hot_latte", days: [3, 0], count: 1 },
         { loc: "過十字路口直行", name: "貢丸老闆 (手)", item: "熱手沖", type: "hand_drip", days: [3, 0], count: 1, note: "總計$185" },
         { loc: "過十字路口直行", name: "菜老闆", item: "熱拿鐵", type: "hot_latte", days: [], count: 1 },
@@ -677,8 +678,10 @@
         return s.replace(/ /g, '_').replace(/[^a-zA-Z0-9\u4e00-\u9fa5_]/g, ''); 
     }
 
-    function getStorageKey(name, item, loc) {
-        return `${getTodayDateString()}_${sanitizeKeyPart(name)}_${sanitizeKeyPart(item)}_${sanitizeKeyPart(loc)}`;
+    // *** 關鍵修改：新增 index 參數來區分多杯訂單的每一項 ***
+    function getStorageKey(name, item, loc, index = 0) {
+        // 使用 index 作為 Key 的一部分
+        return `${getTodayDateString()}_${sanitizeKeyPart(name)}_${sanitizeKeyPart(item)}_${sanitizeKeyPart(loc)}_${index}`;
     }
 
     function escapeJsString(s) {
@@ -688,8 +691,9 @@
     }
 
     // 狀態切換邏輯
-    window.toggleDone = function(name, item, loc) {
-        const key = getStorageKey(name, item, loc);
+    // *** 關鍵修改：新增 index 參數 ***
+    window.toggleDone = function(name, item, loc, index) {
+        const key = getStorageKey(name, item, loc, index);
         const isDone = localStorage.getItem(key) === 'true';
         
         if (isDone) {
@@ -700,8 +704,9 @@
         renderOrders(); 
     }
 
-    function isItemDone(name, item, loc) {
-        const key = getStorageKey(name, item, loc);
+    // *** 關鍵修改：新增 index 參數 ***
+    function isItemDone(name, item, loc, index = 0) {
+        const key = getStorageKey(name, item, loc, index);
         return localStorage.getItem(key) === 'true';
     }
     
@@ -714,7 +719,11 @@
         const todaysOrders = customers.filter(c => c.days.length === 0 || c.days.includes(day));
 
         todaysOrders.forEach(c => {
-             localStorage.removeItem(getStorageKey(c.name, c.item, c.loc));
+            // 清除時，也要考慮多杯訂單的情況
+            const maxCount = c.count || 1;
+            for(let i = 0; i < maxCount; i++) {
+                 localStorage.removeItem(getStorageKey(c.name, c.item, c.loc, i));
+            }
         });
 
         expandedStats.clear(); 
@@ -731,17 +740,29 @@
         const staticList = document.getElementById('staticMemoList');
         let memoHtml = '';
         
-        // 【調整點】: 篩選只帶有 tag、且不包含'寄杯'、且未完成的訂單。
+        // 【調整點】: 篩選只帶有 tag、且不包含'寄杯'的訂單。
         const dynamicMemos = todaysOrders.filter(c => 
-            c.tag && !c.tag.includes('寄杯') && !isItemDone(c.name, c.item, c.loc)
+            c.tag && !c.tag.includes('寄杯')
         );
+        
+        // 進一步過濾：如果一個多杯訂單(count>1)的所有杯數都完成了，則不顯示備忘。
+        const filterMemos = dynamicMemos.filter(c => {
+             const maxCount = c.count || 1;
+             for (let i = 0; i < maxCount; i++) {
+                 if (!isItemDone(c.name, c.item, c.loc, i)) {
+                     return true; // 只要有一杯未完成，就顯示備忘
+                 }
+             }
+             return false; // 所有杯數都完成了
+        });
 
-        if (dynamicMemos.length > 0) {
+
+        if (filterMemos.length > 0) {
             // 標題部分
             memoHtml += '<li class="dynamic-memo-title">🎯 今日需詢問確認：</li>';
             
             // 水平排列項目
-            dynamicMemos.forEach(c => {
+            filterMemos.forEach(c => {
                 // 簡化顯示內容：只顯示客戶名稱和 tag
                 memoHtml += `
                     <li class="dynamic-memo-item">
@@ -795,34 +816,44 @@
 
         // 步驟 2：執行統計
         todaysOrders.forEach((c) => {
-            let qty = c.count; // 使用明確的 count 屬性
+            let qty = c.count || 1; // 使用明確的 count 屬性，確保至少為 1
             let isNeighbor = (c.loc === "右邊鄰居" || c.loc === "左邊鄰居");
             let targetStats = isNeighbor ? sNeigh : sOther;
             
             if (typeNames.hasOwnProperty(c.type)) {
-                const isDone = isItemDone(c.name, c.item, c.loc); 
                 
                 if (targetStats[c.type]) {
+                    // 總數計算不變
                     targetStats[c.type].total += qty;
-                    if (isDone) {
-                        targetStats[c.type].done += qty;
-                    }
                     
-                    for(let k = 0; k < qty; k++) {
-                        // 統一顯示名稱邏輯
-                        let displayName = c.name;
-                        if (c.name.startsWith("貢丸老闆")) {
-                            // 貢丸老闆只顯示 品項
-                            displayName = c.name.replace('貢丸老闆', '貢丸').replace(/\(拿\)/g, '(拿)').replace(/\(手\)/g, '(手)');
+                    // *** 關鍵修改：分解訂單，計算完成數，並將每個項目加入 orders 陣列 ***
+                    for(let i = 0; i < qty; i++) {
+                        const isDone = isItemDone(c.name, c.item, c.loc, i); 
+                        
+                        if (isDone) {
+                            targetStats[c.type].done += 1;
                         }
 
+                        // 統一顯示名稱邏輯：處理貢丸老闆的顯示
+                        let displayName = c.name;
+                        if (c.name.startsWith("貢丸老闆")) {
+                            displayName = c.name.replace('貢丸老闆', '貢丸').replace(/\(拿\)/g, '(拿)').replace(/\(手\)/g, '(手)');
+                        }
+                        
+                        // 多杯訂單顯示 "(1/N)"
+                        if (qty > 1) {
+                            // 移除 item 結尾的 'xN'
+                            const baseItemName = c.item.replace(/x\d+$/, ''); 
+                            displayName += ` (${i + 1}/${qty})`;
+                        }
 
                         targetStats[c.type].orders.push({
                             display_name: displayName,
                             loc: c.loc,
-                            item: c.item, 
+                            item: c.item, // 原始 item
                             originalName: c.name, 
                             originalLoc: c.loc, 
+                            index: i, // 傳遞索引 i 
                             tag: c.tag || null, 
                             note: c.note || null,
                             isDone: isDone 
@@ -841,7 +872,8 @@
                 const safeName = escapeJsString(order.originalName);
                 const safeItem = escapeJsString(order.item);
                 const safeLoc = escapeJsString(order.originalLoc);
-                
+                const safeIndex = order.index; // 新增 Index 
+
                 // 優先顯示 Tag，其次 Note
                 const reminder = order.tag || order.note;
                 const tagHtml = reminder 
@@ -850,7 +882,7 @@
 
                 return `
                     <div class="stat-detail-item ${doneClass}"
-                        onclick="toggleDone('${safeName}', '${safeItem}', '${safeLoc}')">
+                        onclick="toggleDone('${safeName}', '${safeItem}', '${safeLoc}', ${safeIndex})">
                         <div class="customer-info">
                             <span class="customer-name">${order.display_name} ${tagHtml}</span>
                             <span class="customer-loc">${order.item} (${order.loc})</span>
