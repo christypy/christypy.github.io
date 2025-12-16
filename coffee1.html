@@ -249,7 +249,7 @@
         margin-top: 8px;
         padding: 5px 0;
         border-top: 1px dashed var(--color-light-gray);
-        display: none; 
+        display: none; /* JS will override this to 'block' by default */
     }
     .stat-detail-item {
         display: flex;
@@ -261,8 +261,10 @@
         cursor: pointer; 
         transition: background-color 0.1s;
         border-radius: 4px;
+        /* 新增：讓內容靠左排列，方便把按鈕放左邊 */
+        justify-content: flex-start;
     }
-    .stat-detail-item:hover:not(.done) {
+    .stat-detail-item:hover:not(.done):not(.absent) {
         background-color: var(--color-done-bg);
     }
     .stat-detail-item.done {
@@ -275,6 +277,8 @@
         flex-direction: column;
         align-items: flex-start;
         flex-grow: 1;
+        /* 新增：將 info 推到最左邊，讓 checkbox 靠右 */
+        margin-right: auto; 
     }
     .customer-name {
         font-weight: 600;
@@ -332,9 +336,66 @@
         font-size: 15px;
         font-weight: bold;
     }
-    .stat-detail-item:hover input[type="checkbox"]:not(:checked) {
+    .stat-detail-item:hover input[type="checkbox"]:not(:checked):not(.absent input[type="checkbox"]) {
         border-color: var(--color-accent);
     }
+    
+    /* ---------------------------------------------------- */
+    /* 新增：缺席 (Absence) 相關樣式 */
+    /* ---------------------------------------------------- */
+
+    /* 缺席按鈕樣式 */
+    .stat-detail-item .absence-toggle {
+        background: #f4f4f4;
+        color: var(--color-danger);
+        border: 1px solid var(--color-light-gray);
+        border-radius: 4px;
+        font-weight: bold;
+        padding: 4px 8px;
+        cursor: pointer;
+        margin-right: 10px;
+        transition: background 0.1s;
+        line-height: 1;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+    .stat-detail-item .absence-toggle:hover {
+        background: #ffe6e6;
+        border-color: var(--color-danger);
+    }
+    
+    /* 缺席時的樣式 (整組變灰) */
+    .stat-detail-item.absent {
+        background-color: #f7f7f7; 
+        color: #999;
+        text-decoration: none; 
+        opacity: 0.6;
+    }
+    .stat-detail-item.absent .customer-name {
+         color: #999;
+    }
+    .stat-detail-item.absent .customer-tag {
+         display: none; /* 缺席後隱藏標籤 */
+    }
+    /* 缺席時的核取框樣式 */
+    .stat-detail-item.absent input[type="checkbox"] {
+         border-color: #ccc;
+         background-color: #e8e8e8;
+         cursor: default; /* 不可點擊時改為預設鼠標 */
+    }
+    /* 缺席時的核取框符號 */
+    .stat-detail-item.absent input[type="checkbox"]:checked::after {
+         content: '－'; /* 缺席時的記號 (短橫線) */
+         color: #999;
+         top: -3px; /* 調整位置 */
+         left: 4px;
+    }
+    /* 缺席時的點擊區域 (讓 info 區也不可點擊，但保留按鈕可點擊) */
+    .stat-detail-item.absent .customer-info {
+        cursor: default;
+        pointer-events: none;
+    }
+    /* ---------------------------------------------------- */
 
 
     /* 價格參考區塊 */
@@ -520,9 +581,8 @@
 
 <div class="quick-price-box-footer">
     <b>☕ 義式基礎飲品</b>
-    熱美式: <span>$70</span> | 冰美式: <span>$75</span> | 
-    熱拿鐵: <span>$85</span> | 冰拿鐵: <span>$85</span> | 
-     大拿鐵: <span>$95</span>
+    熱美式: <span>$70</span> | 冰美式: <span>$75</span> | 大熱美: <span>$80</span>|
+    熱拿鐵: <span>$85</span> | 冰拿鐵: <span>$85</span> | 大拿鐵: <span>$95</span>
 </div>
 
 <div class="info-section" id="menuReference">
@@ -609,55 +669,69 @@
 
 <script>
     // ----------------------------------------------------
-    // 【JS 邏輯區 - 優化版 - 多杯訂單獨立完成】 
+    // 【JS 邏輯區 - 已修正：移除清除通知】 
     // ----------------------------------------------------
     
+    // expandedStats 現在用於追蹤【使用者手動收合】的項目
     const expandedStats = new Set();
     
-    // 將所有 count 設為明確的 1，避免在後續使用 || 1
+    // 【數據結構】days: [] 表示「週二到週日每天都有」
     const customers = [
-        // 右邊鄰居
-        { loc: "右邊鄰居", name: "怡香軒", item: "熱美式", type: "hot_am", days: [], count: 1 },
-        { loc: "右邊鄰居", name: "油飯", item: "熱美式", tag: "當日問",type: "hot_am", days: [], count: 1},
-        { loc: "右邊鄰居", name: "山城米食", item: "熱拿鐵", type: "hot_latte", days: [], count: 1, note: "寄杯" }, 
-        { loc: "右邊鄰居", name: "橘子攤", item: "熱拿鐵", type: "hot_latte", days: [], count: 1 }, 
-        { loc: "右邊鄰居", name: "糖果", item: "熱拿鐵", type: "hot_latte", days: [6, 0], count: 1, note: "付兩天" },
+        // 右邊鄰居 - days: [] 代表每天 (週二至週日)
+        { loc: "右邊鄰居", name: "怡香軒", item: "熱美式", type: "hot_am", days: [], count: 1, groupId: "neighbor_r_1" },
+        { loc: "右邊鄰居", name: "油飯", item: "熱美式", tag: "當日問",type: "hot_am", days: [], count: 1, groupId: "neighbor_r_2"},
+        { loc: "右邊鄰居", name: "山城米食", item: "熱拿鐵", type: "hot_latte", days: [], count: 1, note: "寄杯", groupId: "neighbor_r_3" }, 
+        { loc: "右邊鄰居", name: "橘子攤", item: "熱拿鐵", type: "hot_latte", days: [], count: 1, groupId: "neighbor_r_4" }, 
+        { loc: "右邊鄰居", name: "糖果", item: "熱拿鐵", type: "hot_latte", days: [6, 0], count: 1, note: "付兩天", groupId: "neighbor_r_5" },
 
         // 左邊鄰居
-        { loc: "左邊鄰居", name: "牛肉", item: "熱拿鐵", type: "hot_latte_sugar", days: [3, 5, 0], count: 1, note: "加3g糖" },
-        { loc: "左邊鄰居", name: "布老闆", item: "熱美式", type: "hot_am", days: [5], count: 1, note: "寄杯" },
-        { loc: "左邊鄰居", name: "甘蔗雞", item: "冰美式", type: "ice_am", days: [], count: 1 },
-        { loc: "左邊鄰居", name: "國聯哥", item: "冰美式", type: "ice_am", days: [], count: 1 },
+        { loc: "左邊鄰居", name: "牛肉", item: "熱拿鐵", type: "hot_latte_sugar", days: [3, 5, 0], count: 1, note: "加3g糖", groupId: "neighbor_l_1" },
+        { loc: "左邊鄰居", name: "布老闆", item: "熱美式", type: "hot_am", days: [5], count: 1, note: "寄杯", groupId: "neighbor_l_2" },
+        { loc: "左邊鄰居", name: "甘蔗雞", item: "冰美式", type: "ice_am", days: [], count: 1, groupId: "neighbor_l_3" },
+        { loc: "左邊鄰居", name: "國聯哥", item: "冰美式", type: "ice_am", days: [], count: 1, groupId: "neighbor_l_4" },
+        // 【組】宜蘭魚攤 (GroupId: neighbor_l_5)
+        { loc: "左邊鄰居", name: "宜蘭魚攤", item: "冰美式", type: "ice_am", days: [6], count: 1, groupId: "neighbor_l_5" },
+        { loc: "左邊鄰居", name: "宜蘭魚攤", item: "冰拿鐵", type: "ice_latte_sugar", days: [6], count: 1 ,note:"加糖", groupId: "neighbor_l_5"},
 
-        // 其他區域
-        { loc: "近十字路口", name: "牛肉爸爸兒子", item: "大拿鐵", count: 2, type: "large_hot_latte", days: [], note: "爸爸粉20g" },
-        { loc: "過十字路口直行", name: "魚老闆", item: "大拿鐵", type: "large_hot_latte", days: [2, 3, 5], count: 1, note: "寄杯" },
-        { loc: "過十字路口直行", name: "魚老闆鄰居(水果)", item: "熱拿鐵", type: "hot_latte", days: [2, 3, 6, 0], count: 1 }, 
-        { loc: "過十字路口直行", name: "小辣椒", item: "熱美式", type: "hot_am", days: [], count: 1 },
-        { loc: "過十字路口直行", name: "蝦老闆", item: "熱美式",type: "hot_am", days: [2, 4, 5, 6, 0], count: 1 },
-        { loc: "過十字路口直行", name: "梨山蜜蘋果", item: "熱拿鐵",tag: "當日問", type: "hot_latte", days: [4,5], count: 1 }, 
+        // 其他區域 - days: [] 代表每天 (週二至週日)
+        { loc: "恐龍嫩仙草對面", name: "賣魚的員工", item: "大熱美", type: "large_hot_am", days: [6,0], note: "六給兩天錢", groupId: "other_1" },
+        // 【組】牛肉爸爸/兒子 (GroupId: other_2)
+        { loc: "近十字路口", name: "牛肉爸爸", item: "大拿鐵", count: 1, type: "large_hot_latte", days: [], note: "爸爸粉20g", groupId: "other_2" },
+        { loc: "近十字路口", name: "牛肉兒子", item: "大拿鐵", count: 1, type: "large_hot_latte", days: [], groupId: "other_2" },
+        { loc: "過十字路口直行", name: "魚老闆", item: "大拿鐵", type: "large_hot_latte", days: [2, 3, 5], count: 1, note: "寄杯", groupId: "other_3" },
+        { loc: "過十字路口直行", name: "魚老闆鄰居(水果)", item: "熱拿鐵", type: "hot_latte", days: [2, 3, 6, 0], count: 1, groupId: "other_4" }, 
+        { loc: "過十字路口直行", name: "小辣椒", item: "熱美式", type: "hot_am", days: [], count: 1, groupId: "other_5" },
+        { loc: "過十字路口直行", name: "蝦老闆", item: "熱美式",type: "hot_am", days: [2, 4, 5, 6, 0], count: 1, groupId: "other_6" },
+        { loc: "過十字路口直行", name: "梨山蜜蘋果", item: "熱拿鐵",tag: "當日問", type: "hot_latte", days: [4,5], count: 1, groupId: "other_7" }, 
 
-        // *** 關鍵修改處：這裡的多杯訂單需要被拆分，使用 count > 1 標記 ***
-        { loc: "過十字路口直行", name: "城隍廟口鐵鍋行", item: "冰美式",  count: 2, type: "ice_am", days: [5] }, 
+        // 【組】城隍廟口鐵鍋行 (2杯) (GroupId: other_8)
+        { loc: "過十字路口直行", name: "城隍廟口鐵鍋行", item: "冰美式",  count: 2, type: "ice_am", days: [5], groupId: "other_8" }, 
         
-        { loc: "過十字路口直行", name: "眼鏡白髮小菜老闆", item: "冰手沖|雅", type: "hand_drip",tag: "當日問", days: [4], count: 1, note: "老客戶手沖100"  },
-        { loc: "過十字路口直行", name: "抓餅女老闆", item: "熱美式",tag: "當日問", type: "hot_am", days: [2,4], count: 1 },
+        { loc: "過十字路口直行", name: "眼鏡白髮小菜老闆", item: "冰手沖|雅", type: "hand_drip",tag: "當日問", days: [4], count: 1, note: "老客戶手沖100", groupId: "other_9"  },
+        { loc: "過十字路口直行", name: "抓餅女老闆", item: "熱美式",tag: "當日問", type: "hot_am", days: [2,4], count: 1, groupId: "other_10" },
 
-        { loc: "過十字路口直行", name: "豐原素食", item: "熱美式", type: "hot_am", days: [3], count: 1 },
+        { loc: "過十字路口直行", name: "豐原素食", item: "熱美式", type: "hot_am", days: [3], count: 1, groupId: "other_11" },
 
-        { loc: "過十字路口直行", name: "近中山路水果攤", item: "熱美式", type: "hot_am", days: [], count: 1 },
-        { loc: "過十字路口右轉", name: "福記對面豬肉", item: "熱美式", type: "hot_am", days: [], count: 1, note: "寄杯" },
-        // 貢丸老闆：將這兩筆資料視為一組進行合併渲染
-        { loc: "過十字路口直行", name: "貢丸老闆 (拿)", item: "熱拿鐵", type: "hot_latte", days: [3, 0], count: 1 },
-        { loc: "過十字路口直行", name: "貢丸老闆 (手)", item: "熱手沖", type: "hand_drip", days: [3, 0], count: 1, note: "總計$185" },
-        { loc: "過十字路口直行", name: "菜老闆", item: "熱拿鐵", type: "hot_latte", days: [], count: 1 },
+        { loc: "過十字路口直行", name: "近中山路水果攤", item: "熱美式", type: "hot_am", days: [], count: 1, groupId: "other_12" },
+        { loc: "過十字路口右轉", name: "福記對面豬肉", item: "熱美式", type: "hot_am", days: [], count: 1, note: "寄杯", groupId: "other_13" },
+        { loc: "市場內", name: "國聯哥媽媽", item: "熱美式", type: "hot_am", days: [2,5], count: 1, groupId: "other_14" },
+
+        { loc: "過十字路口直行", name: "城隍廟口貢丸 ", item: "熱拿鐵", type: "hot_latte", days: [2], count: 1, groupId: "other_15" },
+        // 【組】貢丸老闆 (拿/手) (GroupId: other_16)
+        { loc: "過十字路口直行", name: "貢丸老闆 (拿)", item: "熱拿鐵", type: "hot_latte", days: [3, 0], count: 1, groupId: "other_16" },
+        { loc: "過十字路口直行", name: "貢丸老闆 (手)", item: "熱手沖", type: "hand_drip", days: [3, 0], count: 1, note: "總計$185", groupId: "other_16" },
+        
+        { loc: "過十字路口直行", name: "菜老闆", item: "熱拿鐵", type: "hot_latte", days: [], count: 1, groupId: "other_17" },
 
     ];
 
     const typeNames = {
         hot_am: '☕ 熱美式', ice_am: '🧊 冰美式', 
+        large_hot_am:"☕️ 大熱美",
         hot_latte: '🔥 熱拿鐵', 
         hot_latte_sugar: '🍬 熱拿鐵 (加糖)', 
+        ice_latte_sugar: '🍭 冰拿鐵 (加糖)', 
+
         ice_latte: '❄️ 冰拿鐵', 
         large_hot_latte: '🥤 大熱拿', 
         hand_drip: '💧 手沖',
@@ -678,10 +752,15 @@
         return s.replace(/ /g, '_').replace(/[^a-zA-Z0-9\u4e00-\u9fa5_]/g, ''); 
     }
 
-    // *** 關鍵修改：新增 index 參數來區分多杯訂單的每一項 ***
+    // 訂單完成狀態 Key
     function getStorageKey(name, item, loc, index = 0) {
         // 使用 index 作為 Key 的一部分
         return `${getTodayDateString()}_${sanitizeKeyPart(name)}_${sanitizeKeyPart(item)}_${sanitizeKeyPart(loc)}_${index}`;
+    }
+
+    // 組缺席狀態 Key (僅使用 groupId)
+    function getAbsenceKey(groupId) {
+        return `${getTodayDateString()}_absent_${groupId}`;
     }
 
     function escapeJsString(s) {
@@ -690,9 +769,14 @@
                 .replace(/'/g, '\\\'');
     }
 
-    // 狀態切換邏輯
-    // *** 關鍵修改：新增 index 參數 ***
-    window.toggleDone = function(name, item, loc, index) {
+    // 狀態切換邏輯 (完成/未完成)
+    window.toggleDone = function(name, item, loc, index, groupId) {
+        // 1. 檢查是否缺席 (保留此通知，避免誤點)
+        if (isGroupAbsent(groupId)) {
+             alert("該組已標記為「缺席」，請先取消缺席狀態再進行備餐！");
+             return; // 缺席狀態下不可設為完成
+        }
+
         const key = getStorageKey(name, item, loc, index);
         const isDone = localStorage.getItem(key) === 'true';
         
@@ -704,45 +788,91 @@
         renderOrders(); 
     }
 
-    // *** 關鍵修改：新增 index 參數 ***
+    // 狀態切換邏輯 (缺席/未缺席)
+    window.toggleAbsence = function(groupId) {
+        const key = getAbsenceKey(groupId);
+        const isAbsent = localStorage.getItem(key) === 'true';
+        
+        if (isAbsent) {
+            // 2. 取消缺席：移除缺席標記
+            localStorage.removeItem(key); 
+        } else {
+            // 1. 設為缺席：設定缺席標記，並清除該組所有訂單的完成狀態
+            localStorage.setItem(key, 'true'); 
+
+            const day = parseInt(document.getElementById('daySelect').value);
+            const todaysOrdersInGroup = customers.filter(c => 
+                c.groupId === groupId && (c.days.length === 0 || c.days.includes(day))
+            );
+
+            todaysOrdersInGroup.forEach(c => {
+                const maxCount = c.count || 1;
+                for(let i = 0; i < maxCount; i++) {
+                    localStorage.removeItem(getStorageKey(c.name, c.item, c.loc, i)); // 清除完成狀態
+                }
+            });
+            
+            // 3. 移除通知
+            // alert("該組訂單已標記為缺席，其備餐狀態已自動清除。"); 
+        }
+        renderOrders(); 
+    }
+
+    // 檢查單項是否完成
     function isItemDone(name, item, loc, index = 0) {
         const key = getStorageKey(name, item, loc, index);
         return localStorage.getItem(key) === 'true';
     }
+
+    // 檢查組是否缺席
+    function isGroupAbsent(groupId) {
+         if (!groupId) return false;
+         return localStorage.getItem(getAbsenceKey(groupId)) === 'true';
+    }
     
+    // 全部取消：清除所有當日完成狀態和缺席狀態
     window.clearAllDone = function() {
+        // 只保留第一個確認通知
         if (!confirm("確定要清除所有已完成的備餐狀態嗎？\n(這將重置當前日期的所有訂單)")) {
             return;
         }
 
         const day = parseInt(document.getElementById('daySelect').value);
         const todaysOrders = customers.filter(c => c.days.length === 0 || c.days.includes(day));
+        
+        // 紀錄所有今天出現的 groupId
+        const todayGroupIds = new Set(todaysOrders.map(c => c.groupId).filter(Boolean));
 
         todaysOrders.forEach(c => {
-            // 清除時，也要考慮多杯訂單的情況
+            // 清除完成狀態
             const maxCount = c.count || 1;
             for(let i = 0; i < maxCount; i++) {
                  localStorage.removeItem(getStorageKey(c.name, c.item, c.loc, i));
             }
         });
+        
+        // 清除缺席狀態
+        todayGroupIds.forEach(groupId => {
+            localStorage.removeItem(getAbsenceKey(groupId));
+        });
 
-        expandedStats.clear(); 
+        expandedStats.clear(); // 清除收合記錄
         renderOrders();
-        alert("所有備餐狀態已清除！");
+        // 移除多餘的通知
+        // alert("所有備餐狀態和缺席標記已清除！");
     }
 
     /**
-     * 新增：渲染動態備忘錄
-     * 篩選當天有 tag 且【非寄杯】且未完成的訂單。
+     * 渲染動態備忘錄
      */
     function renderMemos(todaysOrders) {
         const memoList = document.getElementById('dynamicMemoList');
         const staticList = document.getElementById('staticMemoList');
         let memoHtml = '';
         
-        // 【調整點】: 篩選只帶有 tag、且不包含'寄杯'的訂單。
+        // 篩選只帶有 tag、且不包含'寄杯'的訂單。並排除缺席組別
         const dynamicMemos = todaysOrders.filter(c => 
-            c.tag && !c.tag.includes('寄杯')
+            c.tag && !c.tag.includes('寄杯') && !isGroupAbsent(c.groupId) 
         );
         
         // 進一步過濾：如果一個多杯訂單(count>1)的所有杯數都完成了，則不顯示備忘。
@@ -788,6 +918,7 @@
         const statsNeighborDiv = document.getElementById('stats-neighbor');
         const statsOtherDiv = document.getElementById('stats-other');
         
+        // 【核心篩選邏輯 1】：統一排除星期一
         if (day === 1) { 
             const restHtml = '<div style="text-align:center;color:#999;font-size:12px; padding: 10px 0;">休息中</div>';
             statsNeighborDiv.innerHTML = restHtml;
@@ -809,6 +940,9 @@
         let sNeigh = JSON.parse(JSON.stringify(initialStats));
         let sOther = JSON.parse(JSON.stringify(initialStats));
 
+        // 【核心篩選邏輯 2】：過濾當日訂單
+        // c.days.length === 0 (空陣列) -> 納入 (表示週二至週日每日)
+        // c.days.includes(day) -> 納入 (指定星期幾的訂單)
         const todaysOrders = customers.filter(c => c.days.length === 0 || c.days.includes(day));
 
         // 步驟 1: 渲染動態備忘錄
@@ -816,25 +950,32 @@
 
         // 步驟 2：執行統計
         todaysOrders.forEach((c) => {
-            let qty = c.count || 1; // 使用明確的 count 屬性，確保至少為 1
+            let qty = c.count || 1; 
             let isNeighbor = (c.loc === "右邊鄰居" || c.loc === "左邊鄰居");
             let targetStats = isNeighbor ? sNeigh : sOther;
             
+            // 檢查組是否缺席
+            const isAbsent = isGroupAbsent(c.groupId);
+
             if (typeNames.hasOwnProperty(c.type)) {
                 
                 if (targetStats[c.type]) {
-                    // 總數計算不變
-                    targetStats[c.type].total += qty;
                     
-                    // *** 關鍵修改：分解訂單，計算完成數，並將每個項目加入 orders 陣列 ***
+                    // 只有未缺席的訂單才計入總數
+                    if (!isAbsent) {
+                        targetStats[c.type].total += qty;
+                    }
+
+                    // 分解訂單，計算完成數，並將每個項目加入 orders 陣列
                     for(let i = 0; i < qty; i++) {
                         const isDone = isItemDone(c.name, c.item, c.loc, i); 
                         
-                        if (isDone) {
+                        // 未缺席且已完成才計入完成數
+                        if (isDone && !isAbsent) { 
                             targetStats[c.type].done += 1;
                         }
 
-                        // 統一顯示名稱邏輯：處理貢丸老闆的顯示
+                        // 統一顯示名稱邏輯：處理多杯和組名
                         let displayName = c.name;
                         if (c.name.startsWith("貢丸老闆")) {
                             displayName = c.name.replace('貢丸老闆', '貢丸').replace(/\(拿\)/g, '(拿)').replace(/\(手\)/g, '(手)');
@@ -842,7 +983,6 @@
                         
                         // 多杯訂單顯示 "(1/N)"
                         if (qty > 1) {
-                            // 移除 item 結尾的 'xN'
                             const baseItemName = c.item.replace(/x\d+$/, ''); 
                             displayName += ` (${i + 1}/${qty})`;
                         }
@@ -850,44 +990,59 @@
                         targetStats[c.type].orders.push({
                             display_name: displayName,
                             loc: c.loc,
-                            item: c.item, // 原始 item
+                            item: c.item, 
                             originalName: c.name, 
                             originalLoc: c.loc, 
-                            index: i, // 傳遞索引 i 
+                            index: i, 
                             tag: c.tag || null, 
                             note: c.note || null,
-                            isDone: isDone 
+                            isDone: isDone,
+                            groupId: c.groupId || null, 
+                            isAbsent: isAbsent 
                         });
                     }
                 }
             }
         });
 
+        // 步驟 3: 渲染詳情列表
         function renderDetailList(orders) {
             if (orders.length === 0) return '';
             
             let detailHtml = orders.map(order => {
-                const doneClass = order.isDone ? 'done' : '';
-                const checkedAttr = order.isDone ? 'checked' : '';
+                let itemClass = '';
+                if (order.isAbsent) {
+                    itemClass = 'absent'; 
+                } else if (order.isDone) {
+                    itemClass = 'done'; 
+                }
+                
+                const checkedAttr = order.isDone || order.isAbsent ? 'checked' : ''; 
                 const safeName = escapeJsString(order.originalName);
                 const safeItem = escapeJsString(order.item);
                 const safeLoc = escapeJsString(order.originalLoc);
-                const safeIndex = order.index; // 新增 Index 
+                const safeIndex = order.index; 
+                const safeGroupId = order.groupId;
 
-                // 優先顯示 Tag，其次 Note
                 const reminder = order.tag || order.note;
                 const tagHtml = reminder 
                     ? `<span class="customer-tag">${reminder}</span>` 
                     : '';
 
+                // 缺席按鈕：點擊時切換該組的缺席狀態 (無通知)
+                const absenceButton = `<span class="absence-toggle" onclick="event.stopPropagation(); toggleAbsence('${safeGroupId}')">${order.isAbsent ? '恢復' : '缺席'}</span>`;
+                
+                // 完成/未完成按鈕的點擊事件。
+                const toggleDoneHandler = `toggleDone('${safeName}', '${safeItem}', '${safeLoc}', ${safeIndex}, '${safeGroupId}')`;
+
                 return `
-                    <div class="stat-detail-item ${doneClass}"
-                        onclick="toggleDone('${safeName}', '${safeItem}', '${safeLoc}', ${safeIndex})">
-                        <div class="customer-info">
+                    <div class="stat-detail-item ${itemClass}">
+                        ${absenceButton}
+                        <div class="customer-info" onclick="${toggleDoneHandler}">
                             <span class="customer-name">${order.display_name} ${tagHtml}</span>
                             <span class="customer-loc">${order.item} (${order.loc})</span>
                         </div>
-                        <input type="checkbox" ${checkedAttr}>
+                        <input type="checkbox" ${checkedAttr} onclick="${order.isAbsent ? 'event.preventDefault();' : toggleDoneHandler}">
                     </div>
                 `;
             }).join('');
@@ -895,7 +1050,7 @@
             return detailHtml;
         }
 
-
+        // 步驟 4: 渲染統計總覽
         function makeStatHtml(stats, idPrefix) {
             let html = '';
             let totalCupsNeeded = 0;
@@ -903,6 +1058,8 @@
             
             for (const typeKey in typeNames) {
                 const itemStats = stats[typeKey];
+                
+                // 只有總數大於 0 的品項才會被渲染出來
                 if (itemStats.total > 0) {
                     const remaining = itemStats.total - itemStats.done;
                     const percent = Math.round((itemStats.done / itemStats.total) * 100);
@@ -912,9 +1069,12 @@
                     
                     const detailId = `detail_${idPrefix}_${typeKey}`;
 
+                    // 將所有有訂單的品項 ID 加入 set，使其預設展開
+                    expandedStats.add(detailId); 
+
                     html += `
                         <div class="stat-row" onclick="toggleStatDetail('${detailId}')">
-                            <span>${typeNames[typeKey]} <span style="font-size:10px; margin-left: 5px; color:#777;"> (點擊展開)</span></span> 
+                            <span>${typeNames[typeKey]} <span style="font-size:10px; margin-left: 5px; color:#777;"> (點擊展開/收合)</span></span> 
                             <div class="progress-counts">
                                 <span class="count-total">${itemStats.total}</span>
                                 <span class="count-remaining">剩: <b style="${remainingColorStyle}">${remaining}</b></span>
@@ -959,23 +1119,26 @@
         statsNeighborDiv.innerHTML = makeStatHtml(sNeigh, 'neigh'); 
         statsOtherDiv.innerHTML = makeStatHtml(sOther, 'other');
 
+        // 步驟 5: 根據 expandedStats 狀態顯示或隱藏詳細列表
         expandedStats.forEach(id => {
             const element = document.getElementById(id);
             if (element) {
+                // 檢查是否是使用者點擊收合的，如果不是就保持展開 (因為我們在 makeStatHtml 中預設加入了)
                 element.style.display = 'block';
             }
         });
     }
 
+    // 點擊統計行時，切換展開/收合狀態，並記錄到 expandedStats
     window.toggleStatDetail = function(detailId) {
         const detailDiv = document.getElementById(detailId);
         if (detailDiv) {
             if (detailDiv.style.display === 'block') {
                 detailDiv.style.display = 'none';
-                expandedStats.delete(detailId); 
+                expandedStats.delete(detailId); // 記錄收合狀態
             } else {
                 detailDiv.style.display = 'block';
-                expandedStats.add(detailId); 
+                expandedStats.add(detailId); // 記錄展開狀態
             }
         }
     }
