@@ -687,7 +687,20 @@
         // 左邊鄰居
         { loc: "左邊鄰居", name: "牛肉", item: "熱拿鐵", type: "hot_latte_sugar", days: [3, 5, 0], count: 1, note: "加3g糖", groupId: "neighbor_l_1" },
         { loc: "左邊鄰居", name: "布老闆", item: "熱美式", type: "hot_am", days: [5], count: 1, note: "寄杯", groupId: "neighbor_l_2" },
-        { loc: "左邊鄰居", name: "甘蔗雞", item: "冰美式", type: "ice_am", days: [], count: 1, groupId: "neighbor_l_3" },
+
+        // --- 甘蔗雞季節邏輯開始 ---
+        { 
+            loc: "左邊鄰居", 
+            name: "甘蔗雞", 
+            item: [10, 11, 0, 1, 2].includes(new Date().getMonth()) ? "熱美式" : "冰美式",
+            type: [10, 11, 0, 1, 2].includes(new Date().getMonth()) ? "hot_am" : "ice_am",
+            days: [], 
+            count: 1, 
+            groupId: "neighbor_l_3" 
+        },
+        // --- 甘蔗雞季節邏輯結束 ---
+
+
         { loc: "左邊鄰居", name: "國聯哥", item: "冰美式", type: "ice_am", days: [], count: 1, groupId: "neighbor_l_4" },
         // 【組】宜蘭魚攤 (GroupId: neighbor_l_5)
         { loc: "左邊鄰居", name: "宜蘭魚攤", item: "冰美式", type: "ice_am", days: [6], count: 1, groupId: "neighbor_l_5" },
@@ -706,7 +719,7 @@
 
         // 【組】城隍廟口鐵鍋行 (2杯) (GroupId: other_8)
         { loc: "過十字路口直行", name: "城隍廟口鐵鍋行", item: "冰美式",  count: 2, type: "ice_am", days: [5], groupId: "other_8" }, 
-        
+
         { loc: "過十字路口直行", name: "眼鏡白髮小菜老闆", item: "冰手沖|雅", type: "hand_drip",tag: "當日問老客戶手沖100", days: [4], count: 1, groupId: "other_9"  },
         { loc: "過十字路口直行", name: "抓餅女老闆", item: "熱美式",tag: "當日問", type: "hot_am", days: [2,4], count: 1, groupId: "other_10" },
 
@@ -722,6 +735,7 @@
         { loc: "過十字路口直行", name: "貢丸老闆 (手)", item: "熱手沖", type: "hand_drip", days: [3, 0], count: 1, note: "總計$185", groupId: "other_16" },
         
         { loc: "過十字路口直行", name: "菜老闆", item: "熱拿鐵", type: "hot_latte", days: [], count: 1, groupId: "other_17" },
+        { loc: "過十字路口直行", name: "城隍廟口豆腐", item: "冰美式",   type: "ice_am", days: [6], note:"當天問",groupId: "other_18" }, 
 
     ];
 
