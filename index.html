@@ -437,7 +437,13 @@
     </table>
 </div>
 
+
+
 <script>
+
+    // --- 重要：替換為你的 API URL ---
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyhIFvp4n6Nynt3ALoIE4kTeLCL5EyhEN0RIxuafC7S-GcC9Lyh1Qws5tMR6YkPGipQLQ/exec';
+    let cloudData = {}; // 存儲從雲端抓下來的資料
     const expandedStats = new Set();
     const customers = [
         { loc: "右邊鄰居", name: "怡香軒", item: "熱美式", type: "hot_am", days: [], count: 1, groupId: "neighbor_r_1" },
