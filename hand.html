@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>四六法手沖咖啡計時器</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --primary-color: #6f4e37;
+      --secondary-color: #a67b5b;
+      --bg-color: #f8f5f2;
+      --card-bg: #ffffff;
+      --text-main: #3e2723;
+      --active-row: #fff9db;
+      /* 統一基礎字級 */
+      --font-size-base: 15px;
+    }
+
+    body {
+      font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+      background: var(--bg-color);
+      color: var(--text-main);
+      margin: 0;
+      padding: 20px;
+      font-size: var(--font-size-base);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 24px;
+      color: var(--primary-color);
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    /* 設定區 */
+    .config-section {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-bottom: 25px;
+      background: #faf8f6;
+      padding: 15px;
+      border-radius: 12px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: var(--secondary-color);
+    }
+
+    input {
+      width: 100%;
+      max-width: 80px;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      text-align: center;
+      font-size: var(--font-size-base);
+      color: var(--text-main);
+      box-sizing: border-box;
+    }
+
+    /* 表格區 */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: var(--font-size-base);
+    }
+
+    th {
+      font-size: 13px;
+      color: var(--secondary-color);
+      padding: 10px 5px;
+      border-bottom: 2px solid #eee;
+    }
+
+    td {
+      padding: 12px 5px;
+      border-bottom: 1px solid #f0f0f0;
+      text-align: center;
+    }
+
+    /* 表格內的 input 統一大小 */
+    td input {
+      border: 1px solid transparent;
+      background: transparent;
+      cursor: pointer;
+    }
+    
+    td input:hover {
+      border: 1px solid #eee;
+      background: #fff;
+    }
+
+    tr.active {
+      background-color: var(--active-row);
+    }
+
+    /* 底部資訊 */
+    .total-info {
+      display: flex;
+      justify-content: space-around;
+      margin: 20px 0;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+      font-size: var(--font-size-base);
+    }
+
+    /* 計時器 */
+    .timer-display {
+      text-align: center;
+      padding: 25px;
+      background: var(--primary-color);
+      color: white;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+
+    #timer-main {
+      font-size: 36px;
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    #timer-sub {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      background: var(--primary-color);
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background: #ccc;
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 15px; }
+      th { font-size: 12px; }
+      td { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>☕ 四六法手沖計時器</h1>
+
+  <div class="container">
+    <div class="config-section">
+      <div class="input-group">
+        <label>粉量 (g)</label>
+        <input id="coffee" type="number" value="20" />
+      </div>
+      <div class="input-group">
+        <label>總水 (g)</label>
+        <input id="water" type="number" value="300" />
+      </div>
+      <div class="input-group">
+        <label>間隔 (秒)</label>
+        <input id="allTime" type="number" value="45" />
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>段數</th>
+          <th>注水</th>
+          <th>累計</th>
+          <th>秒數</th>
+          <th>完成點</th>
+        </tr>
+      </thead>
+      <tbody id="stageBody"></tbody>
+    </table>
+
+    <div class="total-info">
+      <span>總水量: <strong id="totalWaterDisplay">0</strong> g</span>
+      <span>總時間: <strong id="totalTimeDisplay">0:00</strong></span>
+    </div>
+
+    <div class="timer-display">
+      <span id="timer-main">00:00</span>
+      <span id="timer-sub">點擊下方按鈕開始</span>
+    </div>
+
+    <button id="startBtn">開始沖煮</button>
+  </div>
+
+  <script>
+    const stages = 5;
+    const stageBody = document.getElementById('stageBody');
+    const timerMain = document.getElementById('timer-main');
+    const timerSub = document.getElementById('timer-sub');
+    const startBtn = document.getElementById('startBtn');
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${m}:${s.toString().padStart(2,'0')}`;
+    }
+
+    function updateAll() {
+      let accumulatedWater = 0;
+      let cumulativeTime = 0;
+      const rows = stageBody.querySelectorAll('tr');
+      
+      rows.forEach(row => {
+        const waterVal = parseInt(row.querySelector('.stage-water').value) || 0;
+        const timeVal = parseInt(row.querySelector('.stage-time').value) || 0;
+        
+        accumulatedWater += waterVal;
+        cumulativeTime += timeVal;
+        
+        row.querySelector('.accum-water').textContent = accumulatedWater;
+        row.querySelector('.finish-point').textContent = formatTime(cumulativeTime);
+      });
+
+      document.getElementById('totalWaterDisplay').textContent = accumulatedWater;
+      document.getElementById('totalTimeDisplay').textContent = formatTime(cumulativeTime);
+    }
+
+    function buildTable() {
+      const totalWater = parseInt(document.getElementById('water').value) || 0;
+      const allTime = parseInt(document.getElementById('allTime').value) || 0;
+      stageBody.innerHTML = '';
+
+      for (let i = 1; i <= stages; i++) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${i}</td>
+          <td><input type="number" class="stage-water" value="${Math.round(totalWater * 0.2)}" /></td>
+          <td class="accum-water">0</td>
+          <td><input type="number" class="stage-time" value="${allTime}" /></td>
+          <td class="finish-point">0:00</td>
+        `;
+        stageBody.appendChild(tr);
+      }
+      updateAll();
+
+      stageBody.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', updateAll);
+      });
+    }
+
+    document.getElementById('water').addEventListener('input', buildTable);
+    document.getElementById('allTime').addEventListener('input', (e) => {
+      stageBody.querySelectorAll('.stage-time').forEach(input => input.value = e.target.value);
+      updateAll();
+    });
+
+    async function startTimer() {
+      startBtn.disabled = true;
+      const rows = stageBody.querySelectorAll('tr');
+
+      for (let i = 0; i < rows.length; i++) {
+        rows.forEach(r => r.classList.remove('active'));
+        rows[i].classList.add('active');
+
+        let timeLeft = parseInt(rows[i].querySelector('.stage-time').value);
+        const stageWater = rows[i].querySelector('.stage-water').value;
+
+        while (timeLeft >= 0) {
+          timerMain.textContent = formatTime(timeLeft);
+          timerSub.textContent = `第 ${i + 1} 段：請注入 ${stageWater}g`;
+          if (timeLeft === 0) break;
+          await new Promise(r => setTimeout(r, 1000));
+          timeLeft--;
+        }
+      }
+
+      timerMain.textContent = "完成";
+      timerSub.textContent = "享受香醇的咖啡！";
+      startBtn.disabled = false;
+      rows.forEach(r => r.classList.remove('active'));
+    }
+
+    startBtn.addEventListener('click', startTimer);
+    buildTable();
+  </script>
+</body>
+</html>
