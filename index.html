@@ -319,13 +319,20 @@
     .menu-price:empty::before { content: ''; }
 
     /* RWD 優化 */
+    /* 尋找原本的 @media (max-width: 768px) 內的 .btn 樣式 */
     @media (max-width: 768px) {
         .price-card-container { grid-template-columns: 1fr; }
         .price-grid { grid-template-columns: 1fr; }
         .price-item:nth-child(odd) { border-right: none; }
         .stats-container { flex-direction: column; }
-        .btn { width: 48%; }
-        select { width: 100%; }
+        /* 調整按鈕寬度，讓它們在手機上兩兩一排或適度縮小 */
+        .btn { 
+            width: 31%; 
+            font-size: 13px; 
+            padding: 12px 5px;
+        }
+        select { width: 100%; margin-bottom: 10px; }
+        .controls { flex-wrap: wrap; }
     }
 </style>
 </head>
@@ -344,6 +351,7 @@
         <option value="0">星期日</option>
     </select>
     <button class="btn" onclick="renderOrders()">刷新列表</button>
+    <button class="btn" style="background: #607d8b; color: white;" onclick="window.location.href='https://christypy.github.io/hand'">⏱️ 手沖計時器</button>
     <button class="btn" id="clearAllBtn" onclick="clearAllDone()">全部重置</button>
 </div>
 
