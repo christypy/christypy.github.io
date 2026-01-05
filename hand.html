@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <title>四六法手沖咖啡計時器</title>
+  <title>手沖咖啡計時器</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root {
@@ -12,8 +12,7 @@
       --card-bg: #ffffff;
       --text-main: #3e2723;
       --active-row: #fff9db;
-      /* 統一基礎字級 */
-      --font-size-base: 15px;
+      --disabled-row: #f0f0f0;
     }
 
     body {
@@ -21,152 +20,110 @@
       background: var(--bg-color);
       color: var(--text-main);
       margin: 0;
-      padding: 20px;
-      font-size: var(--font-size-base);
+      padding: 10px;
     }
 
-    h1 {
-      text-align: center;
-      margin-bottom: 25px;
-      font-size: 24px;
-      color: var(--primary-color);
-    }
+    h1 { text-align: center; margin-bottom: 15px; font-size: 22px; color: var(--primary-color); }
 
     .container {
       max-width: 600px;
       margin: auto;
       background: var(--card-bg);
       border-radius: 16px;
-      padding: 25px;
+      padding: 20px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.05);
     }
 
-    /* 設定區 */
+    /* 方案區 */
+    .presets-section {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .preset-box {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: #eeeae6;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .preset-load {
+      flex: 1;
+      padding: 10px 5px;
+      border: none;
+      background: none;
+      font-size: 13px;
+      font-weight: bold;
+      color: var(--primary-color);
+      cursor: pointer;
+    }
+
+    .preset-save {
+      padding: 10px;
+      background: #dcd4cc;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* 首頁按鈕 */
+    .home-link-btn {
+      width: 100%;
+      background: #8d6e63;
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
     .config-section {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 15px;
-      margin-bottom: 25px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
       background: #faf8f6;
       padding: 15px;
       border-radius: 12px;
     }
 
-    .input-group {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+    .input-group { display: flex; flex-direction: column; align-items: center; }
+    label { font-size: 12px; font-weight: bold; margin-bottom: 4px; color: var(--secondary-color); }
+    input { width: 100%; max-width: 100px; padding: 6px; border-radius: 6px; border: 1px solid #ddd; text-align: center; font-size: 15px; }
 
-    label {
-      font-size: 13px;
-      font-weight: bold;
-      margin-bottom: 6px;
-      color: var(--secondary-color);
-    }
+    table { width: 100%; border-collapse: collapse; }
+    th { font-size: 12px; color: var(--secondary-color); padding: 8px 2px; border-bottom: 2px solid #eee; }
+    td { padding: 10px 2px; border-bottom: 1px solid #f0f0f0; text-align: center; }
+    td input { border: 1px solid #eee; background: #fff; border-radius: 4px; width: 50px; padding: 4px 0; }
 
-    input {
-      width: 100%;
-      max-width: 80px;
-      padding: 8px;
-      border-radius: 6px;
-      border: 1px solid #ddd;
-      text-align: center;
-      font-size: var(--font-size-base);
-      color: var(--text-main);
-      box-sizing: border-box;
-    }
+    tr.active { background-color: var(--active-row); font-weight: bold; }
+    tr.disabled-line { background-color: var(--disabled-row); opacity: 0.5; }
 
-    /* 表格區 */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-      font-size: var(--font-size-base);
-    }
-
-    th {
-      font-size: 13px;
-      color: var(--secondary-color);
-      padding: 10px 5px;
-      border-bottom: 2px solid #eee;
-    }
-
-    td {
-      padding: 12px 5px;
-      border-bottom: 1px solid #f0f0f0;
-      text-align: center;
-    }
-
-    /* 表格內的 input 統一大小 */
-    td input {
-      border: 1px solid transparent;
-      background: transparent;
-      cursor: pointer;
-    }
-    
-    td input:hover {
-      border: 1px solid #eee;
-      background: #fff;
-    }
-
-    tr.active {
-      background-color: var(--active-row);
-    }
-
-    /* 底部資訊 */
-    .total-info {
-      display: flex;
-      justify-content: space-around;
-      margin: 20px 0;
-      padding-top: 15px;
-      border-top: 1px solid #eee;
-      font-size: var(--font-size-base);
-    }
-
-    /* 計時器 */
     .timer-display {
       text-align: center;
-      padding: 25px;
+      padding: 20px;
       background: var(--primary-color);
       color: white;
       border-radius: 12px;
-      margin-bottom: 20px;
+      margin: 15px 0;
     }
+    #timer-main { font-size: 40px; font-weight: bold; font-family: monospace; }
 
-    #timer-main {
-      font-size: 36px;
-      font-weight: bold;
-      display: block;
-      margin-bottom: 5px;
-    }
+    .button-group { display: flex; flex-direction: column; gap: 8px; }
+    .action-btns { display: flex; gap: 8px; }
+    button.main-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
 
-    #timer-sub {
-      font-size: 14px;
-      opacity: 0.9;
-    }
-
-    button {
-      width: 100%;
-      padding: 15px;
-      border: none;
-      border-radius: 10px;
-      background: var(--primary-color);
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:disabled {
-      background: #ccc;
-    }
-
-    @media (max-width: 480px) {
-      .container { padding: 15px; }
-      th { font-size: 12px; }
-      td { font-size: 14px; }
-    }
+    #startBtn { background: var(--primary-color); color: white; }
+    #stopBtn { background: #d9534f; color: white; display: none; }
+    #resetBtn { background: #6c757d; color: white; font-size: 14px; }
   </style>
 </head>
 <body>
@@ -174,53 +131,56 @@
   <h1>☕ 四六法手沖計時器</h1>
 
   <div class="container">
+    <div class="presets-section">
+      <div class="preset-box"><button class="preset-load" onclick="loadPresetA()">方案一 (固定)</button></div>
+      <div class="preset-box"><button class="preset-load" onclick="loadPreset(2)">方案 B</button><button class="preset-save" onclick="savePreset(2)">💾</button></div>
+      <div class="preset-box"><button class="preset-load" onclick="loadPreset(3)">方案 C</button><button class="preset-save" onclick="savePreset(3)">💾</button></div>
+    </div>
+
+    <a href="https://christypy.github.io/" class="home-link-btn">🏠 返回首頁</a>
+
     <div class="config-section">
-      <div class="input-group">
-        <label>粉量 (g)</label>
-        <input id="coffee" type="number" value="20" />
-      </div>
-      <div class="input-group">
-        <label>總水 (g)</label>
-        <input id="water" type="number" value="300" />
-      </div>
-      <div class="input-group">
-        <label>間隔 (秒)</label>
-        <input id="allTime" type="number" value="45" />
-      </div>
+      <div class="input-group"><label>粉量 (g)</label><input id="coffee" type="number" value="20" /></div>
+      <div class="input-group"><label>粉水比 (1:X)</label><input id="ratio" type="number" value="15" /></div>
+      <div class="input-group"><label>總水 (g)</label><input id="water" type="number" value="300" step="5" /></div>
+      <div class="input-group"><label>間隔 (秒)</label><input id="allTime" type="number" value="35" step="5" /></div>
     </div>
 
     <table>
       <thead>
-        <tr>
-          <th>段數</th>
-          <th>注水</th>
-          <th>累計</th>
-          <th>秒數</th>
-          <th>完成點</th>
-        </tr>
+        <tr><th>段</th><th>注水</th><th>累計</th><th>秒數</th><th>點</th></tr>
       </thead>
       <tbody id="stageBody"></tbody>
     </table>
 
-    <div class="total-info">
-      <span>總水量: <strong id="totalWaterDisplay">0</strong> g</span>
-      <span>總時間: <strong id="totalTimeDisplay">0:00</strong></span>
-    </div>
-
     <div class="timer-display">
       <span id="timer-main">00:00</span>
-      <span id="timer-sub">點擊下方按鈕開始</span>
+      <div id="timer-sub" style="font-size: 13px; margin-top:5px;">準備就緒</div>
     </div>
 
-    <button id="startBtn">開始沖煮</button>
+    <div class="button-group">
+      <div class="action-btns">
+        <button id="startBtn" class="main-btn">開始沖煮</button>
+        <button id="stopBtn" class="main-btn">停止計時</button>
+      </div>
+      <button id="resetBtn" class="main-btn">重置預設值</button>
+    </div>
   </div>
 
   <script>
-    const stages = 5;
+    const STAGES_COUNT = 5;
     const stageBody = document.getElementById('stageBody');
     const timerMain = document.getElementById('timer-main');
     const timerSub = document.getElementById('timer-sub');
     const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    
+    const fields = ['coffee', 'ratio', 'water', 'allTime'];
+    const inputEls = {};
+    fields.forEach(f => inputEls[f] = document.getElementById(f));
+
+    let isRunning = false;
+    let timerTimeout;
 
     function formatTime(sec) {
       const m = Math.floor(sec / 60);
@@ -228,82 +188,185 @@
       return `${m}:${s.toString().padStart(2,'0')}`;
     }
 
-    function updateAll() {
+    function roundTo5(val) { return Math.round(val / 5) * 5; }
+
+    function updateTableVisuals() {
       let accumulatedWater = 0;
       let cumulativeTime = 0;
-      const rows = stageBody.querySelectorAll('tr');
-      
-      rows.forEach(row => {
+      stageBody.querySelectorAll('tr').forEach(row => {
         const waterVal = parseInt(row.querySelector('.stage-water').value) || 0;
         const timeVal = parseInt(row.querySelector('.stage-time').value) || 0;
-        
-        accumulatedWater += waterVal;
+        if (timeVal === 0) {
+          row.classList.add('disabled-line');
+          row.querySelector('.stage-water').value = 0;
+        } else {
+          row.classList.remove('disabled-line');
+        }
+        accumulatedWater += (timeVal === 0 ? 0 : waterVal);
         cumulativeTime += timeVal;
-        
         row.querySelector('.accum-water').textContent = accumulatedWater;
         row.querySelector('.finish-point').textContent = formatTime(cumulativeTime);
       });
-
-      document.getElementById('totalWaterDisplay').textContent = accumulatedWater;
-      document.getElementById('totalTimeDisplay').textContent = formatTime(cumulativeTime);
     }
 
-    function buildTable() {
-      const totalWater = parseInt(document.getElementById('water').value) || 0;
-      const allTime = parseInt(document.getElementById('allTime').value) || 0;
-      stageBody.innerHTML = '';
+    function handleWaterChange(e, changedIndex) {
+      const totalWaterTarget = roundTo5(parseInt(inputEls.water.value) || 0);
+      const rows = Array.from(stageBody.querySelectorAll('tr'));
+      let newValue = roundTo5(parseInt(e.target.value) || 0);
+      e.target.value = newValue;
 
-      for (let i = 1; i <= stages; i++) {
+      let waterUsedSoFar = 0;
+      for (let i = 0; i <= changedIndex; i++) {
+        const t = parseInt(rows[i].querySelector('.stage-time').value);
+        waterUsedSoFar += (t === 0 ? 0 : parseInt(rows[i].querySelector('.stage-water').value));
+      }
+
+      let remainingWater = totalWaterTarget - waterUsedSoFar;
+      let activeRemainingStages = rows.slice(changedIndex + 1).filter(r => parseInt(r.querySelector('.stage-time').value) > 0);
+
+      if (activeRemainingStages.length > 0) {
+        let avgWater = roundTo5(remainingWater / activeRemainingStages.length);
+        let currentTotal = waterUsedSoFar;
+        rows.slice(changedIndex + 1).forEach((row) => {
+            const timeVal = parseInt(row.querySelector('.stage-time').value);
+            const waterIn = row.querySelector('.stage-water');
+            if (timeVal === 0) { waterIn.value = 0; } 
+            else {
+                if (row === activeRemainingStages[activeRemainingStages.length - 1]) { waterIn.value = Math.max(0, totalWaterTarget - currentTotal); } 
+                else { waterIn.value = Math.max(0, avgWater); currentTotal += avgWater; }
+            }
+        });
+      }
+      updateTableVisuals();
+    }
+
+    function buildTable(customData = null) {
+      const totalWater = roundTo5(parseInt(inputEls.water.value) || 0);
+      const allTime = roundTo5(parseInt(inputEls.allTime.value) || 0);
+      stageBody.innerHTML = '';
+      let tempSum = 0;
+
+      for (let i = 0; i < STAGES_COUNT; i++) {
         const tr = document.createElement('tr');
+        let w = customData ? roundTo5(customData[i].w) : (i === STAGES_COUNT - 1 ? totalWater - tempSum : roundTo5(totalWater/STAGES_COUNT));
+        let t = customData ? roundTo5(customData[i].t) : allTime;
+        tempSum += w;
+
         tr.innerHTML = `
-          <td>${i}</td>
-          <td><input type="number" class="stage-water" value="${Math.round(totalWater * 0.2)}" /></td>
+          <td>${i + 1}</td>
+          <td><input type="number" class="stage-water" value="${w}" step="5" /></td>
           <td class="accum-water">0</td>
-          <td><input type="number" class="stage-time" value="${allTime}" /></td>
+          <td><input type="number" class="stage-time" value="${t}" step="5" /></td>
           <td class="finish-point">0:00</td>
         `;
         stageBody.appendChild(tr);
+        tr.querySelector('.stage-water').addEventListener('change', (e) => handleWaterChange(e, i));
+        tr.querySelector('.stage-time').addEventListener('change', (e) => {
+          e.target.value = Math.max(0, roundTo5(e.target.value));
+          rebalanceWater();
+          updateTableVisuals();
+        });
       }
-      updateAll();
-
-      stageBody.querySelectorAll('input').forEach(input => {
-        input.addEventListener('input', updateAll);
-      });
+      updateTableVisuals();
     }
 
-    document.getElementById('water').addEventListener('input', buildTable);
-    document.getElementById('allTime').addEventListener('input', (e) => {
-      stageBody.querySelectorAll('.stage-time').forEach(input => input.value = e.target.value);
-      updateAll();
+    function rebalanceWater() {
+      const rows = Array.from(stageBody.querySelectorAll('tr'));
+      const activeRows = rows.filter(r => parseInt(r.querySelector('.stage-time').value) > 0);
+      if (activeRows.length > 0) {
+        const target = roundTo5(parseInt(inputEls.water.value) || 0);
+        const avg = roundTo5(target / activeRows.length);
+        let s = 0;
+        rows.forEach(r => {
+          const tv = parseInt(r.querySelector('.stage-time').value);
+          const wi = r.querySelector('.stage-water');
+          if (tv === 0) wi.value = 0;
+          else {
+            if (r === activeRows[activeRows.length - 1]) wi.value = target - s;
+            else { wi.value = avg; s += avg; }
+          }
+        });
+      }
+    }
+
+    // 方案功能
+    function loadPresetA() {
+      inputEls.coffee.value = 20;
+      inputEls.ratio.value = 15;
+      inputEls.water.value = 300;
+      inputEls.allTime.value = 35;
+      const fixedStages = [
+        { w: 40, t: 35 },
+        { w: 90, t: 35 },
+        { w: 85, t: 35 },
+        { w: 85, t: 35 },
+        { w: 0, t: 0 }
+      ];
+      buildTable(fixedStages);
+      alert("載入固定方案一");
+    }
+
+    function savePreset(id) {
+      const stageData = Array.from(stageBody.querySelectorAll('tr')).map(r => ({
+        w: parseInt(r.querySelector('.stage-water').value),
+        t: parseInt(r.querySelector('.stage-time').value)
+      }));
+      localStorage.setItem(`coffee_preset_${id}`, JSON.stringify({
+        coffee: inputEls.coffee.value, ratio: inputEls.ratio.value, water: inputEls.water.value, allTime: inputEls.allTime.value, stages: stageData
+      }));
+      alert(`方案 ${id} 已儲存`);
+    }
+
+    function loadPreset(id) {
+      const data = localStorage.getItem(`coffee_preset_${id}`);
+      if (!data) return alert("尚無資料");
+      const config = JSON.parse(data);
+      fields.forEach(f => inputEls[f].value = config[f]);
+      buildTable(config.stages);
+    }
+
+    // 事件監聽
+    inputEls.coffee.addEventListener('change', () => { inputEls.water.value = roundTo5(inputEls.coffee.value * inputEls.ratio.value); buildTable(); });
+    inputEls.ratio.addEventListener('change', () => { inputEls.water.value = roundTo5(inputEls.coffee.value * inputEls.ratio.value); buildTable(); });
+    inputEls.water.addEventListener('change', (e) => { e.target.value = roundTo5(e.target.value); inputEls.ratio.value = Math.round(e.target.value / inputEls.coffee.value); buildTable(); });
+    inputEls.allTime.addEventListener('change', (e) => {
+      const newT = roundTo5(parseInt(e.target.value) || 0);
+      e.target.value = newT;
+      stageBody.querySelectorAll('.stage-time').forEach(input => { if (parseInt(input.value) > 0) input.value = newT; });
+      updateTableVisuals();
     });
 
     async function startTimer() {
-      startBtn.disabled = true;
-      const rows = stageBody.querySelectorAll('tr');
-
+      isRunning = true; startBtn.disabled = true; stopBtn.style.display = 'block';
+      const rows = Array.from(stageBody.querySelectorAll('tr'));
       for (let i = 0; i < rows.length; i++) {
+        if (!isRunning) break;
+        let t = parseInt(rows[i].querySelector('.stage-time').value);
+        if (t <= 0) continue;
         rows.forEach(r => r.classList.remove('active'));
         rows[i].classList.add('active');
-
-        let timeLeft = parseInt(rows[i].querySelector('.stage-time').value);
-        const stageWater = rows[i].querySelector('.stage-water').value;
-
-        while (timeLeft >= 0) {
-          timerMain.textContent = formatTime(timeLeft);
-          timerSub.textContent = `第 ${i + 1} 段：請注入 ${stageWater}g`;
-          if (timeLeft === 0) break;
-          await new Promise(r => setTimeout(r, 1000));
-          timeLeft--;
+        const w = rows[i].querySelector('.stage-water').value;
+        while (t >= 0 && isRunning) {
+          timerMain.textContent = formatTime(t);
+          timerSub.textContent = `第 ${i + 1} 段：注入 ${w}g`;
+          if (t === 0) break;
+          await new Promise(r => { timerTimeout = setTimeout(r, 1000); });
+          t--;
         }
       }
-
-      timerMain.textContent = "完成";
-      timerSub.textContent = "享受香醇的咖啡！";
-      startBtn.disabled = false;
-      rows.forEach(r => r.classList.remove('active'));
+      if (isRunning) { timerMain.textContent = "DONE"; timerSub.textContent = "享用咖啡！"; resetUI(); }
     }
 
+    function resetUI() { isRunning = false; clearTimeout(timerTimeout); startBtn.disabled = false; stopBtn.style.display = 'none'; stageBody.querySelectorAll('tr').forEach(r => r.classList.remove('active')); }
+    
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      inputEls.coffee.value = 20; inputEls.ratio.value = 15; inputEls.water.value = 300; inputEls.allTime.value = 45;
+      timerMain.textContent = "00:00"; timerSub.textContent = "準備就緒"; resetUI(); buildTable();
+    });
+
+    stopBtn.addEventListener('click', () => { resetUI(); timerMain.textContent = "STOP"; });
     startBtn.addEventListener('click', startTimer);
+
     buildTable();
   </script>
 </body>
