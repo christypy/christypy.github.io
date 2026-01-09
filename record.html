@@ -3,34 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>精品咖啡沖煮紀錄器 v27</title>
+<title>精品咖啡紀錄器 v32</title>
 <style>
 :root {
   --bg: #f8f9fa; --card: #ffffff; --main: #5d4037; --accent: #8d6e63;
   --text: #2c1e1c; --line: #e0e0e0; --primary: #795548; --danger: #d32f2f; --share: #388e3c;
+  --wait: #fff3e0; --wait-border: #ff9800; --pour: #e0f7fa; --pour-border: #00bcd4;
 }
 body { margin: 0; font-family: -apple-system, "Noto Sans TC", sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
 .container { max-width: 1200px; margin: auto; padding: 12px; display: grid; grid-template-columns: 1fr; gap: 12px; }
 @media (min-width: 768px) { .container { grid-template-columns: 1fr 1fr; } .header-full { grid-column: span 2; } .history-section { grid-column: 2; grid-row: 2 / 10; } }
 
-.home-link-btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  padding: 12px 24px; margin: 10px auto 20px;
-  background-color: var(--main); color: white !important;
-  text-decoration: none; border-radius: 50px;
-  font-size: 16px; font-weight: bold;
-  box-shadow: 0 4px 10px rgba(93, 64, 55, 0.2);
-  transition: all 0.3s ease; width: fit-content;
-}
+.home-link-btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 24px; margin: 10px auto 20px; background-color: var(--main); color: white !important; text-decoration: none; border-radius: 50px; font-weight: bold; width: fit-content; }
 
 .card { background: var(--card); border-radius: 16px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); }
-.section-title { font-weight: 800; margin-bottom: 12px; font-size: 14px; color: var(--main); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; }
+.section-title { font-weight: 800; margin-bottom: 12px; font-size: 14px; color: var(--main); display: flex; align-items: center; }
 .section-title::before { content: ""; width: 4px; height: 14px; background: var(--main); margin-right: 8px; border-radius: 2px; }
+
+/* 核心操作大區塊 */
+.guide-area { 
+    text-align: center; border-radius: 16px; padding: 20px 10px; margin-bottom: 12px; 
+    transition: all 0.2s; cursor: pointer; border: 4px solid #eee; background: #fdfdfd;
+}
+.guide-area.active:active { transform: scale(0.98); }
+.status-pour { background: var(--pour); border-color: var(--pour-border); }
+.status-wait { background: var(--wait); border-color: var(--wait-border); }
+
+.timer-display { font-size: 56px; font-weight: 800; margin: 5px 0; font-family: monospace; color: var(--main); }
+.step-hint { font-size: 18px; font-weight: bold; color: var(--main); }
+.click-notice { font-size: 12px; color: #888; margin-top: 4px; }
 
 .params-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; background: #fdfaf9; padding: 12px; border-radius: 12px; }
 .param-item { display: flex; flex-direction: column; gap: 4px; }
-.param-label { font-size: 11px; color: #8d6e63; font-weight: bold; padding-left: 2px; }
-.param-select { width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 6px; font-size: 13px; background: white; color: var(--main); outline: none; }
+.param-label { font-size: 11px; color: #8d6e63; font-weight: bold; }
+.param-select { width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 6px; font-size: 13px; background: white; }
 
 .bean-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px; }
 .bean-btn { border: 1px solid var(--line); border-radius: 8px; padding: 8px 2px; background: white; cursor: pointer; font-size: 13px; color: #666; }
@@ -40,37 +46,27 @@ body { margin: 0; font-family: -apple-system, "Noto Sans TC", sans-serif; backgr
 .mode-btn { border: none; border-radius: 8px; padding: 8px; cursor: pointer; font-weight: bold; background: transparent; color: #8d6e63; }
 .mode-btn.active { background: white; color: var(--main); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
-.timer-display { font-size: 48px; font-weight: 800; text-align: center; margin: 15px 0; color: var(--main); font-family: monospace; letter-spacing: -2px; }
 .log-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; table-layout: fixed; }
 .log-table th { background: #f5f5f5; padding: 8px 2px; border-bottom: 2px solid var(--line); }
 .log-table td { padding: 6px 1px; text-align: center; border-bottom: 1px solid #f0f0f0; }
 .log-table select { border: none; background: #f8f9fa; padding: 4px 2px; border-radius: 4px; font-size: 10px; width: 95%; }
 
-.flavor-box { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; border-top: 1px solid var(--line); padding-top: 15px; }
-.history-item { margin-bottom: 10px; border-radius: 12px; border: 1px solid var(--line); background: white; }
-
-/* 刪除按鈕樣式 */
-.btn-danger-outline {
-  background: #fff5f5; color: var(--danger); border: 1px solid #ffcdd2;
-  width: 100%; padding: 12px; border-radius: 10px; margin-top: 20px;
-  font-weight: bold; font-size: 13px; cursor: pointer; transition: 0.2s;
-}
-.btn-danger-outline:active { background: #ffebee; transform: scale(0.98); }
+.btn-danger-outline { background: #fff5f5; color: var(--danger); border: 1px solid #ffcdd2; width: 100%; padding: 12px; border-radius: 10px; margin-top: 20px; font-weight: bold; font-size: 13px; }
 </style>
 </head>
 <body>
 
 <div class="container">
   <div class="header-full" style="text-align: center;">
-    <h2 style="color:var(--main); margin:15px 0 5px;">精品咖啡沖煮紀錄</h2>
+    <h2 style="color:var(--main); margin:15px 0 5px;">精品咖啡紀錄器 v32</h2>
     <a href="https://christypy.github.io/" class="home-link-btn">🏠 返回首頁</a>
   </div>
 
   <div class="card">
     <div class="section-title">模式與豆種</div>
     <div class="mode-switch">
-      <button id="mode-pour" class="mode-btn active" onclick="selectMode('pour',this)">手沖紀錄</button>
-      <button id="mode-esp" class="mode-btn" onclick="selectMode('espresso',this)">義式萃取</button>
+      <button id="mode-pour" class="mode-btn active" onclick="selectMode('pour',this)">手沖模式</button>
+      <button id="mode-esp" class="mode-btn" onclick="selectMode('espresso',this)">義式模式</button>
     </div>
     <div class="bean-grid" id="beanBtns"></div>
   </div>
@@ -78,32 +74,27 @@ body { margin: 0; font-family: -apple-system, "Noto Sans TC", sans-serif; backgr
   <div class="card">
     <div class="section-title">初始參數</div>
     <div class="params-grid">
-      <div class="param-item">
-        <span class="param-label">粉量</span>
-        <select id="dose" class="param-select" onchange="calcStats()"></select>
-      </div>
-      <div class="param-item">
-        <span class="param-label">研磨度</span>
-        <select id="grind" class="param-select"></select>
-      </div>
-      <div class="param-item" id="temp-row">
-        <span class="param-label">水溫</span>
-        <select id="temp" class="param-select"></select>
-      </div>
+      <div class="param-item"><span class="param-label">粉量</span><select id="dose" class="param-select" onchange="calcStats()"></select></div>
+      <div class="param-item"><span class="param-label">研磨</span><select id="grind" class="param-select"></select></div>
+      <div class="param-item" id="temp-row"><span class="param-label">水溫</span><select id="temp" class="param-select"></select></div>
     </div>
   </div>
 
   <div class="card">
-    <div class="timer-display" id="timer">0:00</div>
-    <div style="display:grid; grid-template-columns:2fr 1.2fr 1fr; gap:8px;">
-      <button id="mainTimerBtn" onclick="handleTimerClick()" style="background:var(--main); color:white; border:none; font-weight:bold; font-size:16px; border-radius:12px; height:50px;">開始</button>
-      <button onclick="logAction()" id="logBtn" style="border:2px solid var(--main); color:var(--main); font-weight:bold; border-radius:12px;">紀錄</button>
-      <button onclick="resetTimer()" style="color:#999; border:none; background:none;">重置</button>
+    <div id="guideBox" class="guide-area" onclick="handleTimerAction()">
+        <div id="stepName" class="step-hint">待機中</div>
+        <div id="timer" class="timer-display">0:00</div>
+        <div id="clickNotice" class="click-notice">點擊下方開始按鈕</div>
+    </div>
+    
+    <div style="display:grid; grid-template-columns: 3fr 1fr; gap:10px;">
+        <button id="mainTimerBtn" onclick="toggleTimer()" style="background:var(--main); color:white; border:none; font-weight:bold; font-size:16px; border-radius:12px; height:54px;">開始沖煮</button>
+        <button onclick="resetTimer()" style="color:#999; border:none; background:none; font-weight:bold;">重置</button>
     </div>
   </div>
 
   <div class="card">
-    <div class="section-title">沖煮數據</div>
+    <div class="section-title">沖煮過程紀錄</div>
     <div style="overflow-x: auto;">
       <table class="log-table">
         <thead id="logHead"></thead>
@@ -111,31 +102,26 @@ body { margin: 0; font-family: -apple-system, "Noto Sans TC", sans-serif; backgr
         <tfoot id="logFoot"></tfoot>
       </table>
     </div>
-    <div class="flavor-box">
-      <div><label class="param-label">濃度感</label><select id="eval-strength" class="param-select"><option value="剛好">剛好</option><option value="太濃">太濃</option><option value="太淡(水感)">太淡(水感)</option></select></div>
-      <div><label class="param-label">酸苦平衡</label><select id="eval-balance" class="param-select"><option value="酸甜平衡">酸甜平衡</option><option value="太酸">太酸</option><option value="苦澀">苦澀</option></select></div>
+    <div style="margin-top:15px; display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <select id="eval-strength" class="param-select"><option>濃度剛好</option><option>太濃</option><option>太淡(水感)</option></select>
+        <select id="eval-balance" class="param-select"><option>酸甜平衡</option><option>太酸</option><option>苦澀</option></select>
     </div>
     <button onclick="saveRecord()" style="background:var(--main); color:white; width:100%; border:none; padding:15px; border-radius:12px; margin-top:15px; font-weight:bold; font-size:16px;">儲存本次沖煮</button>
   </div>
 
   <div class="card history-section">
     <div class="section-title">歷史日誌</div>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
-  <button onclick="exportBackup()" style="background:#607d8b; color:white; border:none; padding:10px; border-radius:10px; font-size:13px; font-weight:bold;">💾 導出備份檔</button>
-  <button onclick="document.getElementById('importFile').click()" style="background:#78909c; color:white; border:none; padding:10px; border-radius:10px; font-size:13px; font-weight:bold;">📥 匯入備份檔</button>
-  <input type="file" id="importFile" style="display:none" onchange="importBackup(this)">
-</div>
-    <button onclick="shareAllRecords()" style="background:var(--share); color:white; border:none; width:100%; padding:12px; border-radius:10px; margin-bottom:12px; font-weight:bold;">📤 分享全部紀錄</button>
-    <div id="pour-history-wrap"><div id="pour-history"></div></div>
-    <div id="esp-history-wrap"><div id="esp-history"></div></div>
-    
-    <button class="btn-danger-outline" onclick="clearAllHistory()">🗑️ 刪除所有歷史紀錄</button>
+    <div id="pour-history"></div>
+    <div id="esp-history"></div>
+    <button class="btn-danger-outline" onclick="clearAllHistory()">🗑️ 清空所有紀錄</button>
   </div>
 </div>
 
 <script>
 const baseBeans=['覺','花','寶','菩','雅','靜','果','福','柔','定','真','潤'];
-let mode='pour', bean='覺', startTime=null, elapsed=0, timerInt=null, pours=[], isRunning=false, finalStats={ liquid: 0, ratio: '-', time: '0:00' };
+let mode='pour', bean='覺', startTime=null, elapsed=0, timerInt=null, pours=[], isRunning=false;
+let currentAction = "注水"; 
+let finalStats = { liquid: 0, ratio: '-', time: '0:00' };
 
 window.onload = () => { initSelectors(); selectMode('pour', document.getElementById('mode-pour')); renderHistory(); };
 
@@ -153,20 +139,14 @@ function selectMode(m, btn) {
     document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('temp-row').style.visibility = (m === 'espresso') ? 'hidden' : 'visible';
-    document.getElementById('logBtn').textContent = (m === 'espresso') ? '預浸結束' : '紀錄注水';
     renderTableHead(); buildBeans(); resetTimer();
 }
 
 function renderTableHead() {
     const head = document.getElementById('logHead');
     head.innerHTML = (mode === 'pour') ? 
-        `<tr><th width="14%">階段</th><th width="14%">每段</th><th width="14%">總時</th><th width="18%">路徑</th><th width="18%">水位</th><th width="12%">累計</th><th width="10%">增</th></tr>` :
+        `<tr><th width="15%">動作</th><th width="15%">耗時</th><th width="15%">總時</th><th width="20%">路徑</th><th width="20%">累計</th><th width="15%">增</th></tr>` :
         `<tr><th>階段</th><th>耗時</th><th>總時間</th></tr>`;
-}
-
-function formatTime(ms) {
-    const s = Math.floor(ms / 1000);
-    return `${Math.floor(s/60)}:${('0'+(s%60)).slice(-2)}`;
 }
 
 function buildBeans() {
@@ -174,131 +154,118 @@ function buildBeans() {
     const list = (mode === 'espresso') ? [...baseBeans, '混豆'] : baseBeans;
     list.forEach(b => {
         const btn = document.createElement('button'); btn.textContent = b; btn.className = 'bean-btn';
-        if (b === bean || (mode === 'espresso' && b === '混豆')) { btn.classList.add('active'); bean = b; }
+        if (b === bean) btn.classList.add('active');
         btn.onclick = () => { bean = b; wrap.querySelectorAll('.bean-btn').forEach(x => x.classList.remove('active')); btn.classList.add('active'); };
         wrap.appendChild(btn);
     });
 }
 
-function handleTimerClick() {
+function toggleTimer() {
     const btn = document.getElementById('mainTimerBtn');
     if (!isRunning) {
-        isRunning = true; btn.textContent = '結束沖煮'; btn.style.background = 'var(--danger)';
-        startTime = Date.now() - elapsed;
+        isRunning = true;
+        startTime = Date.now();
         timerInt = setInterval(() => {
             elapsed = Date.now() - startTime;
             document.getElementById('timer').textContent = formatTime(elapsed);
         }, 100);
+        btn.textContent = "結束沖煮";
+        btn.classList.add('btn-danger');
+        
+        // 手沖模式：按下開始 = 自動發動第一筆注水
+        if(mode === 'pour') {
+            pours.push({
+                name: "注水", total: "0:00", absMs: 0, diff: "0:00",
+                path: '中心', cumLiquid: 0, diffLiquid: 0
+            });
+            currentAction = "斷水"; 
+            renderLogs();
+        }
+        updateGuideUI();
     } else {
-        isRunning = false; btn.textContent = '開始沖煮'; btn.style.background = 'var(--main)';
-        clearInterval(timerInt); timerInt = null;
         finalizeBrew();
     }
 }
 
-function resetTimer() {
-    clearInterval(timerInt); timerInt = null; elapsed = 0; isRunning = false;
-    finalStats = { liquid: 0, ratio: '-', time: '0:00' };
-    document.getElementById('timer').textContent = '0:00'; 
-    pours = []; renderLogs();
-    document.getElementById('logBtn').disabled = false;
-    document.getElementById('mainTimerBtn').textContent = '開始沖煮';
-    document.getElementById('mainTimerBtn').style.background = 'var(--main)';
-}
-
-function logAction() {
+function handleTimerAction() {
     if (!isRunning) return;
-    const currentTotalMs = elapsed;
-    const totalStr = formatTime(currentTotalMs);
     if (mode === 'pour') {
-        const lastAbsMs = pours.length > 0 ? pours[pours.length-1].absMs : 0;
-        pours.push({ 
-            name: pours.length === 0 ? '悶蒸' : `注水 ${pours.length}`, 
-            total: totalStr, absMs: currentTotalMs,
-            diff: formatTime(currentTotalMs - lastAbsMs),
-            path: '小圈', waterLevel: '低水位',
-            cumLiquid: (pours.length === 0 ? 40 : 0), diffLiquid: 0 
+        const nowMs = elapsed;
+        const lastMs = pours[pours.length-1].absMs;
+        pours.push({
+            name: currentAction,
+            total: formatTime(nowMs),
+            absMs: nowMs,
+            diff: formatTime(nowMs - lastMs),
+            path: (currentAction === '注水' ? '小圈' : '-'), cumLiquid: 0, diffLiquid: 0
         });
-        calcStats(); renderLogs();
-    } else if (pours.length === 0) {
-        pours.push({ name: '預浸', total: totalStr, diff: (elapsed/1000).toFixed(1)+'s', absSec: elapsed/1000 });
-        document.getElementById('logBtn').textContent = '萃取中...';
-        document.getElementById('logBtn').disabled = true;
+        currentAction = (currentAction === "注水") ? "斷水" : "注水";
+        updateGuideUI();
+        renderLogs();
+    } else if (mode === 'espresso' && pours.length === 0) {
+        pours.push({ name: '預浸', total: formatTime(elapsed), diff: (elapsed/1000).toFixed(1)+'s', absSec: elapsed/1000 });
+        document.getElementById('stepName').textContent = "正在萃取中...";
         renderLogs();
     }
 }
 
-// 導出備份
-function exportBackup() {
-    const data = {
-        pourLogs: JSON.parse(localStorage.getItem('pourLogs') || '[]'),
-        espLogs: JSON.parse(localStorage.getItem('espLogs') || '[]'),
-        backupDate: new Date().toISOString()
-    };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `coffee_backup_${new Date().toLocaleDateString()}.json`;
-    a.click();
+function updateGuideUI() {
+    const box = document.getElementById('guideBox');
+    const nameEl = document.getElementById('stepName');
+    const noticeEl = document.getElementById('clickNotice');
+    
+    if (mode === 'pour') {
+        box.classList.add('active');
+        nameEl.textContent = (currentAction === "注水") ? "正在等待中..." : "正在注水中...";
+        noticeEl.textContent = "點擊面板紀錄「" + currentAction + "」";
+        box.className = "guide-area active " + (currentAction === "注水" ? "status-wait" : "status-pour");
+    } else {
+        nameEl.textContent = "正在沖煮";
+        noticeEl.textContent = (pours.length === 0) ? "點擊面板紀錄「預浸」" : "觀察流速中";
+        box.className = "guide-area";
+    }
 }
 
-// 匯入備份
-function importBackup(input) {
-    const file = input.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const data = JSON.parse(e.target.result);
-            if (confirm("匯入將會與現有紀錄合併，確定嗎？")) {
-                const oldPour = JSON.parse(localStorage.getItem('pourLogs') || '[]');
-                const oldEsp = JSON.parse(localStorage.getItem('espLogs') || '[]');
-                
-                // 合併並去重（簡單處理：合併後重新渲染）
-                localStorage.setItem('pourLogs', JSON.stringify([...data.pourLogs, ...oldPour]));
-                localStorage.setItem('espLogs', JSON.stringify([...data.espLogs, ...oldEsp]));
-                
-                renderHistory();
-                alert("匯入成功！");
-            }
-        } catch (err) {
-            alert("檔案格式錯誤，請確保是正確的備份檔。");
-        }
-    };
-    reader.readAsText(file);
-}
 function finalizeBrew() {
-    const totalMs = elapsed;
-    const totalStr = formatTime(totalMs);
-    if (mode === 'pour') {
-        if (pours.length > 0) {
-            const lastIdx = pours.length - 1;
-            pours[lastIdx].total = totalStr;
-            pours[lastIdx].absMs = totalMs;
-            const prevMs = (lastIdx === 0) ? 0 : pours[lastIdx-1].absMs;
-            pours[lastIdx].diff = formatTime(totalMs - prevMs);
-        }
-    } else {
-        const totalSec = totalMs / 1000;
-        if (pours.length === 1) pours.push({ name: '萃取', total: totalStr, diff: (totalSec - pours[0].absSec).toFixed(1)+'s' });
-        else if (pours.length === 0) pours.push({ name: '萃取(全)', total: totalStr, diff: totalSec.toFixed(1)+'s' });
+    clearInterval(timerInt);
+    isRunning = false;
+    finalStats.time = formatTime(elapsed);
+    if (mode === 'espresso') {
+        const totalSec = elapsed / 1000;
+        if (pours.length === 1) pours.push({ name: '萃取', total: finalStats.time, diff: (totalSec - pours[0].absSec).toFixed(1)+'s' });
         if (finalStats.liquid === 0) updateEspLiquid(40);
     }
-    finalStats.time = totalStr;
-    calcStats(); renderLogs();
+    document.getElementById('mainTimerBtn').textContent = "開始沖煮";
+    document.getElementById('mainTimerBtn').classList.remove('btn-danger');
+    document.getElementById('stepName').textContent = "結束";
+    document.getElementById('guideBox').className = "guide-area";
+    calcStats();
+    renderLogs();
+}
+
+function resetTimer() {
+    clearInterval(timerInt);
+    isRunning = false; elapsed = 0; pours = []; currentAction = "注水";
+    finalStats = { liquid: 0, ratio: '-', time: '0:00' };
+    document.getElementById('timer').textContent = "0:00";
+    document.getElementById('stepName').textContent = "待機中";
+    document.getElementById('guideBox').className = "guide-area";
+    document.getElementById('mainTimerBtn').textContent = "開始沖煮";
+    document.getElementById('mainTimerBtn').classList.remove('btn-danger');
+    renderLogs();
 }
 
 function updateDetail(idx, field, val) {
     pours[idx][field] = (field === 'cumLiquid') ? parseInt(val) : val;
-    calcStats(); renderLogs();
+    calcStats();
+    renderLogs();
 }
 
 function calcStats() {
     const dose = parseFloat(document.getElementById('dose').value);
     for (let i = 0; i < pours.length; i++) {
-        const prevCum = (i === 0) ? 0 : pours[i-1].cumLiquid;
-        pours[i].diffLiquid = pours[i].cumLiquid > 0 ? pours[i].cumLiquid - prevCum : 0;
+        const prevCum = (i === 0) ? 0 : (pours[i-1].cumLiquid || 0);
+        pours[i].diffLiquid = (pours[i].cumLiquid > 0) ? (pours[i].cumLiquid - prevCum) : 0;
     }
     if (pours.length > 0 && mode === 'pour') {
         const lastVal = pours[pours.length-1].cumLiquid;
@@ -313,112 +280,64 @@ function renderLogs() {
     pours.forEach((p, i) => {
         const tr = document.createElement('tr');
         if (mode === 'pour') {
-            let pathOpt = `<select onchange="updateDetail(${i}, 'path', this.value)">` + ['中心點','小圈','大圈','來回'].map(v=>`<option value="${v}" ${p.path===v?'selected':''}>${v}</option>`).join('') + `</select>`;
-            let levelOpt = `<select onchange="updateDetail(${i}, 'waterLevel', this.value)">` + ['低水位','中水位','高水位'].map(v=>`<option value="${v}" ${p.waterLevel===v?'selected':''}>${v}</option>`).join('') + `</select>`;
-            let cumOpt = `<select onchange="updateDetail(${i}, 'cumLiquid', this.value)"><option value="0">-</option>`;
-            for(let j=20; j<=450; j+=5) { cumOpt += `<option value="${j}" ${p.cumLiquid==j?'selected':''}>${j}g</option>`; }
+            let pathOpt = p.name==='斷水' ? '-' : `<select onchange="updateDetail(${i},'path',this.value)">` + ['中心','小圈','大圈'].map(v=>`<option ${p.path===v?'selected':''}>${v}</option>`).join('') + `</select>`;
+            let cumOpt = `<select onchange="updateDetail(${i},'cumLiquid',this.value)"><option value="0">-</option>`;
+            for(let j=20; j<=450; j+=5) cumOpt += `<option value="${j}" ${p.cumLiquid==j?'selected':''}>${j}g</option>`;
             cumOpt += `</select>`;
-            tr.innerHTML=`<td>${p.name}</td><td>${p.diff}</td><td>${p.total}</td><td>${pathOpt}</td><td>${levelOpt}</td><td>${cumOpt}</td><td style="color:var(--primary); font-weight:bold;">${p.diffLiquid > 0 ? '+'+p.diffLiquid : '-'}</td>`;
+            tr.innerHTML=`<td>${p.name}</td><td>${p.diff}</td><td>${p.total}</td><td>${pathOpt}</td><td>${cumOpt}</td><td>+${p.diffLiquid}</td>`;
         } else {
-            tr.innerHTML=`<td>${p.name}</td><td>${p.diff||'-'}</td><td>${p.total||'-'}</td>`;
+            tr.innerHTML=`<td>${p.name}</td><td>${p.diff}</td><td>${p.total}</td>`;
         }
         wrap.appendChild(tr);
     });
-    if (mode === 'espresso' && (finalStats.time !== '0:00' || !isRunning)) {
-        let sel = `<select onchange="updateEspLiquid(this.value)" class="param-select" style="width:70px;"><option value="0">液重</option>`;
-        for(let i=15; i<=70; i++) sel += `<option value="${i}" ${finalStats.liquid==i?'selected':''}>${i}g</option>`;
-        sel += `</select>`;
-        foot.innerHTML = `<tr class="summary-row"><td colspan="2">濃縮液重: ${sel}</td><td>比值: ${finalStats.ratio}</td></tr>`;
-    } else if (mode === 'pour') {
-        foot.innerHTML = `<tr class="summary-row"><td colspan="4">總計: ${finalStats.liquid}g</td><td colspan="3">粉水比: ${finalStats.ratio}</td></tr>`;
+    if (mode === 'pour') {
+        foot.innerHTML = `<tr style="font-weight:bold; background:#f9f9f9;"><td colspan="3">總計: ${finalStats.liquid}g</td><td colspan="3">粉水比: ${finalStats.ratio}</td></tr>`;
     }
 }
 
 function updateEspLiquid(val) {
     finalStats.liquid = parseInt(val);
     const dose = parseFloat(document.getElementById('dose').value);
-    finalStats.ratio = finalStats.liquid > 0 ? `1:${(finalStats.liquid / dose).toFixed(1)}` : '-';
+    finalStats.ratio = `1:${(finalStats.liquid / dose).toFixed(1)}`;
     renderLogs();
 }
 
 function saveRecord() {
-    if (pours.length === 0 || finalStats.liquid === 0) { alert("請填寫數據並結束計時！"); return; }
+    if (pours.length === 0) return;
     const key = (mode === 'pour') ? 'pourLogs' : 'espLogs';
     const history = JSON.parse(localStorage.getItem(key) || '[]');
     history.unshift({
-        time: new Date().toLocaleString('zh-TW',{hour12:false, month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'}).replace(/\//g,'-'), 
-        bean, dose: document.getElementById('dose').value, grind: document.getElementById('grind').value, 
-        temp: (mode === 'pour') ? document.getElementById('temp').value : 'N/A',
-        target: finalStats.liquid, pours: JSON.parse(JSON.stringify(pours)), mode, finalStats: {...finalStats},
+        time: new Date().toLocaleString('zh-TW',{hour12:false, month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'}),
+        bean, dose: document.getElementById('dose').value, grind: document.getElementById('grind').value,
+        temp: document.getElementById('temp').value, target: finalStats.liquid,
+        pours: JSON.parse(JSON.stringify(pours)), mode, finalStats: {...finalStats},
         evaluation: { strength: document.getElementById('eval-strength').value, balance: document.getElementById('eval-balance').value }
     });
     localStorage.setItem(key, JSON.stringify(history));
     renderHistory(); resetTimer();
 }
 
-function formatSingleRecord(r) {
-    let text = `● ${r.bean} (${r.time})\n  粉:${r.dose}g | 研磨:${r.grind}${r.mode==='pour'?' | 水溫:'+r.temp+'°C':''}\n  結果:${r.target}g | 比值:${r.finalStats.ratio} | 總時:${r.finalStats.time}\n  風味：${r.evaluation.strength} / ${r.evaluation.balance}\n`;
-    r.pours.forEach(p => text += (r.mode==='pour') ? `  └ ${p.name}: ${p.diff} (總${p.total}) | ${p.cumLiquid}g [${p.path}/${p.waterLevel}]\n` : `  └ ${p.name}: ${p.diff} (總${p.total})\n`);
-    return text + `\n`;
-}
-
-async function shareRecord(key, index) {
-    const list = JSON.parse(localStorage.getItem(key));
-    const text = `【咖啡紀錄】\n` + formatSingleRecord(list[index]);
-    if (navigator.share) { try { await navigator.share({ text: text }); } catch (err) {} }
-    else { navigator.clipboard.writeText(text).then(() => alert('已複製紀錄！')); }
-}
-
-async function shareAllRecords() {
-    const pLogs = JSON.parse(localStorage.getItem('pourLogs')||'[]');
-    const eLogs = JSON.parse(localStorage.getItem('espLogs')||'[]');
-    if(pLogs.length === 0 && eLogs.length === 0) { alert("目前沒有紀錄可分享"); return; }
-    let fullText = `☕【咖啡紀錄全備份】\n\n`;
-    pLogs.forEach(r => fullText += formatSingleRecord(r));
-    eLogs.forEach(r => fullText += formatSingleRecord(r));
-    if (navigator.share) { try { await navigator.share({ text: fullText }); } catch (err) {} }
-    else { navigator.clipboard.writeText(fullText).then(() => alert('全部紀錄已複製！')); }
-}
-
 function renderHistory() {
     ['pour-history','esp-history'].forEach(id => document.getElementById(id).innerHTML='');
     ['pourLogs','espLogs'].forEach(key => {
         const list = JSON.parse(localStorage.getItem(key) || '[]');
-        const wrap = document.getElementById(key === 'pourLogs' ? 'pour-history' : 'esp-history');
-        if(list.length > 0) {
-            wrap.innerHTML = `<div class="history-group-title" style="font-size:13px; font-weight:bold; margin:15px 0 8px; color:var(--primary);">${key==='pourLogs'?'📋 手沖日誌':'☕ 義式日誌'}</div>`;
-            list.forEach((item, idx) => {
-                const div = document.createElement('div');
-                div.className = 'history-item';
-                div.innerHTML = `
-                    <div class="history-header" onclick="toggleDetail(this)" style="padding:10px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
-                        <div style="font-size:12px;"><b>${item.bean}</b> <small style="color:#888;">${item.time}</small><br><span style="color:#666;">${item.finalStats.ratio} (${item.target}g) | ${item.evaluation.strength}</span></div>
-                        <div><button onclick="shareRecord('${key}',${idx})" style="padding:4px 8px; font-size:11px; border:1px solid #ccc; background:none; border-radius:6px;">分享</button><button onclick="deleteItem('${key}',${idx},event)" style="margin-left:8px; color:#ccc; border:none; background:none;">✕</button></div>
-                    </div>
-                    <div class="history-detail" style="display:none; padding:10px; border-top:1px solid #eee; font-size:12px; background:#fafafa;">
-                        <div>參數：${item.dose}g / 研磨${item.grind}${item.mode==='pour'?' / '+item.temp+'°C':''}</div>
-                        <div>評鑑：${item.evaluation.strength} / ${item.evaluation.balance}</div>
-                        <table class="log-table" style="background:white;">
-                            ${item.pours.map(p => item.mode==='pour' ? `<tr><td>${p.name}</td><td>${p.diff}</td><td>${p.total}</td><td>${p.path}</td><td>${p.waterLevel}</td><td>${p.cumLiquid}g</td></tr>` : `<tr><td>${p.name}</td><td>${p.diff}</td><td>${p.total}</td></tr>`).join('')}
-                        </table>
-                    </div>`;
-                wrap.appendChild(div);
-            });
-        }
+        const wrap = document.getElementById(key==='pourLogs' ? 'pour-history' : 'esp-history');
+        list.forEach((item, idx) => {
+            const div = document.createElement('div');
+            div.className = 'card'; div.style.marginBottom = '10px'; div.style.fontSize = '12px';
+            div.innerHTML = `<b>${item.bean}</b> <small>${item.time}</small> (${item.target}g / ${item.finalStats.ratio})<br>
+            <button onclick="deleteItem('${key}',${idx})" style="border:none; background:none; color:red; float:right;">✕</button>`;
+            wrap.appendChild(div);
+        });
     });
 }
 
-function toggleDetail(el) { const d = el.nextElementSibling; d.style.display = (d.style.display === 'block') ? 'none' : 'block'; }
-function deleteItem(k, i, e) { e.stopPropagation(); if (confirm("確定刪除此筆紀錄？")) { const h = JSON.parse(localStorage.getItem(k)); h.splice(i, 1); localStorage.setItem(k, JSON.stringify(h)); renderHistory(); } }
+function deleteItem(k, i) { if(confirm("刪除？")){ const h=JSON.parse(localStorage.getItem(k)); h.splice(i,1); localStorage.setItem(k,JSON.stringify(h)); renderHistory(); } }
+function clearAllHistory() { if(confirm("清空？")){ localStorage.clear(); renderHistory(); } }
 
-// 新增：清除所有歷史紀錄函式
-function clearAllHistory() {
-    if (confirm("⚠️ 注意：這將會永久刪除「所有手沖與義式」的歷史紀錄，且無法復原。確定要執行嗎？")) {
-        localStorage.removeItem('pourLogs');
-        localStorage.removeItem('espLogs');
-        renderHistory();
-        alert("已清空所有歷史紀錄。");
-    }
+function formatTime(ms) {
+    const s = Math.floor(ms / 1000);
+    return `${Math.floor(s/60)}:${('0'+(s%60)).slice(-2)}`;
 }
 </script>
 </body>
