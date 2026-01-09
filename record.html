@@ -211,7 +211,7 @@ function logAction() {
             name: pours.length === 0 ? '悶蒸' : `注水 ${pours.length}`, 
             total: totalStr, absMs: currentTotalMs,
             diff: formatTime(currentTotalMs - lastAbsMs),
-            path: '中心點', waterLevel: '低水位',
+            path: '小圈', waterLevel: '低水位',
             cumLiquid: (pours.length === 0 ? 40 : 0), diffLiquid: 0 
         });
         calcStats(); renderLogs();
