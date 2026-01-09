@@ -339,6 +339,9 @@
 <body>
 
 <h2>☕ 一味淨生活咖啡備餐助理</h2>
+<button class="btn" style="background: #607d8b; color: white;" onclick="window.location.href='https://christypy.github.io/time'">⏱️ 計時器</button>
+<button class="btn" style="background: #607d8b; color: white;" onclick="window.location.href='https://christypy.github.io/record'">📝 記錄器</button>
+
 
 <div class="controls">
     <select id="daySelect" onchange="renderOrders()">
@@ -351,7 +354,6 @@
         <option value="0">星期日</option>
     </select>
     <button class="btn" onclick="renderOrders()">刷新列表</button>
-    <button class="btn" style="background: #607d8b; color: white;" onclick="window.location.href='https://christypy.github.io/hand'">⏱️ 手沖計時器</button>
     <button class="btn" id="clearAllBtn" onclick="clearAllDone()">全部重置</button>
 </div>
 
@@ -442,6 +444,10 @@
             <tr><td>福</td><td><span class="menu-price">130</span></td><td><span class="menu-price">180</span></td><td><span class="menu-price">550</span></td><td><span class="menu-price">35</span></td></tr>
             <tr><td>柔</td><td><span class="menu-price">130</span></td><td><span class="menu-price">180</span></td><td><span class="menu-price">450</span></td><td><span class="menu-price">35</span></td></tr>
             <tr><td>定</td><td>-</td><td>-</td><td><span class="menu-price">650</span></td><td>-</td></tr>
+
+            <tr><td>真</td><td>-</td><td>-</td><td></td><td>-</td></tr>
+            <tr><td>潤</td><td>-</td><td>-</td><td></td><td>-</td></tr>
+
         </tbody>
     </table>
 </div>
@@ -451,7 +457,7 @@
         <div style="padding: 15px; font-size: 14px; line-height: 1.8;">
             <div style="margin-bottom: 12px; border-bottom: 1px dashed var(--color-light-gray); padding-bottom: 8px;">
                 <strong style="color: var(--color-primary);">☕ 美式/拿鐵基底：</strong><br>
-                20g 粉 → 萃取 60g 濃縮 (30-45s)<br>
+                20g 粉 → 萃取 40g 濃縮 1:2 (30-45s)<br>
                 ➔ <b>熱美式：</b>加熱水至九分滿<br>
                 ➔ <b>冰美式：</b>整杯冰塊加水補滿<br>
                 ➔ <b>冰拿鐵：</b>半杯冰塊加牛奶補滿<br>
