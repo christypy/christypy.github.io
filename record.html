@@ -2,396 +2,379 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>咖啡沖煮紀錄器</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>精品咖啡沖煮紀錄器 v27</title>
 <style>
-:root{
-  --bg:#fef9f2;
-  --card:#fff8f0;
-  --main:#7a4a24;
-  --accent:#c89b6a;
-  --line:#e2d3c2;
-  --btn-small:28px;
+:root {
+  --bg: #f8f9fa; --card: #ffffff; --main: #5d4037; --accent: #8d6e63;
+  --text: #2c1e1c; --line: #e0e0e0; --primary: #795548; --danger: #d32f2f; --share: #388e3c;
 }
-body{
-  margin:0;
-  font-family:system-ui,-apple-system,BlinkMacSystemFont;
-  background:var(--bg);
-  color:#3b2a1a;
+body { margin: 0; font-family: -apple-system, "Noto Sans TC", sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+.container { max-width: 1200px; margin: auto; padding: 12px; display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 768px) { .container { grid-template-columns: 1fr 1fr; } .header-full { grid-column: span 2; } .history-section { grid-column: 2; grid-row: 2 / 10; } }
+
+.home-link-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 12px 24px; margin: 10px auto 20px;
+  background-color: var(--main); color: white !important;
+  text-decoration: none; border-radius: 50px;
+  font-size: 16px; font-weight: bold;
+  box-shadow: 0 4px 10px rgba(93, 64, 55, 0.2);
+  transition: all 0.3s ease; width: fit-content;
 }
-h1{margin:12px;text-align:center;font-size:24px}
-.container{max-width:1100px;margin:auto;padding:12px}
-.card{
-  background:var(--card);
-  border-radius:18px;
-  padding:14px;
-  margin-bottom:14px;
-  box-shadow:0 6px 16px rgba(0,0,0,.06)
+
+.card { background: var(--card); border-radius: 16px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); }
+.section-title { font-weight: 800; margin-bottom: 12px; font-size: 14px; color: var(--main); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; }
+.section-title::before { content: ""; width: 4px; height: 14px; background: var(--main); margin-right: 8px; border-radius: 2px; }
+
+.params-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; background: #fdfaf9; padding: 12px; border-radius: 12px; }
+.param-item { display: flex; flex-direction: column; gap: 4px; }
+.param-label { font-size: 11px; color: #8d6e63; font-weight: bold; padding-left: 2px; }
+.param-select { width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 6px; font-size: 13px; background: white; color: var(--main); outline: none; }
+
+.bean-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px; }
+.bean-btn { border: 1px solid var(--line); border-radius: 8px; padding: 8px 2px; background: white; cursor: pointer; font-size: 13px; color: #666; }
+.bean-btn.active { background: var(--main); color: white; border-color: var(--main); }
+
+.mode-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; background: #efebe9; padding: 4px; border-radius: 10px; }
+.mode-btn { border: none; border-radius: 8px; padding: 8px; cursor: pointer; font-weight: bold; background: transparent; color: #8d6e63; }
+.mode-btn.active { background: white; color: var(--main); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+
+.timer-display { font-size: 48px; font-weight: 800; text-align: center; margin: 15px 0; color: var(--main); font-family: monospace; letter-spacing: -2px; }
+.log-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; table-layout: fixed; }
+.log-table th { background: #f5f5f5; padding: 8px 2px; border-bottom: 2px solid var(--line); }
+.log-table td { padding: 6px 1px; text-align: center; border-bottom: 1px solid #f0f0f0; }
+.log-table select { border: none; background: #f8f9fa; padding: 4px 2px; border-radius: 4px; font-size: 10px; width: 95%; }
+
+.flavor-box { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; border-top: 1px solid var(--line); padding-top: 15px; }
+.history-item { margin-bottom: 10px; border-radius: 12px; border: 1px solid var(--line); background: white; }
+
+/* 刪除按鈕樣式 */
+.btn-danger-outline {
+  background: #fff5f5; color: var(--danger); border: 1px solid #ffcdd2;
+  width: 100%; padding: 12px; border-radius: 10px; margin-top: 20px;
+  font-weight: bold; font-size: 13px; cursor: pointer; transition: 0.2s;
 }
-.section-title{font-weight:700;margin-bottom:8px;font-size:16px}
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(max-content,1fr));
-  gap:8px;
-  align-items:center;
-}
-button{
-  border:none;
-  border-radius:14px;
-  padding:6px 12px;
-  background:#eee;
-  cursor:pointer;
-  transition:0.2s;
-  font-size:14px;
-  min-width:60px;
-}
-button:hover{background:var(--accent);color:#fff;}
-button.active{background:var(--main);color:#fff}
-button.small{padding:4px 6px;font-size:12px;min-width:var(--btn-small);}
-select{
-  padding:4px 6px;
-  border-radius:8px;
-  border:1px solid var(--line);
-  font-size:13px;
-  height:28px;
-  min-width:50px;
-  max-width:80px;
-  -moz-appearance:none; -webkit-appearance:none; appearance:none;
-}
-.timer{
-  font-size:32px;
-  font-weight:800;
-  text-align:center;
-  margin:10px 0
-}
-.actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
-.log{border-top:1px dashed var(--line);padding-top:6px;margin-top:6px}
-.log-row{
-  display:grid;
-  grid-template-columns:1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-  gap:4px;
-  margin-bottom:4px;
-  align-items:center;
-}
-.log-row span, .log-row select{
-  background:#fdf6ef;
-  border-radius:6px;
-  padding:2px;
-  text-align:center;
-  font-size:12px
-}
-.history-item{
-  border:1px solid var(--line);
-  border-radius:10px;
-  padding:8px;
-  margin-bottom:8px;
-  font-size:13px;
-  background:#fff;
-  transition:0.2s;
-}
-.history-item:hover{box-shadow:0 4px 12px rgba(0,0,0,0.1);}
-.history-header{display:flex;justify-content:space-between;cursor:pointer;font-weight:600;}
-.history-detail{margin-top:6px;padding-left:8px;display:none;border-top:1px dashed var(--line);}
-.history-detail div{padding:2px 0;}
-.delete-btn{
-  background:#c44;
-  color:#fff;
-  border-radius:8px;
-  padding:2px 6px;
-  cursor:pointer;
-  font-size:12px;
-}
-.delete-btn:hover{background:#f55;}
+.btn-danger-outline:active { background: #ffebee; transform: scale(0.98); }
 </style>
 </head>
 <body>
+
 <div class="container">
-<h1>☕ 咖啡沖煮紀錄器</h1>
+  <div class="header-full" style="text-align: center;">
+    <h2 style="color:var(--main); margin:15px 0 5px;">精品咖啡沖煮紀錄</h2>
+    <a href="https://christypy.github.io/" class="home-link-btn">🏠 返回首頁</a>
+  </div>
 
-<!-- 模式選擇 -->
-<div class="card">
-<div class="section-title">模式選擇</div>
-<div class="grid" id="modeBtns">
-<button class="active" onclick="selectMode('pour',this)">手沖</button>
-<button onclick="selectMode('espresso',this)">義式</button>
-</div>
-</div>
+  <div class="card">
+    <div class="section-title">模式與豆種</div>
+    <div class="mode-switch">
+      <button id="mode-pour" class="mode-btn active" onclick="selectMode('pour',this)">手沖紀錄</button>
+      <button id="mode-esp" class="mode-btn" onclick="selectMode('espresso',this)">義式萃取</button>
+    </div>
+    <div class="bean-grid" id="beanBtns"></div>
+  </div>
 
-<!-- 豆子 -->
-<div class="card">
-<div class="section-title">豆子選擇</div>
-<div class="grid" id="beanBtns"></div>
-</div>
+  <div class="card">
+    <div class="section-title">初始參數</div>
+    <div class="params-grid">
+      <div class="param-item">
+        <span class="param-label">粉量</span>
+        <select id="dose" class="param-select" onchange="calcStats()"></select>
+      </div>
+      <div class="param-item">
+        <span class="param-label">研磨度</span>
+        <select id="grind" class="param-select"></select>
+      </div>
+      <div class="param-item" id="temp-row">
+        <span class="param-label">水溫</span>
+        <select id="temp" class="param-select"></select>
+      </div>
+    </div>
+  </div>
 
-<!-- 參數 -->
-<div class="card" id="paramsCard">
-<div class="section-title">沖煮參數</div>
-<div class="grid">
-<div>粉量(g)<select id="dose"></select></div>
-<div>研磨度<select id="grind"></select></div>
-<div>目標液體量<div class="grid" id="targetBtns"></div></div>
-<div>粉水比 <span id="ratio">-</span></div>
-</div>
+  <div class="card">
+    <div class="timer-display" id="timer">0:00</div>
+    <div style="display:grid; grid-template-columns:2fr 1.2fr 1fr; gap:8px;">
+      <button id="mainTimerBtn" onclick="handleTimerClick()" style="background:var(--main); color:white; border:none; font-weight:bold; font-size:16px; border-radius:12px; height:50px;">開始</button>
+      <button onclick="logAction()" id="logBtn" style="border:2px solid var(--main); color:var(--main); font-weight:bold; border-radius:12px;">紀錄</button>
+      <button onclick="resetTimer()" style="color:#999; border:none; background:none;">重置</button>
+    </div>
+  </div>
 
-<div id="espressoTime" style="display:none;margin-top:10px">
-<div class="section-title">義式總秒數</div>
-<select id="shotSelect"></select>
-</div>
-</div>
+  <div class="card">
+    <div class="section-title">沖煮數據</div>
+    <div style="overflow-x: auto;">
+      <table class="log-table">
+        <thead id="logHead"></thead>
+        <tbody id="logs"></tbody>
+        <tfoot id="logFoot"></tfoot>
+      </table>
+    </div>
+    <div class="flavor-box">
+      <div><label class="param-label">濃度感</label><select id="eval-strength" class="param-select"><option value="剛好">剛好</option><option value="太濃">太濃</option><option value="太淡(水感)">太淡(水感)</option></select></div>
+      <div><label class="param-label">酸苦平衡</label><select id="eval-balance" class="param-select"><option value="酸甜平衡">酸甜平衡</option><option value="太酸">太酸</option><option value="苦澀">苦澀</option></select></div>
+    </div>
+    <button onclick="saveRecord()" style="background:var(--main); color:white; width:100%; border:none; padding:15px; border-radius:12px; margin-top:15px; font-weight:bold; font-size:16px;">儲存本次沖煮</button>
+  </div>
 
-<!-- 手沖計時 -->
-<div class="card" id="timerCard">
-<div class="section-title">計時控制</div>
-<div class="timer" id="timer">0:00</div>
-<div class="actions">
-<button id="startBtn" onclick="startTimer()">開始</button>
-<button id="pauseBtn" onclick="toggleTimer()">暫停</button>
-<button onclick="logPour()">紀錄注水</button>
-<button onclick="resetTimer()">重新</button>
-</div>
-</div>
-
-<div class="actions">
-<button onclick="saveRecord()">儲存紀錄</button>
-<button onclick="clearCurrent()">清除當筆</button>
-<button onclick="clearAll()">清空歷史</button>
-</div>
-
-<!-- 本次 -->
-<div class="card">
-<div class="section-title">本次注水紀錄</div>
-<div id="logs"></div>
-</div>
-
-<!-- 歷史 -->
-<div class="card">
-<div class="section-title">歷史紀錄</div>
-<div id="history"></div>
-</div>
+  <div class="card history-section">
+    <div class="section-title">歷史日誌</div>
+    <button onclick="shareAllRecords()" style="background:var(--share); color:white; border:none; width:100%; padding:12px; border-radius:10px; margin-bottom:12px; font-weight:bold;">📤 分享全部紀錄</button>
+    <div id="pour-history-wrap"><div id="pour-history"></div></div>
+    <div id="esp-history-wrap"><div id="esp-history"></div></div>
+    
+    <button class="btn-danger-outline" onclick="clearAllHistory()">🗑️ 刪除所有歷史紀錄</button>
+  </div>
 </div>
 
 <script>
-const pourBeans=['覺','花','寶','菩','雅','靜','果','福','柔','定','真','潤'];
-const espBeans=[...pourBeans,'混豆'];
-let mode='pour';
-let target=300;
-let shotTime=25;
-let bean='混豆';
-let startTime=null, elapsed=0, timerInt=null;
-let pours=[];
-let pourEnded=false;
-let paused=false;
+const baseBeans=['覺','花','寶','菩','雅','靜','果','福','柔','定','真','潤'];
+let mode='pour', bean='覺', startTime=null, elapsed=0, timerInt=null, pours=[], isRunning=false, finalStats={ liquid: 0, ratio: '-', time: '0:00' };
 
-/* ===== 模式選擇 ===== */
-function selectMode(m,btn){
-  mode=m;
-  document.querySelectorAll('#modeBtns button').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  buildBeans();
-  buildTargets();
-  buildShot();
-  buildDose();
-  buildGrind();
-  updateRatio();
-  pours=[];
-  renderLogs();
-  elapsed=0;pourEnded=false;paused=false;
-  document.getElementById('timer').textContent='0:00';
-  document.getElementById('timerCard').style.display=(mode==='pour')?'block':'none';
-  document.getElementById('pauseBtn').textContent='暫停';
-  document.getElementById('startBtn').style.display=(mode==='pour')?'inline-block':'none';
+window.onload = () => { initSelectors(); selectMode('pour', document.getElementById('mode-pour')); renderHistory(); };
+
+function initSelectors() {
+    const d = document.getElementById('dose');
+    for(let i=12; i<=30; i+=0.5) { let o = new Option(i+'g', i); if(i===20) o.selected=true; d.add(o); }
+    const g = document.getElementById('grind');
+    for(let i=1; i<=15; i+=0.5) { let o = new Option(i, i); if(i===6) o.selected=true; g.add(o); }
+    const t = document.getElementById('temp');
+    for(let i=80; i<=99; i++) { let o = new Option(i+'°C', i); if(i===93) o.selected=true; t.add(o); }
 }
 
-/* ===== 豆子 ===== */
-const beanBtns=document.getElementById('beanBtns');
-function buildBeans(){
-  beanBtns.innerHTML='';
-  const list=mode==='pour'?pourBeans:espBeans;
-  list.forEach(b=>{
-    const btn=document.createElement('button');
-    btn.textContent=b;
-    btn.onclick=()=>selectBean(b,btn);
-    beanBtns.appendChild(btn);
-  });
-  bean=(mode==='espresso')?'混豆':list[0];
-  beanBtns.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
-  beanBtns.querySelectorAll('button')[list.indexOf(bean)].classList.add('active');
-}
-function selectBean(b,btn){
-  bean=b;
-  document.querySelectorAll('#beanBtns button').forEach(x=>x.classList.remove('active'));
-  btn.classList.add('active');
+function selectMode(m, btn) {
+    mode = m;
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('temp-row').style.visibility = (m === 'espresso') ? 'hidden' : 'visible';
+    document.getElementById('logBtn').textContent = (m === 'espresso') ? '預浸結束' : '紀錄注水';
+    renderTableHead(); buildBeans(); resetTimer();
 }
 
-/* ===== 參數 ===== */
-const doseSel=document.getElementById('dose');
-const grindSel=document.getElementById('grind');
-const ratioSpan=document.getElementById('ratio');
-
-function buildDose(){
-  doseSel.innerHTML='';
-  for(let i=18;i<=23;i++){
-    const opt=document.createElement('option'); opt.value=i; opt.textContent=i; doseSel.appendChild(opt);
-  }
-  doseSel.value=20;
-  doseSel.onchange=updateRatio;
+function renderTableHead() {
+    const head = document.getElementById('logHead');
+    head.innerHTML = (mode === 'pour') ? 
+        `<tr><th width="14%">階段</th><th width="14%">每段</th><th width="14%">總時</th><th width="18%">路徑</th><th width="18%">水位</th><th width="12%">累計</th><th width="10%">增</th></tr>` :
+        `<tr><th>階段</th><th>耗時</th><th>總時間</th></tr>`;
 }
 
-function buildGrind(){
-  grindSel.innerHTML='';
-  for(let i=3;i<=12;i++){
-    const opt=document.createElement('option'); opt.value=i; opt.textContent=i; grindSel.appendChild(opt);
-  }
-  grindSel.value=(mode==='espresso')?6.5:6;
-  grindSel.onchange=updateRatio;
+function formatTime(ms) {
+    const s = Math.floor(ms / 1000);
+    return `${Math.floor(s/60)}:${('0'+(s%60)).slice(-2)}`;
 }
 
-function buildTargets(){
-  const wrap=document.getElementById('targetBtns');
-  wrap.innerHTML='';
-  const opts=mode==='espresso'?[40,45,50,55,60]:[200,300,320];
-  target=mode==='espresso'?40:300;
-  opts.forEach(v=>{
-    const b=document.createElement('button');b.textContent=v;
-    if(v===target)b.classList.add('active');
-    b.onclick=()=>{target=v;wrap.querySelectorAll('button').forEach(x=>x.classList.remove('active'));b.classList.add('active');updateRatio();}
-    wrap.appendChild(b);
-  });
-}
-
-function buildShot(){
-  const sec=document.getElementById('espressoTime');
-  const select=document.getElementById('shotSelect');
-  select.innerHTML='';
-  if(mode!=='espresso'){sec.style.display='none';return;}
-  sec.style.display='block';
-  for(let i=20;i<=50;i+=1){
-    const opt=document.createElement('option'); opt.value=i; opt.textContent=i+'秒'; select.appendChild(opt);}
-  select.value=25; shotTime=25;
-  select.onchange=()=>{shotTime=parseInt(select.value);}
-}
-
-function updateRatio(){
-  ratioSpan.textContent=Math.round(target/doseSel.value);
-}
-
-/* ===== 計時 ===== */
-function startTimer(){
-  if(timerInt||pourEnded)return;
-  startTime=Date.now()-elapsed;
-  timerInt=setInterval(()=>{
-    elapsed=Date.now()-startTime;
-    const s=(elapsed/1000)|0;
-    document.getElementById('timer').textContent=`${Math.floor(s/60)}:${('0'+(s%60)).slice(-2)}`;
-  },100);
-  document.getElementById('startBtn').style.display='none';
-}
-
-function toggleTimer(){
-  if(!paused){
-    clearInterval(timerInt);timerInt=null;paused=true;
-    document.getElementById('pauseBtn').textContent='繼續';
-  } else {
-    startTimer(); paused=false; document.getElementById('pauseBtn').textContent='暫停';
-  }
-}
-
-function resetTimer(){clearInterval(timerInt);timerInt=null;elapsed=0;document.getElementById('timer').textContent='0:00';paused=false;document.getElementById('pauseBtn').textContent='暫停';document.getElementById('startBtn').style.display='inline-block';}
-
-/* ===== 手沖紀錄 ===== */
-function logPour(){
-  if(mode!=='pour')return;
-  const index=pours.length===0?'悶蒸':`第${pours.length}次斷水`;
-  pours.push({index,total:(elapsed/1000).toFixed(1),water:null,flow:'小水'}); //預設小水
-  renderLogs();
-}
-
-/* ===== 紀錄渲染 ===== */
-function renderLogs(){
-  const wrap=document.getElementById('logs'); wrap.innerHTML='';
-  let cumTime=0, cumWater=0;
-  if(mode==='pour'){
-    pours.forEach((p,i)=>{
-      const d=document.createElement('div');d.className='log';
-      cumTime+=parseFloat(p.total);
-      cumWater+=(p.water||0);
-      d.innerHTML=`
-      <div class="log-row">
-        <span>${p.index}</span>
-        <span>${p.total}s</span>
-        <select id="water${i}"><option value="">選擇水量</option></select>
-        <div>
-          <button class="small ${p.flow==='大水'?'active':''}" onclick="setFlow(${i},'大水')">大水</button>
-          <button class="small ${p.flow==='小水'?'active':''}" onclick="setFlow(${i},'小水')">小水</button>
-        </div>
-        <span>${Math.floor(cumTime/60)}:${('0'+Math.floor(cumTime%60)).slice(-2)}</span>
-        <span>${cumWater} g</span>
-      </div>`;
-      wrap.appendChild(d);
-      const select=document.getElementById(`water${i}`);
-      for(let w=20;w<=300;w+=5){ const opt=document.createElement('option'); opt.value=w; opt.textContent=w; select.appendChild(opt);}
-      select.value=p.water;
-      select.onchange=()=>{p.water=parseInt(select.value)||null; renderLogs();}
+function buildBeans() {
+    const wrap = document.getElementById('beanBtns'); wrap.innerHTML = '';
+    const list = (mode === 'espresso') ? [...baseBeans, '混豆'] : baseBeans;
+    list.forEach(b => {
+        const btn = document.createElement('button'); btn.textContent = b; btn.className = 'bean-btn';
+        if (b === bean || (mode === 'espresso' && b === '混豆')) { btn.classList.add('active'); bean = b; }
+        btn.onclick = () => { bean = b; wrap.querySelectorAll('.bean-btn').forEach(x => x.classList.remove('active')); btn.classList.add('active'); };
+        wrap.appendChild(btn);
     });
-  }
-}
-function setFlow(i,f){pours[i].flow=f;renderLogs()}
-
-/* ===== 儲存 & 清除 & 歷史 ===== */
-function saveRecord(){
-  if(mode==='pour'){
-    if(pours.length===0){alert("手沖未紀錄任何注水"); return;}
-    const rec={time:new Date().toLocaleString(),mode,bean,dose:doseSel.value,grind:grindSel.value,target,ratio:ratioSpan.textContent,pours:[...pours]};
-    const h=JSON.parse(localStorage.getItem('pourLogs')||'[]');h.unshift(rec);localStorage.setItem('pourLogs',JSON.stringify(h));
-  } else {
-    const rec={time:new Date().toLocaleString(),mode,bean,dose:doseSel.value,grind:grindSel.value,target,ratio:ratioSpan.textContent,shotTime};
-    const h=JSON.parse(localStorage.getItem('espLogs')||'[]');h.unshift(rec);localStorage.setItem('espLogs',JSON.stringify(h));
-  }
-  renderHistory(); clearCurrent();
 }
 
-function clearCurrent(){pours=[];elapsed=0;pourEnded=false;paused=false;document.getElementById('timer').textContent='0:00';document.getElementById('pauseBtn').textContent='暫停';document.getElementById('startBtn').style.display='inline-block';renderLogs();}
-function clearAll(){localStorage.removeItem('pourLogs');localStorage.removeItem('espLogs');renderHistory();clearCurrent();}
-
-function renderHistory(){
-  const wrap=document.getElementById('history'); wrap.innerHTML='';
-  const pourH=JSON.parse(localStorage.getItem('pourLogs')||'[]');
-  const espH=JSON.parse(localStorage.getItem('espLogs')||'[]');
-
-  function createItem(r,i,isEsp){
-    const div=document.createElement('div'); div.className='history-item';
-    div.innerHTML=`<div class="history-header"><span>${r.time}｜${r.bean}｜粉:${r.dose}g｜研磨:${r.grind}${isEsp?`｜秒數:${r.shotTime}s`:`｜段數:${r.pours.length}`}</span><span class="delete-btn" onclick="deleteHistory(${i},'${isEsp?'esp':'pour'}')">刪除</span></div>`;
-    if(!isEsp){
-      const detail=document.createElement('div'); detail.className='history-detail';
-      detail.innerHTML=r.pours.map(p=>`<div>${p.index}｜${p.total}s｜${p.water||'-'} g｜${p.flow}</div>`).join('');
-      div.appendChild(detail);
-      div.querySelector('.history-header span:first-child').onclick=()=>{detail.style.display=detail.style.display==='none'?'block':'none';}
+function handleTimerClick() {
+    const btn = document.getElementById('mainTimerBtn');
+    if (!isRunning) {
+        isRunning = true; btn.textContent = '結束沖煮'; btn.style.background = 'var(--danger)';
+        startTime = Date.now() - elapsed;
+        timerInt = setInterval(() => {
+            elapsed = Date.now() - startTime;
+            document.getElementById('timer').textContent = formatTime(elapsed);
+        }, 100);
+    } else {
+        isRunning = false; btn.textContent = '開始沖煮'; btn.style.background = 'var(--main)';
+        clearInterval(timerInt); timerInt = null;
+        finalizeBrew();
     }
-    return div;
-  }
-
-  if(pourH.length>0){wrap.appendChild(document.createElement('div')).textContent='手沖歷史';}
-  pourH.forEach((r,i)=>wrap.appendChild(createItem(r,i,false)));
-  if(espH.length>0){wrap.appendChild(document.createElement('div')).textContent='義式歷史';}
-  espH.forEach((r,i)=>wrap.appendChild(createItem(r,i,true)));
 }
 
-function deleteHistory(index,type){
-  if(type==='pour'){
-    let h=JSON.parse(localStorage.getItem('pourLogs')||'[]');
-    h.splice(index,1);
-    localStorage.setItem('pourLogs',JSON.stringify(h));
-  } else {
-    let h=JSON.parse(localStorage.getItem('espLogs')||'[]');
-    h.splice(index,1);
-    localStorage.setItem('espLogs',JSON.stringify(h));
-  }
-  renderHistory();
+function resetTimer() {
+    clearInterval(timerInt); timerInt = null; elapsed = 0; isRunning = false;
+    finalStats = { liquid: 0, ratio: '-', time: '0:00' };
+    document.getElementById('timer').textContent = '0:00'; 
+    pours = []; renderLogs();
+    document.getElementById('logBtn').disabled = false;
+    document.getElementById('mainTimerBtn').textContent = '開始沖煮';
+    document.getElementById('mainTimerBtn').style.background = 'var(--main)';
 }
 
-/* ===== 初始化 ===== */
-selectMode('pour',document.querySelector('#modeBtns button.active'));
-renderHistory();
+function logAction() {
+    if (!isRunning) return;
+    const currentTotalMs = elapsed;
+    const totalStr = formatTime(currentTotalMs);
+    if (mode === 'pour') {
+        const lastAbsMs = pours.length > 0 ? pours[pours.length-1].absMs : 0;
+        pours.push({ 
+            name: pours.length === 0 ? '悶蒸' : `注水 ${pours.length}`, 
+            total: totalStr, absMs: currentTotalMs,
+            diff: formatTime(currentTotalMs - lastAbsMs),
+            path: '中心點', waterLevel: '低水位',
+            cumLiquid: (pours.length === 0 ? 40 : 0), diffLiquid: 0 
+        });
+        calcStats(); renderLogs();
+    } else if (pours.length === 0) {
+        pours.push({ name: '預浸', total: totalStr, diff: (elapsed/1000).toFixed(1)+'s', absSec: elapsed/1000 });
+        document.getElementById('logBtn').textContent = '萃取中...';
+        document.getElementById('logBtn').disabled = true;
+        renderLogs();
+    }
+}
+
+function finalizeBrew() {
+    const totalMs = elapsed;
+    const totalStr = formatTime(totalMs);
+    if (mode === 'pour') {
+        if (pours.length > 0) {
+            const lastIdx = pours.length - 1;
+            pours[lastIdx].total = totalStr;
+            pours[lastIdx].absMs = totalMs;
+            const prevMs = (lastIdx === 0) ? 0 : pours[lastIdx-1].absMs;
+            pours[lastIdx].diff = formatTime(totalMs - prevMs);
+        }
+    } else {
+        const totalSec = totalMs / 1000;
+        if (pours.length === 1) pours.push({ name: '萃取', total: totalStr, diff: (totalSec - pours[0].absSec).toFixed(1)+'s' });
+        else if (pours.length === 0) pours.push({ name: '萃取(全)', total: totalStr, diff: totalSec.toFixed(1)+'s' });
+        if (finalStats.liquid === 0) updateEspLiquid(40);
+    }
+    finalStats.time = totalStr;
+    calcStats(); renderLogs();
+}
+
+function updateDetail(idx, field, val) {
+    pours[idx][field] = (field === 'cumLiquid') ? parseInt(val) : val;
+    calcStats(); renderLogs();
+}
+
+function calcStats() {
+    const dose = parseFloat(document.getElementById('dose').value);
+    for (let i = 0; i < pours.length; i++) {
+        const prevCum = (i === 0) ? 0 : pours[i-1].cumLiquid;
+        pours[i].diffLiquid = pours[i].cumLiquid > 0 ? pours[i].cumLiquid - prevCum : 0;
+    }
+    if (pours.length > 0 && mode === 'pour') {
+        const lastVal = pours[pours.length-1].cumLiquid;
+        finalStats.liquid = lastVal;
+        finalStats.ratio = lastVal > 0 ? `1:${(lastVal / dose).toFixed(1)}` : '-';
+    }
+}
+
+function renderLogs() {
+    const wrap = document.getElementById('logs'); wrap.innerHTML = '';
+    const foot = document.getElementById('logFoot'); foot.innerHTML = '';
+    pours.forEach((p, i) => {
+        const tr = document.createElement('tr');
+        if (mode === 'pour') {
+            let pathOpt = `<select onchange="updateDetail(${i}, 'path', this.value)">` + ['中心點','小圈','大圈','來回'].map(v=>`<option value="${v}" ${p.path===v?'selected':''}>${v}</option>`).join('') + `</select>`;
+            let levelOpt = `<select onchange="updateDetail(${i}, 'waterLevel', this.value)">` + ['低水位','中水位','高水位'].map(v=>`<option value="${v}" ${p.waterLevel===v?'selected':''}>${v}</option>`).join('') + `</select>`;
+            let cumOpt = `<select onchange="updateDetail(${i}, 'cumLiquid', this.value)"><option value="0">-</option>`;
+            for(let j=20; j<=450; j+=5) { cumOpt += `<option value="${j}" ${p.cumLiquid==j?'selected':''}>${j}g</option>`; }
+            cumOpt += `</select>`;
+            tr.innerHTML=`<td>${p.name}</td><td>${p.diff}</td><td>${p.total}</td><td>${pathOpt}</td><td>${levelOpt}</td><td>${cumOpt}</td><td style="color:var(--primary); font-weight:bold;">${p.diffLiquid > 0 ? '+'+p.diffLiquid : '-'}</td>`;
+        } else {
+            tr.innerHTML=`<td>${p.name}</td><td>${p.diff||'-'}</td><td>${p.total||'-'}</td>`;
+        }
+        wrap.appendChild(tr);
+    });
+    if (mode === 'espresso' && (finalStats.time !== '0:00' || !isRunning)) {
+        let sel = `<select onchange="updateEspLiquid(this.value)" class="param-select" style="width:70px;"><option value="0">液重</option>`;
+        for(let i=15; i<=70; i++) sel += `<option value="${i}" ${finalStats.liquid==i?'selected':''}>${i}g</option>`;
+        sel += `</select>`;
+        foot.innerHTML = `<tr class="summary-row"><td colspan="2">濃縮液重: ${sel}</td><td>比值: ${finalStats.ratio}</td></tr>`;
+    } else if (mode === 'pour') {
+        foot.innerHTML = `<tr class="summary-row"><td colspan="4">總計: ${finalStats.liquid}g</td><td colspan="3">粉水比: ${finalStats.ratio}</td></tr>`;
+    }
+}
+
+function updateEspLiquid(val) {
+    finalStats.liquid = parseInt(val);
+    const dose = parseFloat(document.getElementById('dose').value);
+    finalStats.ratio = finalStats.liquid > 0 ? `1:${(finalStats.liquid / dose).toFixed(1)}` : '-';
+    renderLogs();
+}
+
+function saveRecord() {
+    if (pours.length === 0 || finalStats.liquid === 0) { alert("請填寫數據並結束計時！"); return; }
+    const key = (mode === 'pour') ? 'pourLogs' : 'espLogs';
+    const history = JSON.parse(localStorage.getItem(key) || '[]');
+    history.unshift({
+        time: new Date().toLocaleString('zh-TW',{hour12:false, month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'}).replace(/\//g,'-'), 
+        bean, dose: document.getElementById('dose').value, grind: document.getElementById('grind').value, 
+        temp: (mode === 'pour') ? document.getElementById('temp').value : 'N/A',
+        target: finalStats.liquid, pours: JSON.parse(JSON.stringify(pours)), mode, finalStats: {...finalStats},
+        evaluation: { strength: document.getElementById('eval-strength').value, balance: document.getElementById('eval-balance').value }
+    });
+    localStorage.setItem(key, JSON.stringify(history));
+    renderHistory(); resetTimer();
+}
+
+function formatSingleRecord(r) {
+    let text = `● ${r.bean} (${r.time})\n  粉:${r.dose}g | 研磨:${r.grind}${r.mode==='pour'?' | 水溫:'+r.temp+'°C':''}\n  結果:${r.target}g | 比值:${r.finalStats.ratio} | 總時:${r.finalStats.time}\n  風味：${r.evaluation.strength} / ${r.evaluation.balance}\n`;
+    r.pours.forEach(p => text += (r.mode==='pour') ? `  └ ${p.name}: ${p.diff} (總${p.total}) | ${p.cumLiquid}g [${p.path}/${p.waterLevel}]\n` : `  └ ${p.name}: ${p.diff} (總${p.total})\n`);
+    return text + `\n`;
+}
+
+async function shareRecord(key, index) {
+    const list = JSON.parse(localStorage.getItem(key));
+    const text = `【咖啡紀錄】\n` + formatSingleRecord(list[index]);
+    if (navigator.share) { try { await navigator.share({ text: text }); } catch (err) {} }
+    else { navigator.clipboard.writeText(text).then(() => alert('已複製紀錄！')); }
+}
+
+async function shareAllRecords() {
+    const pLogs = JSON.parse(localStorage.getItem('pourLogs')||'[]');
+    const eLogs = JSON.parse(localStorage.getItem('espLogs')||'[]');
+    if(pLogs.length === 0 && eLogs.length === 0) { alert("目前沒有紀錄可分享"); return; }
+    let fullText = `☕【咖啡紀錄全備份】\n\n`;
+    pLogs.forEach(r => fullText += formatSingleRecord(r));
+    eLogs.forEach(r => fullText += formatSingleRecord(r));
+    if (navigator.share) { try { await navigator.share({ text: fullText }); } catch (err) {} }
+    else { navigator.clipboard.writeText(fullText).then(() => alert('全部紀錄已複製！')); }
+}
+
+function renderHistory() {
+    ['pour-history','esp-history'].forEach(id => document.getElementById(id).innerHTML='');
+    ['pourLogs','espLogs'].forEach(key => {
+        const list = JSON.parse(localStorage.getItem(key) || '[]');
+        const wrap = document.getElementById(key === 'pourLogs' ? 'pour-history' : 'esp-history');
+        if(list.length > 0) {
+            wrap.innerHTML = `<div class="history-group-title" style="font-size:13px; font-weight:bold; margin:15px 0 8px; color:var(--primary);">${key==='pourLogs'?'📋 手沖日誌':'☕ 義式日誌'}</div>`;
+            list.forEach((item, idx) => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.innerHTML = `
+                    <div class="history-header" onclick="toggleDetail(this)" style="padding:10px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                        <div style="font-size:12px;"><b>${item.bean}</b> <small style="color:#888;">${item.time}</small><br><span style="color:#666;">${item.finalStats.ratio} (${item.target}g) | ${item.evaluation.strength}</span></div>
+                        <div><button onclick="shareRecord('${key}',${idx})" style="padding:4px 8px; font-size:11px; border:1px solid #ccc; background:none; border-radius:6px;">分享</button><button onclick="deleteItem('${key}',${idx},event)" style="margin-left:8px; color:#ccc; border:none; background:none;">✕</button></div>
+                    </div>
+                    <div class="history-detail" style="display:none; padding:10px; border-top:1px solid #eee; font-size:12px; background:#fafafa;">
+                        <div>參數：${item.dose}g / 研磨${item.grind}${item.mode==='pour'?' / '+item.temp+'°C':''}</div>
+                        <div>評鑑：${item.evaluation.strength} / ${item.evaluation.balance}</div>
+                        <table class="log-table" style="background:white;">
+                            ${item.pours.map(p => item.mode==='pour' ? `<tr><td>${p.name}</td><td>${p.diff}</td><td>${p.total}</td><td>${p.path}</td><td>${p.waterLevel}</td><td>${p.cumLiquid}g</td></tr>` : `<tr><td>${p.name}</td><td>${p.diff}</td><td>${p.total}</td></tr>`).join('')}
+                        </table>
+                    </div>`;
+                wrap.appendChild(div);
+            });
+        }
+    });
+}
+
+function toggleDetail(el) { const d = el.nextElementSibling; d.style.display = (d.style.display === 'block') ? 'none' : 'block'; }
+function deleteItem(k, i, e) { e.stopPropagation(); if (confirm("確定刪除此筆紀錄？")) { const h = JSON.parse(localStorage.getItem(k)); h.splice(i, 1); localStorage.setItem(k, JSON.stringify(h)); renderHistory(); } }
+
+// 新增：清除所有歷史紀錄函式
+function clearAllHistory() {
+    if (confirm("⚠️ 注意：這將會永久刪除「所有手沖與義式」的歷史紀錄，且無法復原。確定要執行嗎？")) {
+        localStorage.removeItem('pourLogs');
+        localStorage.removeItem('espLogs');
+        renderHistory();
+        alert("已清空所有歷史紀錄。");
+    }
+}
 </script>
 </body>
 </html>
