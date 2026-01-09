@@ -120,6 +120,11 @@ body { margin: 0; font-family: -apple-system, "Noto Sans TC", sans-serif; backgr
 
   <div class="card history-section">
     <div class="section-title">歷史日誌</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+  <button onclick="exportBackup()" style="background:#607d8b; color:white; border:none; padding:10px; border-radius:10px; font-size:13px; font-weight:bold;">💾 導出備份檔</button>
+  <button onclick="document.getElementById('importFile').click()" style="background:#78909c; color:white; border:none; padding:10px; border-radius:10px; font-size:13px; font-weight:bold;">📥 匯入備份檔</button>
+  <input type="file" id="importFile" style="display:none" onchange="importBackup(this)">
+</div>
     <button onclick="shareAllRecords()" style="background:var(--share); color:white; border:none; width:100%; padding:12px; border-radius:10px; margin-bottom:12px; font-weight:bold;">📤 分享全部紀錄</button>
     <div id="pour-history-wrap"><div id="pour-history"></div></div>
     <div id="esp-history-wrap"><div id="esp-history"></div></div>
@@ -223,6 +228,46 @@ function logAction() {
     }
 }
 
+// 導出備份
+function exportBackup() {
+    const data = {
+        pourLogs: JSON.parse(localStorage.getItem('pourLogs') || '[]'),
+        espLogs: JSON.parse(localStorage.getItem('espLogs') || '[]'),
+        backupDate: new Date().toISOString()
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `coffee_backup_${new Date().toLocaleDateString()}.json`;
+    a.click();
+}
+
+// 匯入備份
+function importBackup(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (confirm("匯入將會與現有紀錄合併，確定嗎？")) {
+                const oldPour = JSON.parse(localStorage.getItem('pourLogs') || '[]');
+                const oldEsp = JSON.parse(localStorage.getItem('espLogs') || '[]');
+                
+                // 合併並去重（簡單處理：合併後重新渲染）
+                localStorage.setItem('pourLogs', JSON.stringify([...data.pourLogs, ...oldPour]));
+                localStorage.setItem('espLogs', JSON.stringify([...data.espLogs, ...oldEsp]));
+                
+                renderHistory();
+                alert("匯入成功！");
+            }
+        } catch (err) {
+            alert("檔案格式錯誤，請確保是正確的備份檔。");
+        }
+    };
+    reader.readAsText(file);
+}
 function finalizeBrew() {
     const totalMs = elapsed;
     const totalStr = formatTime(totalMs);
