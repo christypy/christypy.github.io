@@ -135,17 +135,21 @@
 </div>
 
 <div class="section-card">
-    <div class="section-header">💰 飲品與單品價格表</div>
+    <div class="section-header">💰 單品豆單價格 (每一款)</div>
     <table class="price-table">
         <thead>
             <tr><th>品項</th><th>外帶</th><th>內用</th><th>半磅</th><th>濾掛</th></tr>
         </thead>
         <tbody>
             <tr><td><b>覺</b></td><td class="price-val">200</td><td class="price-val">250</td><td class="price-val">950</td><td>-</td></tr>
-            <tr><td><b>花/寶</b></td><td class="price-val">180</td><td class="price-val">230</td><td class="price-val">850</td><td class="price-val">55</td></tr>
-            <tr><td><b>菩/雅/靜/果</b></td><td class="price-val">130</td><td class="price-val">180</td><td class="price-val">600~700</td><td class="price-val">45</td></tr>
-            <tr><td><b>福/柔</b></td><td class="price-val">130</td><td class="price-val">180</td><td class="price-val">450~550</td><td class="price-val">35</td></tr>
-            <tr style="background:#fdf6e9"><td colspan="5"><b>義式：</b>美式 70/75 | 拿鐵 85 | 大美 80 | 大拿 95 | 歐蕾(抹茶/巧) 85</td></tr>
+            <tr><td><b>花</b></td><td class="price-val">180</td><td class="price-val">230</td><td class="price-val">850</td><td class="price-val">55</td></tr>
+            <tr><td><b>寶</b></td><td class="price-val">180</td><td class="price-val">230</td><td class="price-val">850</td><td class="price-val">55</td></tr>
+            <tr><td><b>菩</b></td><td class="price-val">130</td><td class="price-val">180</td><td class="price-val">700</td><td class="price-val">45</td></tr>
+            <tr><td><b>雅</b></td><td class="price-val">130</td><td class="price-val">180</td><td class="price-val">650</td><td class="price-val">45</td></tr>
+            <tr><td><b>靜</b></td><td class="price-val">130</td><td class="price-val">180</td><td class="price-val">650</td><td class="price-val">45</td></tr>
+            <tr><td><b>果</b></td><td class="price-val">130</td><td class="price-val">180</td><td class="price-val">600</td><td class="price-val">45</td></tr>
+            <tr><td><b>福</b></td><td class="price-val">130</td><td class="price-val">180</td><td class="price-val">550</td><td class="price-val">35</td></tr>
+            <tr><td><b>柔</b></td><td class="price-val">130</td><td class="price-val">180</td><td class="price-val">450</td><td class="price-val">35</td></tr>
         </tbody>
     </table>
 </div>
@@ -153,6 +157,8 @@
 <div class="section-card">
     <div class="section-header" style="background:#6d4c41">📖 調製配方備忘</div>
     <div class="recipe-box">
+        <div class="recipe-title">☕ 義式基礎飲品價格</div>
+        熱美式 70 / 冰美式 75 / 熱拿鐵 85 / 冰拿鐵 85 / 大熱美 80 / 大熱拿 95 / 歐蕾 85
         <div class="recipe-title">☕ 基礎比例</div>
         20g 粉 ➔ 萃取 40g 濃縮 (30-45s)。<br>
         <div class="recipe-title">🍵 抹茶/巧克力歐蕾</div>
@@ -169,12 +175,14 @@
         { loc: "右鄰", name: "糖果", item: "熱拿鐵", note: "付兩天", type: "hot_latte", days: [6, 0], groupId: "n5" },
         { loc: "左鄰", name: "牛肉", item: "熱拿鐵", tag: "加3g糖", type: "hot_latte_sugar", days: [3, 5, 0], groupId: "n6" },
         { loc: "左鄰", name: "布老闆", item: "熱美式", note: "寄杯", type: "hot_am", days: [5], groupId: "n7" },
-        { loc: "左鄰", name: "甘蔗雞", item: "美式(冬熱夏冰)", type: "hot_am", days: [], groupId: "n8" },
+        { loc: "左鄰", name: "甘蔗雞", item: "熱/冰美式", type: "hot_am", days: [], groupId: "n8" },
+        { loc: "左鄰", name: "國聯哥", item: "冰美式", type: "ice_am", days: [], groupId: "n12" },
         { loc: "左鄰", name: "宜蘭魚攤", item: "冰美+冰拿", tag: "加糖", type: "ice_latte_sugar", days: [6], count: 2, groupId: "n9" },
-        { loc: "區域", name: "賣魚員工", item: "大熱美", tag: "付兩天", type: "large_hot_am", days: [6, 0], groupId: "o1" },
+        { loc: "區域", name: "賣魚員工", item: "大熱美", tag: "六給兩天錢", type: "large_hot_am", days: [6, 0], groupId: "o1" },
         { loc: "區域", name: "牛肉爸爸", item: "大拿鐵", tag: "粉20g", type: "large_hot_latte", days: [], groupId: "o2" },
+        { loc: "區域", name: "牛肉兒子", item: "大拿鐵", type: "large_hot_latte", days: [], groupId: "o2_son" },
         { loc: "區域", name: "魚老闆", item: "大拿鐵", note: "寄杯", type: "large_hot_latte", days: [2, 3, 5], groupId: "o3" },
-        { loc: "區域", name: "水果攤(魚隔壁)", item: "熱拿鐵", type: "hot_latte", days: [2, 3, 6, 0], groupId: "o4" },
+        { loc: "區域", name: "魚老闆鄰居", item: "熱拿鐵", type: "hot_latte", days: [2, 3, 6, 0], groupId: "o4" },
         { loc: "區域", name: "蝦老闆", item: "熱美式", type: "hot_am", days: [2, 4, 5, 6, 0], groupId: "o5" },
         { loc: "區域", name: "蜜蘋果", item: "熱拿鐵", tag: "當日問", type: "hot_latte", days: [4, 5], groupId: "o6" },
         { loc: "區域", name: "鐵鍋行", item: "冰美式", type: "ice_am", days: [5], count: 2, groupId: "o7" },
@@ -182,10 +190,21 @@
         { loc: "區域", name: "抓餅女老闆", item: "熱美式", tag: "當日問", type: "hot_am", days: [2, 4], groupId: "o9" },
         { loc: "區域", name: "豐原素食", item: "熱美式", type: "hot_am", days: [3], groupId: "o10" },
         { loc: "區域", name: "國聯哥媽媽", item: "熱美式", type: "hot_am", days: [2, 5], groupId: "o11" },
-        { loc: "區域", name: "豆腐老闆", item: "冰美式", tag: "當日問", type: "ice_am", days: [6], groupId: "o12" }
+        { loc: "區域", name: "豆腐老闆", item: "冰美式", tag: "當天問", type: "ice_am", days: [6], groupId: "o12" },
+        { loc: "區域", name: "貢丸老闆", item: "手沖+拿鐵", note: "總計$185", type: "hand_drip", days: [3, 0], count: 2, groupId: "o13" },
+        { loc: "區域", name: "豬肉老闆", item: "熱美式", note: "寄杯", type: "hot_am", days: [], groupId: "o14" }
     ];
 
-    const types = { hot_am: "☕ 熱美式", ice_am: "🧊 冰美式", hot_latte: "🔥 熱拿鐵", hot_latte_sugar: "🍬 熱拿(糖)", ice_latte_sugar: "🍭 冰拿(糖)", large_hot_am: "🥤 大熱美", large_hot_latte: "🥤 大熱拿", hand_drip: "💧 手沖" };
+    const types = { 
+        hot_am: "☕ 熱美式", 
+        ice_am: "🧊 冰美式", 
+        hot_latte: "🔥 熱拿鐵", 
+        hot_latte_sugar: "🍬 熱拿(糖)", 
+        ice_latte_sugar: "🍭 冰拿(糖)", 
+        large_hot_am: "🥤 大熱美", 
+        large_hot_latte: "🥤 大熱拿", 
+        hand_drip: "💧 手沖" 
+    };
 
     const getDayKey = () => new Date().toISOString().slice(0, 10);
 
@@ -201,7 +220,9 @@
             let target = c.loc.includes("鄰") ? dataN : dataO;
             let isAbs = localStorage.getItem(`abs_${getDayKey()}_${c.groupId}`);
             let cnt = c.count || 1;
+            
             if (!isAbs) target[c.type].total += cnt;
+            
             for(let i=0; i<cnt; i++) {
                 let isDone = localStorage.getItem(`done_${getDayKey()}_${c.groupId}_${i}`);
                 if (isDone && !isAbs) target[c.type].done++;
@@ -233,6 +254,7 @@
     }
 
     window.toggleDone = (id, idx) => {
+        if (localStorage.getItem(`abs_${getDayKey()}_${id}`)) return;
         let key = `done_${getDayKey()}_${id}_${idx}`;
         localStorage.getItem(key) ? localStorage.removeItem(key) : localStorage.setItem(key, '1');
         renderOrders();
