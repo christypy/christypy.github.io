@@ -17,9 +17,6 @@
         --color-total-progress: #d68910; 
         --color-section-bg: #ffffff; 
         --color-text: #333333; 
-
-        --shadow-subtle: 0 1px 4px rgba(0,0,0,0.08);
-        --shadow-medium: 0 3px 8px rgba(0,0,0,0.1);
         --border-radius-lg: 12px;
         --border-radius-md: 8px;
     }
@@ -31,120 +28,69 @@
         color: var(--color-text); 
         max-width: 960px; 
         margin: 0 auto;
-        line-height: 1.5;
+        line-height: 1.6;
     }
 
-    h2 { 
-        text-align: center; 
-        color: var(--color-primary); 
-        margin: 15px 0 10px 0; 
-        font-size: 24px; 
-        font-weight: 700;
-    }
+    h2 { text-align: center; color: var(--color-primary); margin: 20px 0 15px 0; font-size: 26px; }
 
-    /* 頂部按鈕 */
-    .nav-container {
-        display: flex;
-        gap: 8px;
-        justify-content: center;
-        margin-bottom: 15px;
-    }
+    /* 頂部導覽 */
+    .nav-container { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
     .nav-btn {
-        background: #607d8b;
-        color: white;
-        border: none;
-        padding: 8px 15px;
-        border-radius: 20px;
-        font-size: 14px;
-        cursor: pointer;
-        text-decoration: none;
-        flex: 1;
-        max-width: 120px;
-        text-align: center;
+        background: #607d8b; color: white; border: none; padding: 10px 20px;
+        border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 14px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1); flex: 1; max-width: 150px; text-align: center;
     }
 
+    /* 資訊區塊 */
     .info-section {
-        background: var(--color-section-bg);
-        padding: 12px;
-        border-radius: var(--border-radius-lg);
-        box-shadow: var(--shadow-medium);
-        margin-bottom: 15px;
-        border-left: 5px solid var(--color-secondary);
+        background: var(--color-section-bg); padding: 15px; border-radius: var(--border-radius-lg);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; border-left: 5px solid var(--color-secondary);
     }
-    .info-section h3 {
-        color: var(--color-primary);
-        font-size: 16px;
-        margin: 0 0 8px 0;
-        border-bottom: 2px dashed var(--color-light-gray);
-        padding-bottom: 5px;
-    }
+    .info-section h3 { color: var(--color-primary); font-size: 18px; margin: 0 0 10px 0; border-bottom: 2px dashed var(--color-light-gray); padding-bottom: 8px; }
 
     /* 控制區 */
-    .controls { 
-        background: var(--color-section-bg); 
-        padding: 12px; 
-        border-radius: var(--border-radius-lg); 
-        box-shadow: var(--shadow-subtle); 
-        margin-bottom: 15px; 
-        display: flex; 
-        gap: 8px; 
-        flex-wrap: wrap;
-    }
-    select { 
-        padding: 10px; 
-        font-size: 15px; 
-        border-radius: var(--border-radius-md); 
-        border: 1px solid var(--color-light-gray); 
-        flex: 2;
-        min-width: 120px;
-    }
-    .btn { 
-        background: var(--color-accent); 
-        color: var(--color-primary); 
-        border: none; 
-        padding: 10px; 
-        border-radius: var(--border-radius-md); 
-        cursor: pointer; 
-        font-weight: bold; 
-        flex: 1;
-    }
+    .controls { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+    select { padding: 10px; font-size: 16px; border-radius: 8px; border: 1px solid #ddd; flex: 2; min-width: 150px; }
+    .btn { background: var(--color-accent); color: var(--color-primary); border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; flex: 1; }
     #clearAllBtn { background: #aaaaaa; color: white; }
 
     /* 統計區 */
-    .stats-container { display: flex; gap: 15px; margin-bottom: 15px; flex-direction: column; }
+    .stats-container { display: flex; gap: 20px; margin-bottom: 20px; flex-direction: column; }
     @media (min-width: 768px) { .stats-container { flex-direction: row; } }
+    .stat-box { flex: 1; background: white; border-radius: 12px; padding: 15px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); border-top: 6px solid var(--color-primary); }
     
-    .stat-box { flex: 1; background: var(--color-section-bg); border-radius: var(--border-radius-lg); padding: 12px; box-shadow: var(--shadow-medium); border-top: 6px solid var(--color-primary); }
-    .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 5px; cursor: pointer; font-size: 14px; }
-    .stat-row-progress { height: 4px; background: var(--color-light-gray); border-radius: 2px; margin-bottom: 8px; overflow: hidden; }
-    .progress-fill { height: 100%; background: var(--color-accent); }
+    /* 訂單行樣式 */
+    .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; cursor: pointer; border-radius: 6px; font-weight: 500; }
+    .stat-row:hover { background: #f9f9f9; }
+    .stat-row-progress { height: 6px; background: #eee; border-radius: 3px; margin: 0 10px 10px 10px; overflow: hidden; }
+    .progress-fill { height: 100%; transition: width 0.3s ease; }
+
+    /* 明細樣式 (含缺席功能) */
+    .stat-detail-list { display: block; padding: 5px 0; border-top: 1px dashed #eee; }
+    .stat-detail-item { display: flex; align-items: center; padding: 10px; border-bottom: 1px dotted #eee; }
+    .stat-detail-item.done { background: #f4f4f4; opacity: 0.6; text-decoration: line-through; }
+    .stat-detail-item.absent { background: #fdf2f2; opacity: 0.5; }
+    .customer-info { flex: 1; display: flex; flex-direction: column; }
+    .customer-name { font-weight: bold; color: var(--color-primary); display: flex; align-items: center; }
+    .customer-tag { font-size: 11px; background: var(--color-accent); color: var(--color-primary); padding: 1px 5px; border-radius: 4px; margin-left: 8px; font-weight: bold; }
+    .customer-loc { font-size: 12px; color: #777; }
+    
+    .absence-toggle { background: #eee; color: #cf4a4a; border: 1px solid #ddd; border-radius: 4px; padding: 4px 8px; font-size: 12px; cursor: pointer; margin-right: 10px; font-weight: bold; }
 
     /* 價格卡片 */
     .price-card-container { display: grid; grid-template-columns: 1fr; gap: 15px; }
     @media (min-width: 600px) { .price-card-container { grid-template-columns: 1fr 1fr; } }
-    
-    .price-card { background: #fff; border-radius: var(--border-radius-lg); border: 1px solid var(--color-light-gray); overflow: hidden; }
-    .price-card-header { background: var(--color-primary); color: #fff; padding: 8px; font-weight: bold; text-align: center; font-size: 15px; }
-    .price-grid { display: grid; grid-template-columns: 1fr 1fr; padding: 5px; }
-    .price-item { padding: 6px 8px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; font-size: 13px; }
+    .price-card { background: white; border-radius: 12px; border: 1px solid #eee; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    .price-card-header { background: var(--color-primary); color: white; padding: 10px; text-align: center; font-weight: bold; }
+    .price-grid { display: grid; grid-template-columns: 1fr 1fr; padding: 10px; }
+    .price-item { padding: 8px; border-bottom: 1px solid #f9f9f9; display: flex; justify-content: space-between; font-size: 14px; }
     .p-value { color: var(--color-danger); font-weight: bold; }
     .p-value::before { content: '$'; }
 
-    /* 單品豆單表格 - 無捲軸優化 */
+    /* 豆單表格 - 滿版不捲動 */
     .menu-group-full { width: 100%; border-collapse: collapse; table-layout: fixed; }
-    .menu-group-full th { background: var(--color-secondary); color: white; padding: 8px 2px; font-size: 13px; }
-    .menu-group-full td { padding: 8px 2px; text-align: center; font-size: 12px; border-bottom: 1px solid #eee; }
-    .menu-price { color: var(--color-danger); font-weight: bold; }
-    .menu-price::before { content: '$'; }
-    .menu-price:empty::before { content: ''; }
-
-    /* 訂單明細清單樣式 */
-    .stat-detail-list { display: none; padding: 5px 0; border-top: 1px dashed var(--color-light-gray); }
-    .stat-detail-item { display: flex; align-items: center; padding: 8px 5px; border-bottom: 1px dotted #e0e0e0; font-size: 13px; }
-    .customer-info { flex: 1; display: flex; flex-direction: column; }
-    .customer-name { font-weight: bold; color: var(--color-primary); }
-    .stat-detail-item.done { background: var(--color-done-bg); opacity: 0.6; text-decoration: line-through; }
-    .customer-tag { font-size: 10px; background: var(--color-accent); padding: 1px 4px; border-radius: 3px; margin-left: 5px; }
+    .menu-group-full th { background: var(--color-secondary); color: white; padding: 10px 2px; font-size: 13px; }
+    .menu-group-full td { padding: 10px 2px; text-align: center; font-size: 13px; border-bottom: 1px solid #eee; }
 </style>
 </head>
 <body>
@@ -172,21 +118,21 @@
 
 <div class="info-section">
     <h3>📝 常駐備忘</h3>
-    <ul id="staticMemoList" style="list-style: none; padding:0; font-size:14px;">
-        <li><b style="color:var(--color-danger)">恐龍嫩仙草：</b>環保杯熱美式</li>
-        <li><b style="color:var(--color-danger)">內衣店老闆：</b>熱拿鐵</li>
-        <li><b style="color:var(--color-danger)">芭樂：</b>熱拿鐵 + 糖(3g)</li>
+    <ul id="staticMemoList" style="list-style: none; padding: 0; font-size: 14px;">
+        <li><b>恐龍嫩仙草：</b>環保杯熱美式</li>
+        <li><b>內衣店老闆：</b>熱拿鐵</li>
+        <li><b>芭樂：</b>熱拿鐵 + 糖(3g)</li>
     </ul>
     <div id="dynamicMemoList"></div>
 </div>
 
 <div class="stats-container">
     <div class="stat-box" style="border-top-color: var(--color-success);">
-        <h3>🏠 左右鄰居</h3>
+        <h3>🏠 左右鄰居 總計</h3>
         <div id="stats-neighbor"></div>
     </div>
     <div class="stat-box" style="border-top-color: var(--color-total-progress);">
-        <h3>🛵 其他區域</h3>
+        <h3>🛵 其他區域 總計</h3>
         <div id="stats-other"></div>
     </div>
 </div>
@@ -201,9 +147,9 @@
             <div class="price-item"><span>冰拿鐵</span><span class="p-value">85</span></div>
             <div class="price-item"><span>大熱美</span><span class="p-value">80</span></div>
             <div class="price-item"><span>大熱拿</span><span class="p-value">95</span></div>
-            <div class="price-item"><span>熱牛奶</span><span class="p-value">50</span></div>
             <div class="price-item"><span>抹茶歐蕾</span><span class="p-value">85</span></div>
             <div class="price-item"><span>巧克力歐蕾</span><span class="p-value">85</span></div>
+            <div class="price-item"><span>熱牛奶</span><span class="p-value">50</span></div>
         </div>
     </div>
     <div class="price-card">
@@ -213,74 +159,72 @@
             <div class="price-item"><span>即溶(1條)</span><span class="p-value">16</span></div>
             <div class="price-item"><span>酸柑茶(大)</span><span class="p-value">950</span></div>
             <div class="price-item"><span>即溶(30條)</span><span class="p-value">475</span></div>
-            <div class="price-item"><span>酸柑茶(100)</span><span class="p-value">1440</span></div>
-            <div class="price-item"><span>即溶(100)</span><span class="p-value">1450</span></div>
             <div class="price-item"><span>小濾紙</span><span class="p-value">120</span></div>
             <div class="price-item"><span>大濾紙</span><span class="p-value">130</span></div>
-            <div class="price-item"><span>濾掛紙(50)</span><span class="p-value">150</span></div>
         </div>
     </div>
 </div>
 
 <div class="info-section" style="margin-top:20px;">
-    <h3>📋 單品豆單 (完整版)</h3>
+    <h3>📋 單品豆單價格</h3>
     <table class="menu-group-full">
         <thead>
             <tr><th width="20%">品項</th><th>外帶</th><th>內用</th><th>半磅</th><th>濾掛</th></tr>
         </thead>
         <tbody>
-            <tr><td>覺</td><td><span class="menu-price">200</span></td><td><span class="menu-price">250</span></td><td><span class="menu-price">950</span></td><td>-</td></tr>
-            <tr><td>花</td><td><span class="menu-price">180</span></td><td><span class="menu-price">230</span></td><td><span class="menu-price">850</span></td><td><span class="menu-price">55</span></td></tr>
-            <tr><td>寶</td><td><span class="menu-price">180</span></td><td><span class="menu-price">230</span></td><td><span class="menu-price">850</span></td><td><span class="menu-price">55</span></td></tr>
-            <tr><td>菩</td><td><span class="menu-price">130</span></td><td><span class="menu-price">180</span></td><td><span class="menu-price">700</span></td><td><span class="menu-price">45</span></td></tr>
-            <tr><td>雅</td><td><span class="menu-price">130</span></td><td><span class="menu-price">180</span></td><td><span class="menu-price">650</span></td><td><span class="menu-price">45</span></td></tr>
-            <tr><td>靜</td><td><span class="menu-price">130</span></td><td><span class="menu-price">180</span></td><td><span class="menu-price">650</span></td><td><span class="menu-price">45</span></td></tr>
-            <tr><td>果</td><td><span class="menu-price">130</span></td><td><span class="menu-price">180</span></td><td><span class="menu-price">600</span></td><td><span class="menu-price">45</span></td></tr>
-            <tr><td>福</td><td><span class="menu-price">130</span></td><td><span class="menu-price">180</span></td><td><span class="menu-price">550</span></td><td><span class="menu-price">35</span></td></tr>
-            <tr><td>柔</td><td><span class="menu-price">130</span></td><td><span class="menu-price">180</span></td><td><span class="menu-price">450</span></td><td><span class="menu-price">35</span></td></tr>
-            <tr><td>定</td><td>-</td><td>-</td><td><span class="menu-price">650</span></td><td>-</td></tr>
-            <tr><td>真</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-            <tr><td>潤</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+            <tr><td>覺</td><td>180</td><td>230</td><td>950</td><td>-</td></tr>
+            <tr><td>花</td><td>180</td><td>230</td><td>850</td><td>55</td></tr>
+            <tr><td>寶</td><td>180</td><td>230</td><td>850</td><td>55</td></tr>
+            <tr><td>菩</td><td>130</td><td>180</td><td>700</td><td>45</td></tr>
+            <tr><td>雅</td><td>130</td><td>180</td><td>650</td><td>45</td></tr>
+            <tr><td>靜</td><td>130</td><td>180</td><td>650</td><td>45</td></tr>
+            <tr><td>果</td><td>130</td><td>180</td><td>600</td><td>45</td></tr>
+            <tr><td>福</td><td>130</td><td>180</td><td>550</td><td>35</td></tr>
+            <tr><td>柔</td><td>130</td><td>180</td><td>450</td><td>35</td></tr>
+            <tr><td>定/真/潤</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
         </tbody>
     </table>
 </div>
 
 <script>
-    // 保持原始邏輯，僅更新顯示
-    const expandedStats = new Set();
     const customers = [
-        { loc: "右邊鄰居", name: "怡香軒", item: "熱美式", type: "hot_am", days: [], count: 1, groupId: "neighbor_r_1" },
-        { loc: "右邊鄰居", name: "油飯", item: "熱美式", tag: "當日問",type: "hot_am", days: [], count: 1, groupId: "neighbor_r_2"},
-        { loc: "右邊鄰居", name: "山城米食", item: "熱拿鐵", type: "hot_latte", days: [], count: 1, note: "寄杯", groupId: "neighbor_r_3" }, 
-        { loc: "右邊鄰居", name: "橘子攤", item: "熱拿鐵", type: "hot_latte", days: [], count: 1, groupId: "neighbor_r_4" }, 
-        { loc: "右邊鄰居", name: "糖果", item: "熱拿鐵", type: "hot_latte", days: [6, 0], count: 1, note: "付兩天", groupId: "neighbor_r_5" },
-        { loc: "左邊鄰居", name: "牛肉", item: "熱拿鐵", type: "hot_latte_sugar", days: [3, 5, 0], count: 1, note: "加3g糖", groupId: "neighbor_l_1" },
-        { loc: "左邊鄰居", name: "布老闆", item: "熱美式", type: "hot_am", days: [5], count: 1, note: "寄杯", groupId: "neighbor_l_2" },
-        { loc: "左邊鄰居", name: "甘蔗雞", item: "季節美式", type: "hot_am", days: [], count: 1, groupId: "neighbor_l_3" },
-        { loc: "左邊鄰居", name: "國聯哥", item: "冰美式", type: "ice_am", days: [], count: 1, groupId: "neighbor_l_4" },
-        { loc: "左邊鄰居", name: "宜蘭魚攤", item: "冰美式", type: "ice_am", days: [6], count: 1, groupId: "neighbor_l_5" },
-        { loc: "其他區域", name: "賣魚員工", item: "大熱美", type: "large_hot_am", days: [6,0], groupId: "other_1" },
-        { loc: "近十字路口", name: "牛肉爸爸", item: "大拿鐵", type: "large_hot_latte", days: [], groupId: "other_2" },
-        { loc: "過十字路口直行", name: "魚老闆", item: "大拿鐵", type: "large_hot_latte", days: [2, 3, 5], groupId: "other_3" }
+        { loc: "右鄰", name: "怡香軒", item: "熱美式", type: "hot_am", days: [], count: 1, groupId: "neighbor_r_1" },
+        { loc: "右鄰", name: "油飯", item: "熱美式", tag: "當日問", type: "hot_am", days: [], count: 1, groupId: "neighbor_r_2"},
+        { loc: "右鄰", name: "山城米食", item: "熱拿鐵", type: "hot_latte", days: [], count: 1, note: "寄杯", groupId: "neighbor_r_3" }, 
+        { loc: "右鄰", name: "橘子攤", item: "熱拿鐵", type: "hot_latte", days: [], count: 1, groupId: "neighbor_r_4" }, 
+        { loc: "右鄰", name: "糖果", item: "熱拿鐵", type: "hot_latte", days: [6, 0], count: 1, note: "付兩天", groupId: "neighbor_r_5" },
+        { loc: "左鄰", name: "牛肉", item: "熱拿鐵", type: "hot_latte_sugar", days: [3, 5, 0], count: 1, note: "加3g糖", groupId: "neighbor_l_1" },
+        { loc: "左鄰", name: "布老闆", item: "熱美式", type: "hot_am", days: [5], count: 1, note: "寄杯", groupId: "neighbor_l_2" },
+        { loc: "左鄰", name: "甘蔗雞", item: "季節美式", type: "hot_am", days: [], count: 1, groupId: "neighbor_l_3" },
+        { loc: "左鄰", name: "國聯哥", item: "冰美式", type: "ice_am", days: [], count: 1, groupId: "neighbor_l_4" },
+        { loc: "左鄰", name: "宜蘭魚攤", item: "冰美式", type: "ice_am", days: [6], count: 1, groupId: "neighbor_l_5" },
+        { loc: "左鄰", name: "宜蘭魚攤", item: "冰拿鐵", type: "ice_latte_sugar", days: [6], count: 1 ,note:"加糖", groupId: "neighbor_l_5"},
+        { loc: "區域", name: "賣魚員工", item: "大熱美", type: "large_hot_am", days: [6,0], note: "六給兩天錢", groupId: "other_1" },
+        { loc: "區域", name: "牛肉爸爸", item: "大拿鐵", type: "large_hot_latte", days: [], note: "爸爸粉20g", groupId: "other_2" },
+        { loc: "區域", name: "牛肉兒子", item: "大拿鐵", type: "large_hot_latte", days: [], groupId: "other_2" },
+        { loc: "區域", name: "魚老闆", item: "大拿鐵", type: "large_hot_latte", days: [2, 3, 5], note: "寄杯", groupId: "other_3" },
+        { loc: "區域", name: "魚老闆鄰居", item: "熱拿鐵", type: "hot_latte", days: [2, 3, 6, 0], groupId: "other_4" }, 
+        { loc: "區域", name: "小辣椒", item: "熱美式", type: "hot_am", days: [], groupId: "other_5" },
+        { loc: "區域", name: "蝦老闆", item: "熱美式", type: "hot_am", days: [2, 4, 5, 6, 0], groupId: "other_6" },
+        { loc: "區域", name: "梨山蜜蘋果", item: "熱拿鐵", tag: "當日問", type: "hot_latte", days: [4,5], groupId: "other_7" }, 
+        { loc: "區域", name: "抓餅女老闆", item: "熱美式", tag: "當日問", type: "hot_am", days: [2,4], groupId: "other_10" },
+        { loc: "區域", name: "豐原素食", item: "熱美式", type: "hot_am", days: [3], groupId: "other_11" },
+        { loc: "區域", name: "城隍廟口豆腐", item: "冰美式", type: "ice_am", days: [6], note:"當天問", groupId: "other_18" }
     ];
 
-    const typeNames = {
-        hot_am: '☕ 熱美式', ice_am: '🧊 冰美式', large_hot_am:"☕️ 大熱美",
-        hot_latte: '🔥 熱拿鐵', hot_latte_sugar: '🍬 熱拿鐵 (加糖)', 
-        large_hot_latte: '🥤 大熱拿', hand_drip: '💧 手沖'
-    };
+    const typeNames = { hot_am: '☕ 熱美式', ice_am: '🧊 冰美式', large_hot_am:"☕️ 大熱美", hot_latte: '🔥 熱拿鐵', hot_latte_sugar: '🍬 熱拿鐵 (加糖)', ice_latte_sugar: '🍭 冰拿鐵 (加糖)', large_hot_latte: '🥤 大熱拿' };
 
-    function getTodayDateString() {
-        const t = new Date();
-        return t.getFullYear() + (t.getMonth()+1).toString().padStart(2,'0') + t.getDate().toString().padStart(2,'0');
+    function getTodayKey() { const t = new Date(); return t.getFullYear() + (t.getMonth()+1).toString().padStart(2,'0') + t.getDate().toString().padStart(2,'0'); }
+
+    window.toggleDone = function(name, item, index, groupId) {
+        if (localStorage.getItem(`${getTodayKey()}_absent_${groupId}`)) return;
+        const key = `${getTodayKey()}_${name}_${item}_${index}`;
+        localStorage.getItem(key) === 'true' ? localStorage.removeItem(key) : localStorage.setItem(key, 'true');
+        renderOrders();
     }
 
-    function isItemDone(name, item, loc, index) {
-        return localStorage.getItem(`${getTodayDateString()}_${name}_${item}_${index}`) === 'true';
-    }
-
-    window.toggleDone = function(name, item, loc, index) {
-        const key = `${getTodayDateString()}_${name}_${item}_${index}`;
+    window.toggleAbsence = function(groupId) {
+        const key = `${getTodayKey()}_absent_${groupId}`;
         localStorage.getItem(key) === 'true' ? localStorage.removeItem(key) : localStorage.setItem(key, 'true');
         renderOrders();
     }
@@ -290,10 +234,7 @@
         const sNDiv = document.getElementById('stats-neighbor');
         const sODiv = document.getElementById('stats-other');
         
-        if (day === 1) { 
-            sNDiv.innerHTML = sODiv.innerHTML = '<div style="text-align:center;color:#999;padding:10px;">本日休息</div>';
-            return; 
-        }
+        if (day === 1) { sNDiv.innerHTML = sODiv.innerHTML = '<div style="text-align:center;color:#999;padding:10px;">本日休息</div>'; return; }
 
         let sNeigh = {}, sOther = {};
         for (const k in typeNames) { sNeigh[k] = {total:0, done:0, orders:[]}; sOther[k] = {total:0, done:0, orders:[]}; }
@@ -301,13 +242,14 @@
         const todaysOrders = customers.filter(c => c.days.length === 0 || c.days.includes(day));
 
         todaysOrders.forEach(c => {
-            let target = (c.loc.includes("鄰居")) ? sNeigh : sOther;
+            let target = (c.loc.includes("鄰")) ? sNeigh : sOther;
+            let isAbsent = localStorage.getItem(`${getTodayKey()}_absent_${c.groupId}`) === 'true';
             if (typeNames[c.type]) {
-                target[c.type].total += (c.count || 1);
+                if (!isAbsent) target[c.type].total += (c.count || 1);
                 for(let i=0; i<(c.count||1); i++){
-                    let done = isItemDone(c.name, c.item, c.loc, i);
-                    if (done) target[c.type].done++;
-                    target[c.type].orders.push({...c, isDone: done, index: i});
+                    let done = localStorage.getItem(`${getTodayKey()}_${c.name}_${c.item}_${i}`) === 'true';
+                    if (done && !isAbsent) target[c.type].done++;
+                    target[c.type].orders.push({...c, isDone: done, isAbsent, index: i});
                 }
             }
         });
@@ -316,13 +258,17 @@
             let html = '';
             for (const k in typeNames) {
                 if (stats[k].total > 0) {
-                    let s = stats[k], rem = s.total - s.done, per = Math.round((s.done/s.total)*100), id = `detail_${prefix}_${k}`;
-                    html += `<div class="stat-row" onclick="toggleStatDetail('${id}')"><span>${typeNames[k]}</span><span>${s.total} (剩: ${rem})</span></div>
-                            <div class="stat-row-progress"><div class="progress-fill" style="width:${per}%"></div></div>
-                            <div id="${id}" class="stat-detail-list" style="display:block;">
-                            ${s.orders.map(o => `<div class="stat-detail-item ${o.isDone?'done':''}" onclick="toggleDone('${o.name}','${o.item}','${o.loc}',${o.index})">
-                                <div class="customer-info"><span class="customer-name">${o.name}</span><span>${o.item}</span></div>
-                                <input type="checkbox" ${o.isDone?'checked':''}>
+                    let s = stats[k], rem = s.total - s.done, per = Math.round((s.done/s.total)*100);
+                    html += `<div class="stat-row"><span>${typeNames[k]}</span><span>${s.total} (剩: ${rem})</span></div>
+                            <div class="stat-row-progress"><div class="progress-fill" style="width:${per}%; background:${rem===0?'#4a7d4a':'#e2b34a'}"></div></div>
+                            <div class="stat-detail-list">
+                            ${s.orders.map(o => `<div class="stat-detail-item ${o.isAbsent?'absent':(o.isDone?'done':'')}">
+                                <button class="absence-toggle" onclick="toggleAbsence('${o.groupId}')">${o.isAbsent?'取消缺席':'標記缺席'}</button>
+                                <div class="customer-info" onclick="toggleDone('${o.name}','${o.item}',${o.index},'${o.groupId}')">
+                                    <span class="customer-name">${o.name} ${o.tag||o.note?`<span class="customer-tag">${o.tag||o.note}</span>`:''}</span>
+                                    <span class="customer-loc">${o.item}</span>
+                                </div>
+                                <input type="checkbox" ${o.isDone?'checked':''} ${o.isAbsent?'disabled':''}>
                             </div>`).join('')}</div>`;
                 }
             }
@@ -332,17 +278,7 @@
         sODiv.innerHTML = makeHtml(sOther, 'o');
     }
 
-    window.toggleStatDetail = function(id) {
-        const el = document.getElementById(id);
-        el.style.display = el.style.display === 'none' ? 'block' : 'none';
-    }
-
-    window.clearAllDone = function() {
-        if(confirm("重置今日完成狀態？")) {
-            localStorage.clear(); // 簡化處理
-            renderOrders();
-        }
-    }
+    window.clearAllDone = function() { if(confirm("確定重置今日所有狀態？")) { localStorage.clear(); renderOrders(); } }
 
     document.getElementById('daySelect').value = new Date().getDay();
     renderOrders();
