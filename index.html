@@ -1,695 +1,1075 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>一味淨生活咖啡系統</title>
-<style>
-    /* 全局變數與配色優化 */
-    :root {
-        --color-primary: #5c3a21; /* 經典深咖啡 */
-        --color-secondary: #9a6e4e; /* 溫暖中咖啡 */
-        --color-accent: #e2b34a; /* 金黃色/強調色 */
-        --color-background: #fdf6e9; /* 奶油淺黃背景 */
-        --color-light-gray: #e6e0d8; /* 柔和邊界色 */
-        --color-done-bg: #f5f0e7; /* 完成品的背景色 */
-        --color-success: #4a7d4a; /* 完成/進度綠 (飽和度略降) */
-        --color-danger: #cf4a4a; /* 剩餘數紅色 (更柔和的紅) */
-        --color-total-progress: #d68910; /* 總計進度橘 */
-        --color-section-bg: #ffffff; /* 區塊背景 (白) */
-        --color-text: #333333; /* 主要文字色 */
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一味淨生活咖啡系統</title>
+    <style>
+        /* 全局變數與配色優化 */
+        :root {
+            --color-primary: #5c3a21;
+            /* 經典深咖啡 */
+            --color-secondary: #9a6e4e;
+            /* 溫暖中咖啡 */
+            --color-accent: #e2b34a;
+            /* 金黃色/強調色 */
+            --color-background: #fdf6e9;
+            /* 奶油淺黃背景 */
+            --color-light-gray: #e6e0d8;
+            /* 柔和邊界色 */
+            --color-done-bg: #f5f0e7;
+            /* 完成品的背景色 */
+            --color-success: #4a7d4a;
+            /* 完成/進度綠 (飽和度略降) */
+            --color-danger: #cf4a4a;
+            /* 剩餘數紅色 (更柔和的紅) */
+            --color-total-progress: #d68910;
+            /* 總計進度橘 */
+            --color-section-bg: #ffffff;
+            /* 區塊背景 (白) */
+            --color-text: #333333;
+            /* 主要文字色 */
 
-        --shadow-subtle: 0 1px 4px rgba(0,0,0,0.08);
-        --shadow-medium: 0 3px 8px rgba(0,0,0,0.1);
-        --border-radius-lg: 12px;
-        --border-radius-md: 8px;
-    }
-
-    /* 基礎排版與字體 */
-    body { 
-        font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif; 
-        background: var(--color-background); 
-        padding: 0 15px 30px 15px; 
-        color: var(--color-text); 
-        max-width: 960px; 
-        margin: 0 auto;
-        line-height: 1.6;
-    }
-    h2 { 
-        text-align: center; 
-        color: var(--color-primary); 
-        margin: 20px 0 15px 0; 
-        font-size: 30px; 
-        font-weight: 700;
-        letter-spacing: 1px;
-    }
-    
-    /* 按鈕容器佈局 */
-    .top-nav {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 15px;
-    }
-    .top-nav .btn {
-        flex: 1;
-        padding: 10px;
-        font-size: 14px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        text-decoration: none;
-    }
-
-    /* 資訊區塊 (備忘/菜單) */
-    .info-section {
-        background: var(--color-section-bg);
-        padding: 15px;
-        border-radius: var(--border-radius-lg);
-        box-shadow: var(--shadow-medium);
-        margin-bottom: 20px;
-        border-left: 5px solid var(--color-secondary);
-    }
-    .info-section h3 {
-        color: var(--color-primary);
-        font-size: 18px;
-        margin: 0 0 10px 0;
-        border-bottom: 2px dashed var(--color-light-gray);
-        padding-bottom: 8px;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .info-section ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-    .info-section li {
-        font-size: 14px;
-        padding: 4px 0;
-        color: #555;
-    }
-    .info-section li b {
-        color: var(--color-danger);
-        font-weight: 700;
-    }
-    
-    #dynamicMemoList {
-        display: flex;
-        flex-wrap: wrap; 
-        gap: 15px; 
-        padding-top: 5px;
-    }
-    .dynamic-memo-title {
-        width: 100%; 
-        margin-top: 10px; 
-        padding-bottom: 5px; 
-        color: var(--color-danger); 
-        font-weight: bold; 
-        border-top: 2px dashed var(--color-danger);
-    }
-    .dynamic-memo-item {
-        color: var(--color-primary);
-        font-weight: 600;
-        padding: 2px 0;
-        border: none;
-        margin: 0;
-        white-space: nowrap; 
-    }
-    .dynamic-memo-item .memo-tag {
-        font-style: normal; 
-        color: white; 
-        background-color: var(--color-total-progress); 
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-weight: bold;
-        margin-left: 5px;
-        font-size: 12px;
-    }
-    #staticMemoList.has-dynamic {
-        margin-bottom: 10px;
-    }
-
-    /* 控制區 */
-    .controls { 
-        background: var(--color-section-bg); 
-        padding: 15px; 
-        border-radius: var(--border-radius-lg); 
-        box-shadow: var(--shadow-subtle); 
-        margin-bottom: 20px; 
-        display: flex; 
-        gap: 10px; 
-    }
-    select { 
-        padding: 12px; 
-        font-size: 16px; 
-        border-radius: var(--border-radius-md); 
-        border: 1px solid var(--color-light-gray); 
-        width: 40%; 
-        appearance: none; 
-        background-color: #fcfcfc;
-        flex-grow: 2;
-        cursor: pointer;
-    }
-    .btn { 
-        background: var(--color-accent); 
-        color: var(--color-primary); 
-        border: none; 
-        padding: 12px 15px; 
-        border-radius: var(--border-radius-md); 
-        cursor: pointer; 
-        font-weight: bold; 
-        font-size: 15px; 
-        transition: background 0.2s, transform 0.1s;
-        flex-grow: 1; 
-    }
-    .btn:hover {
-        background: #f0c35f;
-        transform: translateY(-1px);
-    }
-    #clearAllBtn { background: #aaaaaa; color: white; }
-    #clearAllBtn:hover { background: #888888; }
-
-    /* 統計區 */
-    .stats-container { 
-        display: flex; 
-        gap: 20px; 
-        margin-bottom: 20px; 
-    }
-    .stat-box { 
-        flex: 1; 
-        background: var(--color-section-bg); 
-        border-radius: var(--border-radius-lg); 
-        padding: 15px; 
-        box-shadow: var(--shadow-medium); 
-        border-top: 6px solid var(--color-primary); 
-    }
-    .stat-box h3 { 
-        margin: 0 0 10px 0; 
-        font-size: 16px; 
-        color: var(--color-primary); 
-        font-weight: 700;
-        text-align: center; 
-        border-bottom: 1px solid var(--color-light-gray); 
-        padding-bottom: 8px;
-    }
-    .stat-row { 
-        display: flex; 
-        justify-content: space-between; 
-        align-items: center; 
-        font-size: 15px; 
-        margin: 6px 0; 
-        padding: 8px 10px; 
-        cursor: pointer; 
-        transition: background-color 0.15s;
-        border-radius: 6px;
-        font-weight: 500;
-    }
-    .stat-row:hover { background-color: var(--color-done-bg); }
-    .stat-row.total {
-        font-size: 16px;
-        font-weight: 700;
-        border-top: 2px solid var(--color-light-gray);
-        margin-top: 15px;
-        padding-top: 12px;
-        color: var(--color-primary);
-    }
-    .stat-row-progress {
-        height: 5px;
-        background-color: var(--color-light-gray);
-        border-radius: 2px;
-        margin: 0 10px 8px 10px;
-        overflow: hidden;
-    }
-    .progress-fill {
-        height: 100%;
-        background-color: var(--color-accent);
-        transition: width 0.3s ease;
-    }
-    .progress-counts .count-total { color: var(--color-danger); font-weight: bold; margin-right: 10px; }
-    .progress-counts .count-remaining b { color: var(--color-danger); font-weight: bold; }
-    .progress-counts .count-remaining b[style*="color: var(--color-success);"] { color: var(--color-success) !important; }
-    
-    .stat-detail-list { margin-top: 8px; padding: 5px 0; border-top: 1px dashed var(--color-light-gray); display: none; }
-    .stat-detail-item {
-        display: flex;
-        justify-content: flex-start;
-        align-items: center; 
-        font-size: 14px;
-        padding: 8px 10px;
-        border-bottom: 1px dotted #e0e0e0;
-        cursor: pointer; 
-        transition: background-color 0.1s;
-        border-radius: 4px;
-    }
-    .stat-detail-item:hover:not(.done):not(.absent) { background-color: var(--color-done-bg); }
-    .stat-detail-item.done { background-color: var(--color-done-bg); color: #888; text-decoration: line-through; }
-    .customer-info { display: flex; flex-direction: column; align-items: flex-start; flex-grow: 1; margin-right: auto; }
-    .customer-name { font-weight: 600; color: var(--color-primary); }
-    .stat-detail-item.done .customer-name { color: #aaa; }
-    .customer-loc { font-size: 12px; color: #777; margin-top: 2px; }
-    .customer-tag { font-size: 11px; background-color: var(--color-accent); color: var(--color-primary); padding: 1px 4px; border-radius: 3px; font-weight: bold; margin-left: 8px; flex-shrink: 0; line-height: 1.4; }
-    .stat-detail-item.done .customer-tag { background-color: #d8d8d8; color: #999; }
-
-    /* Checkbox */
-    .stat-detail-item input[type="checkbox"] {
-        appearance: none; -webkit-appearance: none;
-        width: 20px; height: 20px; border: 2px solid var(--color-secondary);
-        border-radius: 4px; cursor: pointer; outline: none; position: relative; flex-shrink: 0;
-    }
-    .stat-detail-item input[type="checkbox"]:checked { border-color: var(--color-success); background-color: var(--color-success); }
-    .stat-detail-item input[type="checkbox"]:checked::after { content: '✓'; color: white; position: absolute; top: -1px; left: 4px; font-size: 15px; font-weight: bold; }
-    
-    .stat-detail-item .absence-toggle {
-        background: #f4f4f4; color: var(--color-danger); border: 1px solid var(--color-light-gray);
-        border-radius: 4px; font-weight: bold; padding: 4px 8px; cursor: pointer; margin-right: 10px;
-        transition: background 0.1s; line-height: 1; font-size: 14px; flex-shrink: 0;
-    }
-    .stat-detail-item .absence-toggle:hover { background: #ffe6e6; border-color: var(--color-danger); }
-    .stat-detail-item.absent { background-color: #f7f7f7; color: #999; opacity: 0.6; }
-    .stat-detail-item.absent .customer-name { color: #999; }
-    .stat-detail-item.absent .customer-tag { display: none; }
-    .stat-detail-item.absent input[type="checkbox"] { border-color: #ccc; background-color: #e8e8e8; cursor: default; }
-    .stat-detail-item.absent input[type="checkbox"]:checked::after { content: '－'; color: #999; top: -3px; left: 4px; }
-    .stat-detail-item.absent .customer-info { cursor: default; pointer-events: none; }
-
-    /* --- 優化後的價格顯示區塊樣式 --- */
-    .price-card-container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        margin-top: 25px;
-    }
-    .price-card {
-        background: #fff;
-        border-radius: var(--border-radius-lg);
-        box-shadow: var(--shadow-medium);
-        overflow: hidden;
-        border: 1px solid var(--color-light-gray);
-    }
-    .price-card-header {
-        background: var(--color-primary);
-        color: #fff;
-        padding: 10px 15px;
-        font-weight: bold;
-        text-align: center;
-        font-size: 16px;
-    }
-    .price-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0 24px;
-    }
-
-    .price-item {
-        padding: 8px 12px;
-        border-bottom: 1px solid #f0f0f0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 14px;
-    }
-
-    .price-item.milk {
-        grid-column: 2;
-    }
-
-    .price-item:nth-child(odd) {
-        border-right: 1px solid #f0f0f0;
-    }
-    .price-item .p-name { color: #555; }
-    .price-item .p-value { color: var(--color-danger); font-weight: bold; }
-    .price-item .p-value::before { content: '$'; font-size: 12px; margin-right: 2px; }
-
-    /* 單品豆單表格優化 */
-    .menu-group-full {
-        width: 100%; border-collapse: collapse; margin-top: 10px;
-        background: #fff; border-radius: 8px; overflow: hidden;
-    }
-    .menu-group-full thead th {
-        background-color: var(--color-secondary); color: white;
-        padding: 12px 8px; font-size: 14px; text-align: center;
-    }
-    .menu-group-full tbody tr:nth-child(even) { background-color: #fafafa; }
-    .menu-group-full tbody td {
-        padding: 10px 8px; text-align: center; font-size: 13px; border-bottom: 1px solid #eee;
-    }
-    .menu-group-full td:first-child { font-weight: bold; color: var(--color-primary); }
-    .menu-price { color: var(--color-danger); font-weight: bold; }
-    .menu-price::before { content: '$'; font-size: 11px; }
-    .menu-price:empty::before { content: ''; }
-
-    /* RWD 優化 */
-    @media (max-width: 768px) {
-        .price-card-container { grid-template-columns: 1fr; }
-        .price-grid { grid-template-columns: 1fr; }
-        .price-item:nth-child(odd) { border-right: none; }
-        .stats-container { flex-direction: column; }
-        .btn { 
-            font-size: 13px; 
-            padding: 12px 5px;
+            --shadow-subtle: 0 1px 4px rgba(0, 0, 0, 0.08);
+            --shadow-medium: 0 3px 8px rgba(0, 0, 0, 0.1);
+            --border-radius-lg: 12px;
+            --border-radius-md: 8px;
         }
-        .controls { flex-wrap: wrap; }
-        .controls select { width: 100%; margin-bottom: 0px; }
-        .controls .btn { width: 48%; flex-grow: 1; }
-    }
-</style>
+
+        #quickMenuBtn {
+            position: fixed;
+            right: 16px;
+            bottom: 20px;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 999px;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 999;
+        }
+
+        @media (min-width: 769px) {
+            #quickMenuBtn {
+                display: none;
+            }
+        }
+
+        /* 基礎排版與字體 */
+        body {
+            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif;
+            background: var(--color-background);
+            padding: 0 15px 30px 15px;
+            color: var(--color-text);
+            max-width: 960px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--color-primary);
+            margin: 20px 0 15px 0;
+            font-size: 30px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        /* 按鈕容器佈局 */
+        .top-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .top-nav .btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        /* 資訊區塊 (備忘/菜單) */
+        .info-section {
+            background: var(--color-section-bg);
+            padding: 15px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-medium);
+            margin-bottom: 20px;
+            border-left: 5px solid var(--color-secondary);
+        }
+
+        .info-section h3 {
+            color: var(--color-primary);
+            font-size: 18px;
+            margin: 0 0 10px 0;
+            border-bottom: 2px dashed var(--color-light-gray);
+            padding-bottom: 8px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .info-section li {
+            font-size: 14px;
+            padding: 4px 0;
+            color: #555;
+        }
+
+        .info-section li b {
+            color: var(--color-danger);
+            font-weight: 700;
+        }
+
+        #dynamicMemoList {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding-top: 5px;
+        }
+
+        .dynamic-memo-title {
+            width: 100%;
+            margin-top: 10px;
+            padding-bottom: 5px;
+            color: var(--color-danger);
+            font-weight: bold;
+            border-top: 2px dashed var(--color-danger);
+        }
+
+        .dynamic-memo-item {
+            color: var(--color-primary);
+            font-weight: 600;
+            padding: 2px 0;
+            border: none;
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        .dynamic-memo-item .memo-tag {
+            font-style: normal;
+            color: white;
+            background-color: var(--color-total-progress);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-left: 5px;
+            font-size: 12px;
+        }
+
+        #staticMemoList.has-dynamic {
+            margin-bottom: 10px;
+        }
+
+        /* 控制區 */
+        .controls {
+            background: var(--color-section-bg);
+            padding: 15px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-subtle);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        select {
+            padding: 12px;
+            font-size: 16px;
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--color-light-gray);
+            width: 40%;
+            appearance: none;
+            background-color: #fcfcfc;
+            flex-grow: 2;
+            cursor: pointer;
+        }
+
+        .btn {
+            background: var(--color-accent);
+            color: var(--color-primary);
+            border: none;
+            padding: 12px 15px;
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+            transition: background 0.2s, transform 0.1s;
+            flex-grow: 1;
+        }
+
+        .btn:hover {
+            background: #f0c35f;
+            transform: translateY(-1px);
+        }
+
+        #clearAllBtn {
+            background: #aaaaaa;
+            color: white;
+        }
+
+        #clearAllBtn:hover {
+            background: #888888;
+        }
+
+        /* 統計區 */
+        .stats-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            flex: 1;
+            background: var(--color-section-bg);
+            border-radius: var(--border-radius-lg);
+            padding: 15px;
+            box-shadow: var(--shadow-medium);
+            border-top: 6px solid var(--color-primary);
+        }
+
+        .stat-box h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            color: var(--color-primary);
+            font-weight: 700;
+            text-align: center;
+            border-bottom: 1px solid var(--color-light-gray);
+            padding-bottom: 8px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 15px;
+            margin: 6px 0;
+            padding: 8px 10px;
+            cursor: pointer;
+            transition: background-color 0.15s;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .stat-row:hover {
+            background-color: var(--color-done-bg);
+        }
+
+        .stat-row.total {
+            font-size: 16px;
+            font-weight: 700;
+            border-top: 2px solid var(--color-light-gray);
+            margin-top: 15px;
+            padding-top: 12px;
+            color: var(--color-primary);
+        }
+
+        .stat-row-progress {
+            height: 5px;
+            background-color: var(--color-light-gray);
+            border-radius: 2px;
+            margin: 0 10px 8px 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--color-accent);
+            transition: width 0.3s ease;
+        }
+
+        .progress-counts .count-total {
+            color: var(--color-danger);
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .progress-counts .count-remaining b {
+            color: var(--color-danger);
+            font-weight: bold;
+        }
+
+        .progress-counts .count-remaining b[style*="color: var(--color-success);"] {
+            color: var(--color-success) !important;
+        }
+
+        .stat-detail-list {
+            margin-top: 8px;
+            padding: 5px 0;
+            border-top: 1px dashed var(--color-light-gray);
+            display: none;
+        }
+
+        .stat-detail-item {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            font-size: 14px;
+            padding: 8px 10px;
+            border-bottom: 1px dotted #e0e0e0;
+            cursor: pointer;
+            transition: background-color 0.1s;
+            border-radius: 4px;
+        }
+
+        .stat-detail-item:hover:not(.done):not(.absent) {
+            background-color: var(--color-done-bg);
+        }
+
+        .stat-detail-item.done {
+            background-color: var(--color-done-bg);
+            color: #888;
+            text-decoration: line-through;
+        }
+
+        .customer-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            flex-grow: 1;
+            margin-right: auto;
+        }
+
+        .customer-name {
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+
+        .stat-detail-item.done .customer-name {
+            color: #aaa;
+        }
+
+        .customer-loc {
+            font-size: 12px;
+            color: #777;
+            margin-top: 2px;
+        }
+
+        .customer-tag {
+            font-size: 11px;
+            background-color: var(--color-accent);
+            color: var(--color-primary);
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+            margin-left: 8px;
+            flex-shrink: 0;
+            line-height: 1.4;
+        }
+
+        .stat-detail-item.done .customer-tag {
+            background-color: #d8d8d8;
+            color: #999;
+        }
+
+        /* Checkbox */
+        .stat-detail-item input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--color-secondary);
+            border-radius: 4px;
+            cursor: pointer;
+            outline: none;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .stat-detail-item input[type="checkbox"]:checked {
+            border-color: var(--color-success);
+            background-color: var(--color-success);
+        }
+
+        .stat-detail-item input[type="checkbox"]:checked::after {
+            content: '✓';
+            color: white;
+            position: absolute;
+            top: -1px;
+            left: 4px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .stat-detail-item .absence-toggle {
+            background: #f4f4f4;
+            color: var(--color-danger);
+            border: 1px solid var(--color-light-gray);
+            border-radius: 4px;
+            font-weight: bold;
+            padding: 4px 8px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background 0.1s;
+            line-height: 1;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .stat-detail-item .absence-toggle:hover {
+            background: #ffe6e6;
+            border-color: var(--color-danger);
+        }
+
+        .stat-detail-item.absent {
+            background-color: #f7f7f7;
+            color: #999;
+            opacity: 0.6;
+        }
+
+        .stat-detail-item.absent .customer-name {
+            color: #999;
+        }
+
+        .stat-detail-item.absent .customer-tag {
+            display: none;
+        }
+
+        .stat-detail-item.absent input[type="checkbox"] {
+            border-color: #ccc;
+            background-color: #e8e8e8;
+            cursor: default;
+        }
+
+        .stat-detail-item.absent input[type="checkbox"]:checked::after {
+            content: '－';
+            color: #999;
+            top: -3px;
+            left: 4px;
+        }
+
+        .stat-detail-item.absent .customer-info {
+            cursor: default;
+            pointer-events: none;
+        }
+
+        /* --- 優化後的價格顯示區塊樣式 --- */
+        .price-card-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .price-card {
+            background: #fff;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-medium);
+            overflow: hidden;
+            border: 1px solid var(--color-light-gray);
+        }
+
+        .price-card-header {
+            background: var(--color-primary);
+            color: #fff;
+            padding: 10px 15px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .price-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0 24px;
+        }
+
+        .price-item {
+            padding: 8px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .price-item.milk {
+            grid-column: 2;
+        }
+
+        .price-item:nth-child(odd) {
+            border-right: 1px solid #f0f0f0;
+        }
+
+        .price-item .p-name {
+            color: #555;
+        }
+
+        .price-item .p-value {
+            color: var(--color-danger);
+            font-weight: bold;
+        }
+
+        .price-item .p-value::before {
+            content: '$';
+            font-size: 12px;
+            margin-right: 2px;
+        }
+
+        /* 單品豆單表格優化 */
+        .menu-group-full {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .menu-group-full thead th {
+            background-color: var(--color-secondary);
+            color: white;
+            padding: 12px 8px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .menu-group-full tbody tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        .menu-group-full tbody td {
+            padding: 10px 8px;
+            text-align: center;
+            font-size: 13px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .menu-group-full td:first-child {
+            font-weight: bold;
+            color: var(--color-primary);
+        }
+
+        .menu-price {
+            color: var(--color-danger);
+            font-weight: bold;
+        }
+
+        .menu-price::before {
+            content: '$';
+            font-size: 11px;
+        }
+
+        .menu-price:empty::before {
+            content: '';
+        }
+
+
+
+        .fab-container {
+            position: fixed;
+            right: 16px;
+            bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 999;
+        }
+
+        .fab-btn {
+            min-width: 88px;
+            height: 40px;
+            padding: 0 14px;
+            border-radius: 999px;
+            border: none;
+            background: var(--color-primary);
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+            cursor: pointer;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .fab-btn:hover {
+            background: var(--color-secondary);
+        }
+
+        .fab-top {
+            background: var(--color-accent);
+            color: var(--color-primary);
+        }
+
+
+        /* RWD 優化 */
+        @media (max-width: 768px) {
+            .price-card-container {
+                grid-template-columns: 1fr;
+            }
+
+            .price-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .price-item:nth-child(odd) {
+                border-right: none;
+            }
+
+            .stats-container {
+                flex-direction: column;
+            }
+
+            .btn {
+                font-size: 13px;
+                padding: 12px 5px;
+            }
+
+            .controls {
+                flex-wrap: wrap;
+            }
+
+            .controls select {
+                width: 100%;
+                margin-bottom: 0px;
+            }
+
+            .controls .btn {
+                width: 48%;
+                flex-grow: 1;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-<h2>☕ 一味淨生活咖啡備餐助理</h2>
+    <h2>☕ 一味淨生活咖啡備餐助理</h2>
 
-<div class="top-nav">
-    <button class="btn" style="background: #607d8b; color: white;" onclick="window.location.href='https://christypy.github.io/time'">⏱️ 計時器</button>
-    <button class="btn" style="background: #607d8b; color: white;" onclick="window.location.href='https://christypy.github.io/record'">📝 記錄器</button>
-</div>
+    <div class="fab-container">
+        <button class="fab-btn fab-top" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
+            回到最上
+        </button>
 
-<div class="controls">
-    <select id="daySelect" onchange="renderOrders()">
-        <option value="1">星期一 (休)</option>
-        <option value="2">星期二</option>
-        <option value="3">星期三</option>
-        <option value="4">星期四</option>
-        <option value="5">星期五</option>
-        <option value="6">星期六</option>
-        <option value="0">星期日</option>
-    </select>
-    <button class="btn" onclick="renderOrders()">刷新列表</button>
-    <button class="btn" id="clearAllBtn" onclick="clearAllDone()">全部重置</button>
-</div>
+        <button class="fab-btn"
+            onclick="document.getElementById('menuReference').scrollIntoView({ behavior: 'smooth' })">
+            豆單
+        </button>
 
-<div class="info-section">
-    <h3>📝 常駐備忘</h3>
-    <ul id="staticMemoList">
-        <li><b>恐龍嫩仙草：</b>環保杯熱美式</li>
-        <li><b>內衣店老闆：</b>熱拿鐵</li>
-        <li><b>芭樂：</b>熱拿鐵 + 糖(3g)</li>
-    </ul>
-    <ul id="dynamicMemoList"></ul>
-</div>
+        <button class="fab-btn" onclick="window.location.href='https://christypy.github.io/record'">
+            記錄器
+        </button>
 
-<div class="stats-container">
-    <div class="stat-box" style="border-top-color: var(--color-success);">
-        <h3>🏠 左右鄰居 總計</h3>
-        <div id="stats-neighbor"></div>
+        <button class="fab-btn" onclick="window.location.href='https://christypy.github.io/time'">
+            計時器
+        </button>
     </div>
-    <div class="stat-box" style="border-top-color: var(--color-total-progress);">
-        <h3>🛵 其他區域 總計</h3>
-        <div id="stats-other"></div>
+
+
+
+    <div class="controls">
+        <select id="daySelect" onchange="renderOrders()">
+            <option value="1">星期一 (休)</option>
+            <option value="2">星期二</option>
+            <option value="3">星期三</option>
+            <option value="4">星期四</option>
+            <option value="5">星期五</option>
+            <option value="6">星期六</option>
+            <option value="0">星期日</option>
+        </select>
+        <button class="btn" onclick="renderOrders()">刷新列表</button>
+        <button class="btn" id="clearAllBtn" onclick="clearAllDone()">全部重置</button>
     </div>
-</div>
 
-<div class="price-card-container">
-    <div class="price-card">
-        <div class="price-card-header">☕ 義式基礎飲品</div>
-        <div class="price-grid">
-            <div class="col">
-                <div class="price-item">熱美式<span class="p-value">70</span></div>
-                <div class="price-item">冰美式<span class="p-value">75</span></div>
-                <div class="price-item">大熱美<span class="p-value">80</span></div>
-            </div>
+    <div class="info-section">
+        <h3>📝 常駐備忘</h3>
+        <ul id="staticMemoList">
+            <li><b>恐龍嫩仙草：</b>環保杯熱美式</li>
+            <li><b>內衣店老闆：</b>熱拿鐵</li>
+            <li><b>芭樂：</b>熱拿鐵 + 糖(3g)</li>
+        </ul>
+        <ul id="dynamicMemoList"></ul>
+    </div>
 
-            <div class="col">
-                <div class="price-item">熱拿鐵<span class="p-value" >85</span></div>
-                <div class="price-item">冰拿鐵<span class="p-value">85</span></div>
-                <div class="price-item">大熱拿<span class="p-value">95</span></div>
-                <div class="price-item">熱牛奶<span class="p-value">50</span></div>
-                <div class="price-item">抹茶歐蕾<span class="p-value">85</span></div>
-                <div class="price-item">可可歐蕾<span class="p-value">85</span></div>
-            </div>
+    <div class="stats-container">
+        <div class="stat-box" style="border-top-color: var(--color-success);">
+            <h3>🏠 左右鄰居 總計</h3>
+            <div id="stats-neighbor"></div>
         </div>
-
-
-
-    </div>
-    <div class="price-card">
-        <div class="price-card-header">其他品項</div>
-        <div class="price-grid">
-            <div class="price-item"><span class="p-name">酸柑茶(小8包)</span><span class="p-value">160</span></div>
-            <div class="price-item"><span class="p-name">即溶(1條)</span><span class="p-value">16</span></div>
-
-            <div class="price-item"><span class="p-name">酸柑茶(大50包)</span><span class="p-value">950</span></div>
-            <div class="price-item"><span class="p-name">即溶(盒30條)</span><span class="p-value">475</span></div>
-
-            <div class="price-item"><span class="p-name">酸柑茶(100包)</span><span class="p-value">1440</span></div>
-            <div class="price-item"><span class="p-name">即溶(袋100條)</span><span class="p-value">1450</span></div>
-            
-            <div class="price-item"><span class="p-name">小濾紙</span><span class="p-value">120</span></div>
-            <div class="price-item"><span class="p-name">大濾紙</span><span class="p-value">130</span></div>
-            <div class="price-item"><span class="p-name">濾掛紙(50個)</span><span class="p-value">150</span></div>
+        <div class="stat-box" style="border-top-color: var(--color-total-progress);">
+            <h3>🛵 其他區域 總計</h3>
+            <div id="stats-other"></div>
         </div>
     </div>
-</div>
 
-<div class="info-section" id="menuReference" style="margin-top:20px;">
-    <h3>📋 單品豆單參考</h3>
-    <table class="menu-group-full">
-        <thead>
-            <tr>
-                <th>品項</th>
-                <th>外帶</th>
-                <th>內用</th>
-                <th>半磅</th>
-                <th>濾掛</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr><td>覺</td><td><span class="menu-price">200</span></td><td><span class="menu-price">250</span></td><td><span class="menu-price">950</span></td><td>-</td></tr>
-            <tr><td>花</td><td><span class="menu-price">180</span></td><td><span class="menu-price">230</span></td><td><span class="menu-price">850</span></td><td><span class="menu-price">55</span></td></tr>
-            <tr><td>寶</td><td><span class="menu-price">180</span></td><td><span class="menu-price">230</span></td><td><span class="menu-price">850</span></td><td><span class="menu-price">55</span></td></tr>
-            <tr><td>菩</td><td><span class="menu-price">130</span></td><td><span class="menu-price">180</span></td><td><span class="menu-price">700</span></td><td><span class="menu-price">45</span></td></tr>
-            <tr><td>雅</td><td><span class="menu-price">130</span></td><td><span class="menu-price">180</span></td><td><span class="menu-price">650</span></td><td><span class="menu-price">45</span></td></tr>
-            <tr><td>靜</td><td><span class="menu-price">130</span></td><td><span class="menu-price">180</span></td><td><span class="menu-price">650</span></td><td><span class="menu-price">45</span></td></tr>
-            <tr><td>果</td><td><span class="menu-price">130</span></td><td><span class="menu-price">180</span></td><td><span class="menu-price">600</span></td><td><span class="menu-price">45</span></td></tr>
-            <tr><td>福</td><td><span class="menu-price">130</span></td><td><span class="menu-price">180</span></td><td><span class="menu-price">550</span></td><td><span class="menu-price">35</span></td></tr>
-            <tr><td>柔</td><td><span class="menu-price">130</span></td><td><span class="menu-price">180</span></td><td><span class="menu-price">450</span></td><td><span class="menu-price">35</span></td></tr>
-            <tr><td>定</td><td>-</td><td>-</td><td><span class="menu-price">650</span></td><td>-</td></tr>
-            <tr><td>真</td><td>-</td><td>-</td><td></td><td>-</td></tr>
-            <tr><td>潤</td><td>-</td><td>-</td><td></td><td>-</td></tr>
-        </tbody>
-    </table>
-</div>
+    <div class="price-card-container">
+        <div class="price-card">
+            <div class="price-card-header">☕ 義式基礎飲品</div>
+            <div class="price-grid">
+                <div class="col">
+                    <div class="price-item">熱美式<span class="p-value">70</span></div>
+                    <div class="price-item">冰美式<span class="p-value">75</span></div>
+                    <div class="price-item">大熱美<span class="p-value">80</span></div>
+                </div>
 
-<div class="price-card-container" style="margin-top: 25px;">
-    <div class="price-card">
-        <div class="price-card-header" style="background: var(--color-secondary);">📖 咖啡調製做法</div>
-        <div style="padding: 15px; font-size: 14px; line-height: 1.8;">
-            <div style="margin-bottom: 12px; border-bottom: 1px dashed var(--color-light-gray); padding-bottom: 8px;">
-                <strong style="color: var(--color-primary);">☕ 美式/拿鐵基底：</strong><br>
-                20g 粉 → 萃取 40g 濃縮 1:2 (30-45s)<br>
-                ➔ <b>熱美式：</b>加熱水至九分滿<br>
-                ➔ <b>冰美式：</b>整杯冰塊加水補滿<br>
-                ➔ <b>冰拿鐵：</b>半杯冰塊加牛奶補滿<br>
-                ➔ <b>熱拿鐵：</b>牛奶用鋼杯打熱後加至九分滿
+                <div class="col">
+                    <div class="price-item">熱拿鐵<span class="p-value">85</span></div>
+                    <div class="price-item">冰拿鐵<span class="p-value">85</span></div>
+                    <div class="price-item">大熱拿<span class="p-value">95</span></div>
+                    <div class="price-item">熱牛奶<span class="p-value">50</span></div>
+                    <div class="price-item">抹茶歐蕾<span class="p-value">85</span></div>
+                    <div class="price-item">可可歐蕾<span class="p-value">85</span></div>
+                </div>
             </div>
-            <div>
-                <strong style="color: var(--color-primary);">🍵 抹茶歐蕾：</strong><br>
-                粉 7g + 糖粉 6g + 熱水 60g 攪拌均勻，剩下用熱牛奶補滿。
-            </div>
-            <div>
-                <strong style="color: var(--color-primary);">🍫 可可歐蕾：</strong><br>
-                粉 7g + 糖粉 6g + 熱水 40g 攪拌均勻，剩下用熱牛奶補滿。
+
+
+
+        </div>
+        <div class="price-card">
+            <div class="price-card-header">其他品項</div>
+            <div class="price-grid">
+                <div class="price-item"><span class="p-name">酸柑茶(小8包)</span><span class="p-value">160</span></div>
+                <div class="price-item"><span class="p-name">即溶(1條)</span><span class="p-value">16</span></div>
+
+                <div class="price-item"><span class="p-name">酸柑茶(大50包)</span><span class="p-value">950</span></div>
+                <div class="price-item"><span class="p-name">即溶(盒30條)</span><span class="p-value">475</span></div>
+
+                <div class="price-item"><span class="p-name">酸柑茶(100包)</span><span class="p-value">1440</span></div>
+                <div class="price-item"><span class="p-name">即溶(袋100條)</span><span class="p-value">1450</span></div>
+
+                <div class="price-item"><span class="p-name">小濾紙</span><span class="p-value">120</span></div>
+                <div class="price-item"><span class="p-name">大濾紙</span><span class="p-value">130</span></div>
+                <div class="price-item"><span class="p-name">濾掛紙(50個)</span><span class="p-value">150</span></div>
             </div>
         </div>
     </div>
 
-    <div class="price-card">
-        <div class="price-card-header" style="background: #666;">🔧 每日洗咖啡機流程</div>
-        <div style="padding: 15px; font-size: 14px; line-height: 1.6;">
-            <ul style="padding-left: 20px; margin: 0;">
-                <li>卸下把手，將粉杯替換為<b>無孔逆洗杯 </b>。</li>
-                <li>用<b>一字起子</b>轉開濾網螺絲，取下濾網清洗（小心燙，保管好螺絲）。</li>
-                <li>把手加入<b>一湯匙清潔粉</b>並扣回。</li>
-                <li>長按<b>「1 + 5」</b>按鈕啟動自動清洗。</li>
-                <li>洗完將水倒掉，重複<b>「1 + 5」</b>清洗至無泡泡。</li>
-                <li>卸下把手，鎖回螺絲與濾網，換回原本有孔粉杯。</li>
-                <li>清水跑幾次觀察是否無泡沫</li>
-            </ul>
+    <div class="info-section" id="menuReference" style="margin-top:20px;">
+        <h3>📋 單品豆單參考</h3>
+        <table class="menu-group-full">
+            <thead>
+                <tr>
+                    <th>品項</th>
+                    <th>外帶</th>
+                    <th>內用</th>
+                    <th>半磅</th>
+                    <th>濾掛</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>覺</td>
+                    <td><span class="menu-price">200</span></td>
+                    <td><span class="menu-price">250</span></td>
+                    <td><span class="menu-price">950</span></td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>花</td>
+                    <td><span class="menu-price">180</span></td>
+                    <td><span class="menu-price">230</span></td>
+                    <td><span class="menu-price">850</span></td>
+                    <td><span class="menu-price">55</span></td>
+                </tr>
+                <tr>
+                    <td>寶</td>
+                    <td><span class="menu-price">180</span></td>
+                    <td><span class="menu-price">230</span></td>
+                    <td><span class="menu-price">850</span></td>
+                    <td><span class="menu-price">55</span></td>
+                </tr>
+                <tr>
+                    <td>菩</td>
+                    <td><span class="menu-price">130</span></td>
+                    <td><span class="menu-price">180</span></td>
+                    <td><span class="menu-price">700</span></td>
+                    <td><span class="menu-price">45</span></td>
+                </tr>
+                <tr>
+                    <td>雅</td>
+                    <td><span class="menu-price">130</span></td>
+                    <td><span class="menu-price">180</span></td>
+                    <td><span class="menu-price">650</span></td>
+                    <td><span class="menu-price">45</span></td>
+                </tr>
+                <tr>
+                    <td>靜</td>
+                    <td><span class="menu-price">130</span></td>
+                    <td><span class="menu-price">180</span></td>
+                    <td><span class="menu-price">650</span></td>
+                    <td><span class="menu-price">45</span></td>
+                </tr>
+                <tr>
+                    <td>果</td>
+                    <td><span class="menu-price">130</span></td>
+                    <td><span class="menu-price">180</span></td>
+                    <td><span class="menu-price">600</span></td>
+                    <td><span class="menu-price">45</span></td>
+                </tr>
+                <tr>
+                    <td>福</td>
+                    <td><span class="menu-price">130</span></td>
+                    <td><span class="menu-price">180</span></td>
+                    <td><span class="menu-price">550</span></td>
+                    <td><span class="menu-price">35</span></td>
+                </tr>
+                <tr>
+                    <td>柔</td>
+                    <td><span class="menu-price">130</span></td>
+                    <td><span class="menu-price">180</span></td>
+                    <td><span class="menu-price">450</span></td>
+                    <td><span class="menu-price">35</span></td>
+                </tr>
+                <tr>
+                    <td>定</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td><span class="menu-price">650</span></td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>真</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td></td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>潤</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td></td>
+                    <td>-</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="price-card-container" style="margin-top: 25px;">
+        <div class="price-card">
+            <div class="price-card-header" style="background: var(--color-secondary);">📖 咖啡調製做法</div>
+            <div style="padding: 15px; font-size: 14px; line-height: 1.8;">
+                <div
+                    style="margin-bottom: 12px; border-bottom: 1px dashed var(--color-light-gray); padding-bottom: 8px;">
+                    <strong style="color: var(--color-primary);">☕ 美式/拿鐵基底：</strong><br>
+                    20g 粉 → 萃取 40g 濃縮 1:2 (30-45s)<br>
+                    ➔ <b>熱美式：</b>加熱水至九分滿<br>
+                    ➔ <b>冰美式：</b>整杯冰塊加水補滿<br>
+                    ➔ <b>冰拿鐵：</b>半杯冰塊加牛奶補滿<br>
+                    ➔ <b>熱拿鐵：</b>牛奶用鋼杯打熱後加至九分滿
+                </div>
+                <div>
+                    <strong style="color: var(--color-primary);">🍵 抹茶歐蕾：</strong><br>
+                    粉 7g + 糖粉 6g + 熱水 60g 攪拌均勻，剩下用熱牛奶補滿。
+                </div>
+                <div>
+                    <strong style="color: var(--color-primary);">🍫 可可歐蕾：</strong><br>
+                    粉 7g + 糖粉 6g + 熱水 40g 攪拌均勻，剩下用熱牛奶補滿。
+                </div>
+            </div>
+        </div>
+
+        <div class="price-card">
+            <div class="price-card-header" style="background: #666;">🔧 每日洗咖啡機流程</div>
+            <div style="padding: 15px; font-size: 14px; line-height: 1.6;">
+                <ul style="padding-left: 20px; margin: 0;">
+                    <li>卸下把手，將粉杯替換為<b>無孔逆洗杯 </b>。</li>
+                    <li>用<b>一字起子</b>轉開濾網螺絲，取下濾網清洗（小心燙，保管好螺絲）。</li>
+                    <li>把手加入<b>一湯匙清潔粉</b>並扣回。</li>
+                    <li>長按<b>「1 + 5」</b>按鈕啟動自動清洗。</li>
+                    <li>洗完將水倒掉，重複<b>「1 + 5」</b>清洗至無泡泡。</li>
+                    <li>卸下把手，鎖回螺絲與濾網，換回原本有孔粉杯。</li>
+                    <li>清水跑幾次觀察是否無泡沫</li>
+                </ul>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    const expandedStats = new Set();
-    const customers = [
-        { loc: "右邊鄰居", name: "怡香軒", item: "熱美式", type: "hot_am", days: [], count: 1, groupId: "neighbor_r_1" },
-        { loc: "右邊鄰居", name: "油飯", item: "熱美式", tag: "當日問",type: "hot_am", days: [], count: 1, groupId: "neighbor_r_2"},
-        { loc: "右邊鄰居", name: "山城米食", item: "熱拿鐵", type: "hot_latte", days: [], count: 1, note: "寄杯", groupId: "neighbor_r_3" }, 
-        { loc: "右邊鄰居", name: "橘子攤", item: "熱拿鐵", type: "hot_latte", days: [], count: 1, groupId: "neighbor_r_4" }, 
-        { loc: "右邊鄰居", name: "糖果", item: "熱拿鐵", type: "hot_latte", days: [6, 0], count: 1, note: "付兩天", groupId: "neighbor_r_5" },
-        { loc: "左邊鄰居", name: "牛肉", item: "熱拿鐵", type: "hot_latte_sugar", days: [3, 5, 0], count: 1, note: "加3g糖", groupId: "neighbor_l_1" },
-        { loc: "左邊鄰居", name: "布老闆", item: "熱美式", type: "hot_am", days: [5], count: 1, note: "寄杯", groupId: "neighbor_l_2" },
-        { 
-            loc: "左邊鄰居", 
-            name: "甘蔗雞", 
-            item: [10, 11, 0, 1, 2].includes(new Date().getMonth()) ? "熱美式" : "冰美式",
-            type: [10, 11, 0, 1, 2].includes(new Date().getMonth()) ? "hot_am" : "ice_am",
-            days: [], 
-            count: 1, 
-            groupId: "neighbor_l_3" 
-        },
-        { loc: "左邊鄰居", name: "國聯哥", item: "冰美式", type: "ice_am", days: [], count: 1, groupId: "neighbor_l_4" },
-        { loc: "左邊鄰居", name: "宜蘭魚攤", item: "冰美式", type: "ice_am", days: [6], count: 1, groupId: "neighbor_l_5" },
-        { loc: "左邊鄰居", name: "宜蘭魚攤", item: "冰拿鐵", type: "ice_latte_sugar", days: [6], count: 1 ,note:"加糖", groupId: "neighbor_l_5"},
-        { loc: "恐龍嫩仙草對面", name: "賣魚的員工", item: "大熱美", type: "large_hot_am", days: [6,0], note: "六給兩天錢", groupId: "other_1" },
-        { loc: "近十字路口", name: "牛肉爸爸", item: "大拿鐵", count: 1, type: "large_hot_latte", days: [], note: "爸爸粉+1g", groupId: "other_2" },
-        { loc: "近十字路口", name: "牛肉兒子", item: "大拿鐵", count: 1, type: "large_hot_latte", days: [], groupId: "other_2" },
-        { loc: "過十字路口直行", name: "魚老闆", item: "大拿鐵", type: "large_hot_latte", days: [2, 3, 5], count: 1, note: "寄杯", groupId: "other_3" },
-        { loc: "過十字路口直行", name: "魚老闆鄰居(水果)", item: "熱拿鐵", type: "hot_latte", days: [2, 3, 6, 0], count: 1, groupId: "other_4" }, 
-        { loc: "過十字路口直行", name: "小辣椒", item: "熱美式", type: "hot_am", days: [], count: 1, groupId: "other_5" },
-        { loc: "過十字路口直行", name: "蝦老闆", item: "熱美式",type: "hot_am", days: [2, 4, 5, 6, 0], count: 1, groupId: "other_6" },
-        { loc: "過十字路口直行", name: "梨山蜜蘋果", item: "熱拿鐵",tag: "當日問", type: "hot_latte", days: [4,5], count: 1, groupId: "other_7" }, 
-        { loc: "過十字路口直行", name: "城隍廟口鐵鍋行", item: "冰美式",  count: 2, type: "ice_am", days: [5], groupId: "other_8" }, 
-        { loc: "過十字路口直行", name: "眼鏡白髮小菜老闆", item: "冰手沖|雅", type: "hand_drip",tag: "當日問老客戶手沖100", days: [4], count: 1, groupId: "other_9"  },
-        { loc: "過十字路口直行", name: "抓餅女老闆", item: "熱美式",tag: "當日問", type: "hot_am", days: [2,4], count: 1, groupId: "other_10" },
-        { loc: "過十字路口直行", name: "豐原素食", item: "熱美式", type: "hot_am", days: [3], count: 1, groupId: "other_11" },
-        { loc: "過十字路口直行", name: "近中山路水果攤", item: "熱美式", type: "hot_am", days: [], count: 1, groupId: "other_12" },
-        { loc: "過十字路口右轉", name: "福記對面豬肉", item: "熱美式", type: "hot_am", days: [], count: 1, note: "寄杯", groupId: "other_13" },
-        { loc: "市場內", name: "國聯哥媽媽", item: "熱美式", type: "hot_am", days: [2,5], count: 1, groupId: "other_14" },
-        { loc: "過十字路口直行", name: "城隍廟口貢丸 ", item: "熱拿鐵", type: "hot_latte", days: [2], count: 1, groupId: "other_15" },
-        { loc: "過十字路口直行", name: "貢丸老闆 (拿)", item: "熱拿鐵", type: "hot_latte", days: [3, 0], count: 1, groupId: "other_16" },
-        { loc: "過十字路口直行", name: "貢丸老闆 (手)", item: "熱手沖", type: "hand_drip", days: [3, 0], count: 1, note: "總計$185", groupId: "other_16" },
-        { loc: "過十字路口直行", name: "菜老闆", item: "熱拿鐵", type: "hot_latte", days: [], count: 1, groupId: "other_17" },
-        { loc: "過十字路口直行", name: "城隍廟口豆腐", item: "冰美式",   type: "ice_am", days: [6], note:"當天問",groupId: "other_18" }, 
-    ];
+    <script>
+        const expandedStats = new Set();
+        const customers = [
+            { loc: "右邊鄰居", name: "怡香軒", item: "熱美式", type: "hot_am", days: [], count: 1, groupId: "neighbor_r_1" },
+            { loc: "右邊鄰居", name: "油飯", item: "熱美式", tag: "當日問", type: "hot_am", days: [], count: 1, groupId: "neighbor_r_2" },
+            { loc: "右邊鄰居", name: "山城米食", item: "熱拿鐵", type: "hot_latte", days: [], count: 1, note: "寄杯", groupId: "neighbor_r_3" },
+            { loc: "右邊鄰居", name: "橘子攤", item: "熱拿鐵", type: "hot_latte", days: [], count: 1, groupId: "neighbor_r_4" },
+            { loc: "右邊鄰居", name: "糖果", item: "熱拿鐵", type: "hot_latte", days: [6, 0], count: 1, note: "付兩天", groupId: "neighbor_r_5" },
+            { loc: "左邊鄰居", name: "牛肉", item: "熱拿鐵", type: "hot_latte_sugar", days: [3, 5, 0], count: 1, note: "加3g糖", groupId: "neighbor_l_1" },
+            { loc: "左邊鄰居", name: "布老闆", item: "熱美式", type: "hot_am", days: [5], count: 1, note: "寄杯", groupId: "neighbor_l_2" },
+            {
+                loc: "左邊鄰居",
+                name: "甘蔗雞",
+                item: [10, 11, 0, 1, 2].includes(new Date().getMonth()) ? "熱美式" : "冰美式",
+                type: [10, 11, 0, 1, 2].includes(new Date().getMonth()) ? "hot_am" : "ice_am",
+                days: [],
+                count: 1,
+                groupId: "neighbor_l_3"
+            },
+            { loc: "左邊鄰居", name: "國聯哥", item: "冰美式", type: "ice_am", days: [], count: 1, groupId: "neighbor_l_4" },
+            { loc: "左邊鄰居", name: "宜蘭魚攤", item: "冰美式", type: "ice_am", days: [6], count: 1, groupId: "neighbor_l_5" },
+            { loc: "左邊鄰居", name: "宜蘭魚攤", item: "冰拿鐵", type: "ice_latte_sugar", days: [6], count: 1, note: "加糖", groupId: "neighbor_l_5" },
+            { loc: "恐龍嫩仙草對面", name: "賣魚的員工", item: "大熱美", type: "large_hot_am", days: [6, 0], note: "六給兩天錢", groupId: "other_1" },
+            { loc: "近十字路口", name: "牛肉爸爸", item: "大拿鐵", count: 1, type: "large_hot_latte", days: [], note: "爸爸粉+1g", groupId: "other_2" },
+            { loc: "近十字路口", name: "牛肉兒子", item: "大拿鐵", count: 1, type: "large_hot_latte", days: [], groupId: "other_2" },
+            { loc: "過十字路口直行", name: "魚老闆", item: "大拿鐵", type: "large_hot_latte", days: [2, 3, 5], count: 1, note: "寄杯", groupId: "other_3" },
+            { loc: "過十字路口直行", name: "魚老闆鄰居(水果)", item: "熱拿鐵", type: "hot_latte", days: [2, 3, 6, 0], count: 1, groupId: "other_4" },
+            { loc: "過十字路口直行", name: "小辣椒", item: "熱美式", type: "hot_am", days: [], count: 1, groupId: "other_5" },
+            { loc: "過十字路口直行", name: "蝦老闆", item: "熱美式", type: "hot_am", days: [2, 4, 5, 6, 0], count: 1, groupId: "other_6" },
+            { loc: "過十字路口直行", name: "梨山蜜蘋果", item: "熱拿鐵", tag: "當日問", type: "hot_latte", days: [4, 5], count: 1, groupId: "other_7" },
+            { loc: "過十字路口直行", name: "城隍廟口鐵鍋行", item: "冰美式", count: 2, type: "ice_am", days: [5], groupId: "other_8" },
+            { loc: "過十字路口直行", name: "眼鏡白髮小菜老闆", item: "冰手沖|雅", type: "hand_drip", tag: "當日問老客戶手沖100", days: [4], count: 1, groupId: "other_9" },
+            { loc: "過十字路口直行", name: "抓餅女老闆", item: "熱美式", tag: "當日問", type: "hot_am", days: [2, 4], count: 1, groupId: "other_10" },
+            { loc: "過十字路口直行", name: "豐原素食", item: "熱美式", type: "hot_am", days: [3], count: 1, groupId: "other_11" },
+            { loc: "過十字路口直行", name: "近中山路水果攤", item: "熱美式", type: "hot_am", days: [], count: 1, groupId: "other_12" },
+            { loc: "過十字路口右轉", name: "福記對面豬肉", item: "熱美式", type: "hot_am", days: [], count: 1, note: "寄杯", groupId: "other_13" },
+            { loc: "市場內", name: "國聯哥媽媽", item: "熱美式", type: "hot_am", days: [2, 5], count: 1, groupId: "other_14" },
+            { loc: "過十字路口直行", name: "城隍廟口貢丸 ", item: "熱拿鐵", type: "hot_latte", days: [2], count: 1, groupId: "other_15" },
+            { loc: "過十字路口直行", name: "貢丸老闆 (拿)", item: "熱拿鐵", type: "hot_latte", days: [3, 0], count: 1, groupId: "other_16" },
+            { loc: "過十字路口直行", name: "貢丸老闆 (手)", item: "熱手沖", type: "hand_drip", days: [3, 0], count: 1, note: "總計$185", groupId: "other_16" },
+            { loc: "過十字路口直行", name: "菜老闆", item: "熱拿鐵", type: "hot_latte", days: [], count: 1, groupId: "other_17" },
+            { loc: "過十字路口直行", name: "城隍廟口豆腐", item: "冰美式", type: "ice_am", days: [6], note: "當天問", groupId: "other_18" },
+        ];
 
-    const typeNames = {
-        hot_am: '☕ 熱美式', ice_am: '🧊 冰美式', large_hot_am:"☕️ 大熱美",
-        hot_latte: '🔥 熱拿鐵', hot_latte_sugar: '🍬 熱拿鐵 (加糖)', 
-        ice_latte_sugar: '🍭 冰拿鐵 (加糖)', ice_latte: '❄️ 冰拿鐵', 
-        large_hot_latte: '🥤 大熱拿', hand_drip: '💧 手沖', potential_item: '❓ 待確認'
-    };
-
-    function getTodayDateString() {
-        const today = new Date();
-        return today.getFullYear() + (today.getMonth() + 1).toString().padStart(2, '0') + today.getDate().toString().padStart(2, '0');
-    }
-
-    function sanitizeKeyPart(s) { return s ? s.replace(/ /g, '_').replace(/[^a-zA-Z0-9\u4e00-\u9fa5_]/g, '') : ''; }
-    function getStorageKey(name, item, loc, index = 0) { return `${getTodayDateString()}_${sanitizeKeyPart(name)}_${sanitizeKeyPart(item)}_${sanitizeKeyPart(loc)}_${index}`; }
-    function getAbsenceKey(groupId) { return `${getTodayDateString()}_absent_${groupId}`; }
-    function escapeJsString(s) { return s ? s.replace(/\\/g, '\\\\').replace(/'/g, '\\\'') : ''; }
-
-    window.toggleDone = function(name, item, loc, index, groupId) {
-        if (isGroupAbsent(groupId)) { alert("該組已標記為「缺席」！"); return; }
-        const key = getStorageKey(name, item, loc, index);
-        localStorage.getItem(key) === 'true' ? localStorage.removeItem(key) : localStorage.setItem(key, 'true'); 
-        renderOrders(); 
-    }
-
-    window.toggleAbsence = function(groupId) {
-        const key = getAbsenceKey(groupId);
-        if (localStorage.getItem(key) === 'true') {
-            localStorage.removeItem(key); 
-        } else {
-            localStorage.setItem(key, 'true'); 
-            const day = parseInt(document.getElementById('daySelect').value);
-            customers.filter(c => c.groupId === groupId && (c.days.length === 0 || c.days.includes(day))).forEach(c => {
-                for(let i = 0; i < (c.count || 1); i++) localStorage.removeItem(getStorageKey(c.name, c.item, c.loc, i));
-            });
-        }
-        renderOrders(); 
-    }
-
-    function isItemDone(name, item, loc, index = 0) { return localStorage.getItem(getStorageKey(name, item, loc, index)) === 'true'; }
-    function isGroupAbsent(groupId) { return groupId ? localStorage.getItem(getAbsenceKey(groupId)) === 'true' : false; }
-    
-    window.clearAllDone = function() {
-        if (!confirm("確定要重置今日所有狀態嗎？")) return;
-        const day = parseInt(document.getElementById('daySelect').value);
-        const todaysOrders = customers.filter(c => c.days.length === 0 || c.days.includes(day));
-        todaysOrders.forEach(c => {
-            for(let i = 0; i < (c.count || 1); i++) localStorage.removeItem(getStorageKey(c.name, c.item, c.loc, i));
-            if(c.groupId) localStorage.removeItem(getAbsenceKey(c.groupId));
-        });
-        expandedStats.clear();
-        renderOrders();
-    }
-
-    function renderMemos(todaysOrders) {
-        const memoList = document.getElementById('dynamicMemoList');
-        const staticList = document.getElementById('staticMemoList');
-        const dynamicMemos = todaysOrders.filter(c => c.tag && !c.tag.includes('寄杯') && !isGroupAbsent(c.groupId));
-        const filterMemos = dynamicMemos.filter(c => {
-             for (let i = 0; i < (c.count || 1); i++) if (!isItemDone(c.name, c.item, c.loc, i)) return true;
-             return false;
-        });
-        if (filterMemos.length > 0) {
-            let html = '<li class="dynamic-memo-title">🎯 今日需確認：</li>';
-            filterMemos.forEach(c => html += `<li class="dynamic-memo-item"><b>${c.name.split('(')[0]}</b> <span class="memo-tag">${c.item}</span></li>`);
-            memoList.innerHTML = html;
-            staticList.classList.add('has-dynamic');
-        } else {
-            memoList.innerHTML = '';
-            staticList.classList.remove('has-dynamic');
-        }
-    }
-
-    function renderOrders() {
-        const day = parseInt(document.getElementById('daySelect').value);
-        const sNDiv = document.getElementById('stats-neighbor');
-        const sODiv = document.getElementById('stats-other');
-        
-        if (day === 1) { 
-            sNDiv.innerHTML = sODiv.innerHTML = '<div style="text-align:center;color:#999;padding:10px;">本日休息</div>';
-            document.getElementById('clearAllBtn').disabled = true;
-            document.getElementById('dynamicMemoList').innerHTML = '';
-            return; 
-        }
-        document.getElementById('clearAllBtn').disabled = false;
-
-        let sNeigh = {}, sOther = {};
-        for (const k in typeNames) { sNeigh[k] = {total:0, done:0, orders:[]}; sOther[k] = {total:0, done:0, orders:[]}; }
-
-        const todaysOrders = customers.filter(c => c.days.length === 0 || c.days.includes(day));
-        renderMemos(todaysOrders);
-
-        todaysOrders.forEach(c => {
-            let target = (c.loc.includes("鄰居")) ? sNeigh : sOther;
-            let isAbsent = isGroupAbsent(c.groupId);
-            if (typeNames[c.type]) {
-                if (!isAbsent) target[c.type].total += (c.count || 1);
-                for(let i=0; i<(c.count||1); i++){
-                    let done = isItemDone(c.name, c.item, c.loc, i);
-                    if (done && !isAbsent) target[c.type].done++;
-                    target[c.type].orders.push({...c, isDone: done, isAbsent, index: i});
-                }
-            }
-        });
-
-        const makeHtml = (stats, prefix) => {
-            let html = '', totalN = 0, totalD = 0;
-            for (const k in typeNames) {
-                if (stats[k].total > 0) {
-                    let s = stats[k], rem = s.total - s.done, per = Math.round((s.done/s.total)*100), id = `detail_${prefix}_${k}`;
-                    expandedStats.add(id);
-                    html += `<div class="stat-row" onclick="toggleStatDetail('${id}')"><span>${typeNames[k]}</span><div class="progress-counts"><span class="count-total">${s.total}</span><span class="count-remaining">剩: <b style="${rem===0?'color:var(--color-success)':''}">${rem}</b></span></div></div><div class="stat-row-progress"><div class="progress-fill" style="width:${per}%; background-color:${rem===0?'var(--color-success)':'var(--color-accent)'};"></div></div><div id="${id}" class="stat-detail-list" style="display:block;">${s.orders.map(o => {
-                        let safe = [escapeJsString(o.name), escapeJsString(o.item), escapeJsString(o.loc), o.index, o.groupId];
-                        return `<div class="stat-detail-item ${o.isAbsent?'absent':(o.isDone?'done':'')}"><span class="absence-toggle" onclick="event.stopPropagation(); toggleAbsence('${o.groupId}')">${o.isAbsent?'恢復':'缺席'}</span><div class="customer-info" onclick="toggleDone('${safe[0]}','${safe[1]}','${safe[2]}',${safe[3]},'${safe[4]}')"><span class="customer-name">${o.name}${o.count>1?` (${o.index+1}/${o.count})`:''} ${o.tag||o.note?`<span class="customer-tag">${o.tag||o.note}</span>`:''}</span><span class="customer-loc">${o.item}</span></div><input type="checkbox" ${o.isDone||o.isAbsent?'checked':''} onclick="${o.isAbsent?'event.preventDefault()':`toggleDone('${safe[0]}','${safe[1]}','${safe[2]}',${safe[3]},'${safe[4]}')`}"></div>`
-                    }).join('')}</div>`;
-                    totalN += s.total; totalD += s.done;
-                }
-            }
-            if(totalN > 0) {
-                let rem = totalN - totalD, per = Math.round((totalD/totalN)*100);
-                html += `<div class="stat-row total"><span>🏆 總計</span><div class="progress-counts"><span class="count-total">${totalN}</span><span class="count-remaining">剩: <b style="${rem===0?'color:var(--color-success)':''}">${rem}</b></span></div></div><div class="stat-row-progress"><div class="progress-fill" style="width:${per}%; background-color:${rem===0?'var(--color-success)':'var(--color-total-progress)'};"></div></div>`;
-            } else html = '<div style="text-align:center;color:#999;padding:10px;">無訂單</div>';
-            return html;
+        const typeNames = {
+            hot_am: '☕ 熱美式', ice_am: '🧊 冰美式', large_hot_am: "☕️ 大熱美",
+            hot_latte: '🔥 熱拿鐵', hot_latte_sugar: '🍬 熱拿鐵 (加糖)',
+            ice_latte_sugar: '🍭 冰拿鐵 (加糖)', ice_latte: '❄️ 冰拿鐵',
+            large_hot_latte: '🥤 大熱拿', hand_drip: '💧 手沖', potential_item: '❓ 待確認'
         };
-        sNDiv.innerHTML = makeHtml(sNeigh, 'n'); sODiv.innerHTML = makeHtml(sOther, 'o');
-    }
 
-    window.toggleStatDetail = function(id) {
-        const el = document.getElementById(id);
-        if (el) {
-            if (el.style.display === 'block') { el.style.display = 'none'; expandedStats.delete(id); }
-            else { el.style.display = 'block'; expandedStats.add(id); }
+        function getTodayDateString() {
+            const today = new Date();
+            return today.getFullYear() + (today.getMonth() + 1).toString().padStart(2, '0') + today.getDate().toString().padStart(2, '0');
         }
-    }
 
-    document.getElementById('daySelect').value = new Date().getDay();
-    renderOrders();
-</script>
+        function sanitizeKeyPart(s) { return s ? s.replace(/ /g, '_').replace(/[^a-zA-Z0-9\u4e00-\u9fa5_]/g, '') : ''; }
+        function getStorageKey(name, item, loc, index = 0) { return `${getTodayDateString()}_${sanitizeKeyPart(name)}_${sanitizeKeyPart(item)}_${sanitizeKeyPart(loc)}_${index}`; }
+        function getAbsenceKey(groupId) { return `${getTodayDateString()}_absent_${groupId}`; }
+        function escapeJsString(s) { return s ? s.replace(/\\/g, '\\\\').replace(/'/g, '\\\'') : ''; }
+
+        window.toggleDone = function (name, item, loc, index, groupId) {
+            if (isGroupAbsent(groupId)) { alert("該組已標記為「缺席」！"); return; }
+            const key = getStorageKey(name, item, loc, index);
+            localStorage.getItem(key) === 'true' ? localStorage.removeItem(key) : localStorage.setItem(key, 'true');
+            renderOrders();
+        }
+
+        window.toggleAbsence = function (groupId) {
+            const key = getAbsenceKey(groupId);
+            if (localStorage.getItem(key) === 'true') {
+                localStorage.removeItem(key);
+            } else {
+                localStorage.setItem(key, 'true');
+                const day = parseInt(document.getElementById('daySelect').value);
+                customers.filter(c => c.groupId === groupId && (c.days.length === 0 || c.days.includes(day))).forEach(c => {
+                    for (let i = 0; i < (c.count || 1); i++) localStorage.removeItem(getStorageKey(c.name, c.item, c.loc, i));
+                });
+            }
+            renderOrders();
+        }
+
+        function isItemDone(name, item, loc, index = 0) { return localStorage.getItem(getStorageKey(name, item, loc, index)) === 'true'; }
+        function isGroupAbsent(groupId) { return groupId ? localStorage.getItem(getAbsenceKey(groupId)) === 'true' : false; }
+
+        window.clearAllDone = function () {
+            if (!confirm("確定要重置今日所有狀態嗎？")) return;
+            const day = parseInt(document.getElementById('daySelect').value);
+            const todaysOrders = customers.filter(c => c.days.length === 0 || c.days.includes(day));
+            todaysOrders.forEach(c => {
+                for (let i = 0; i < (c.count || 1); i++) localStorage.removeItem(getStorageKey(c.name, c.item, c.loc, i));
+                if (c.groupId) localStorage.removeItem(getAbsenceKey(c.groupId));
+            });
+            expandedStats.clear();
+            renderOrders();
+        }
+
+        function renderMemos(todaysOrders) {
+            const memoList = document.getElementById('dynamicMemoList');
+            const staticList = document.getElementById('staticMemoList');
+            const dynamicMemos = todaysOrders.filter(c => c.tag && !c.tag.includes('寄杯') && !isGroupAbsent(c.groupId));
+            const filterMemos = dynamicMemos.filter(c => {
+                for (let i = 0; i < (c.count || 1); i++) if (!isItemDone(c.name, c.item, c.loc, i)) return true;
+                return false;
+            });
+            if (filterMemos.length > 0) {
+                let html = '<li class="dynamic-memo-title">🎯 今日需確認：</li>';
+                filterMemos.forEach(c => html += `<li class="dynamic-memo-item"><b>${c.name.split('(')[0]}</b> <span class="memo-tag">${c.item}</span></li>`);
+                memoList.innerHTML = html;
+                staticList.classList.add('has-dynamic');
+            } else {
+                memoList.innerHTML = '';
+                staticList.classList.remove('has-dynamic');
+            }
+        }
+
+        function renderOrders() {
+            const day = parseInt(document.getElementById('daySelect').value);
+            const sNDiv = document.getElementById('stats-neighbor');
+            const sODiv = document.getElementById('stats-other');
+
+            if (day === 1) {
+                sNDiv.innerHTML = sODiv.innerHTML = '<div style="text-align:center;color:#999;padding:10px;">本日休息</div>';
+                document.getElementById('clearAllBtn').disabled = true;
+                document.getElementById('dynamicMemoList').innerHTML = '';
+                return;
+            }
+            document.getElementById('clearAllBtn').disabled = false;
+
+            let sNeigh = {}, sOther = {};
+            for (const k in typeNames) { sNeigh[k] = { total: 0, done: 0, orders: [] }; sOther[k] = { total: 0, done: 0, orders: [] }; }
+
+            const todaysOrders = customers.filter(c => c.days.length === 0 || c.days.includes(day));
+            renderMemos(todaysOrders);
+
+            todaysOrders.forEach(c => {
+                let target = (c.loc.includes("鄰居")) ? sNeigh : sOther;
+                let isAbsent = isGroupAbsent(c.groupId);
+                if (typeNames[c.type]) {
+                    if (!isAbsent) target[c.type].total += (c.count || 1);
+                    for (let i = 0; i < (c.count || 1); i++) {
+                        let done = isItemDone(c.name, c.item, c.loc, i);
+                        if (done && !isAbsent) target[c.type].done++;
+                        target[c.type].orders.push({ ...c, isDone: done, isAbsent, index: i });
+                    }
+                }
+            });
+
+            const makeHtml = (stats, prefix) => {
+                let html = '', totalN = 0, totalD = 0;
+                for (const k in typeNames) {
+                    if (stats[k].total > 0) {
+                        let s = stats[k], rem = s.total - s.done, per = Math.round((s.done / s.total) * 100), id = `detail_${prefix}_${k}`;
+                        expandedStats.add(id);
+                        html += `<div class="stat-row" onclick="toggleStatDetail('${id}')"><span>${typeNames[k]}</span><div class="progress-counts"><span class="count-total">${s.total}</span><span class="count-remaining">剩: <b style="${rem === 0 ? 'color:var(--color-success)' : ''}">${rem}</b></span></div></div><div class="stat-row-progress"><div class="progress-fill" style="width:${per}%; background-color:${rem === 0 ? 'var(--color-success)' : 'var(--color-accent)'};"></div></div><div id="${id}" class="stat-detail-list" style="display:block;">${s.orders.map(o => {
+                            let safe = [escapeJsString(o.name), escapeJsString(o.item), escapeJsString(o.loc), o.index, o.groupId];
+                            return `<div class="stat-detail-item ${o.isAbsent ? 'absent' : (o.isDone ? 'done' : '')}"><span class="absence-toggle" onclick="event.stopPropagation(); toggleAbsence('${o.groupId}')">${o.isAbsent ? '恢復' : '缺席'}</span><div class="customer-info" onclick="toggleDone('${safe[0]}','${safe[1]}','${safe[2]}',${safe[3]},'${safe[4]}')"><span class="customer-name">${o.name}${o.count > 1 ? ` (${o.index + 1}/${o.count})` : ''} ${o.tag || o.note ? `<span class="customer-tag">${o.tag || o.note}</span>` : ''}</span><span class="customer-loc">${o.item}</span></div><input type="checkbox" ${o.isDone || o.isAbsent ? 'checked' : ''} onclick="${o.isAbsent ? 'event.preventDefault()' : `toggleDone('${safe[0]}','${safe[1]}','${safe[2]}',${safe[3]},'${safe[4]}')`}"></div>`
+                        }).join('')}</div>`;
+                        totalN += s.total; totalD += s.done;
+                    }
+                }
+                if (totalN > 0) {
+                    let rem = totalN - totalD, per = Math.round((totalD / totalN) * 100);
+                    html += `<div class="stat-row total"><span>🏆 總計</span><div class="progress-counts"><span class="count-total">${totalN}</span><span class="count-remaining">剩: <b style="${rem === 0 ? 'color:var(--color-success)' : ''}">${rem}</b></span></div></div><div class="stat-row-progress"><div class="progress-fill" style="width:${per}%; background-color:${rem === 0 ? 'var(--color-success)' : 'var(--color-total-progress)'};"></div></div>`;
+                } else html = '<div style="text-align:center;color:#999;padding:10px;">無訂單</div>';
+                return html;
+            };
+            sNDiv.innerHTML = makeHtml(sNeigh, 'n'); sODiv.innerHTML = makeHtml(sOther, 'o');
+        }
+
+        window.toggleStatDetail = function (id) {
+            const el = document.getElementById(id);
+            if (el) {
+                if (el.style.display === 'block') { el.style.display = 'none'; expandedStats.delete(id); }
+                else { el.style.display = 'block'; expandedStats.add(id); }
+            }
+        }
+
+        document.getElementById('daySelect').value = new Date().getDay();
+        renderOrders();
+
+
+    </script>
 </body>
+
 </html>
