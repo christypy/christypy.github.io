@@ -3,46 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>精品咖啡紀錄器 v63.4 - 水流控制版</title>
+<title>精品咖啡紀錄器 v63.5 - 大字體星星版</title>
 <style>
 :root {
   --bg: #fdfaf7; --card: #ffffff; --main: #5d4037; --accent: #c6a49a;
   --text: #3e2723; --line: #ece0d1; --primary: #8d6e63; --danger: #d32f2f;
-  --success: #43a047; --star: #ffa000; --info: #1976d2; --esp-bg: #3e2723;
+  --success: #43a047; --star: #ffca28; --info: #1976d2; --esp-bg: #3e2723;
 }
-body { margin: 0; font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; background: var(--bg); color: var(--text); -webkit-tap-highlight-color: transparent; }
-.container { max-width: 1200px; margin: auto; padding: 15px; display: grid; grid-template-columns: 1fr; gap: 20px; }
+body { margin: 0; font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; background: var(--bg); color: var(--text); font-size: 18px; -webkit-tap-highlight-color: transparent; }
+.container { max-width: 1200px; margin: auto; padding: 20px; display: grid; grid-template-columns: 1fr; gap: 25px; }
 @media (min-width: 992px) { .container { grid-template-columns: 1.1fr 0.9fr; } .header-full { grid-column: span 2; } }
 
-.tab-btn { flex: 1; padding: 14px; border: none; border-radius: 16px; background: #efebe9; font-weight: 800; cursor: pointer; transition: all 0.2s; color: #8d6e63; }
+/* 按鈕與元件 */
+.tab-btn { flex: 1; padding: 16px; border: none; border-radius: 18px; background: #efebe9; font-weight: 800; cursor: pointer; transition: 0.2s; color: #8d6e63; font-size: 18px; }
 .tab-btn.active.pour { background: var(--main); color: white; box-shadow: 0 4px 12px rgba(93,64,55,0.3); }
 .tab-btn.active.esp { background: var(--esp-bg); color: white; box-shadow: 0 4px 12px rgba(62,39,35,0.3); }
 
-.click-box { display: block; background: #fff; border: 2px solid var(--line); color: var(--main); padding: 12px; border-radius: 14px; font-weight: 800; cursor: pointer; text-align: center; }
-.click-box.empty { border-color: var(--danger); color: var(--danger); background: #fff8f8; }
+.click-box { display: block; background: #fff; border: 2px solid var(--line); color: var(--main); padding: 15px; border-radius: 16px; font-weight: 900; cursor: pointer; text-align: center; font-size: 20px; }
+.click-box.empty { border-color: var(--danger); color: var(--danger); }
 
-.card { background: var(--card); border-radius: 24px; padding: 22px; box-shadow: 0 8px 30px rgba(93,64,55,0.08); border: 1px solid rgba(236,224,209,0.5); }
-.section-title { font-weight: 800; margin-bottom: 18px; font-size: 19px; color: var(--main); display: flex; align-items: center; }
-.section-title::before { content: ""; width: 6px; height: 20px; background: var(--main); margin-right: 12px; border-radius: 3px; }
+.card { background: var(--card); border-radius: 28px; padding: 25px; box-shadow: 0 10px 40px rgba(93,64,55,0.08); }
+.section-title { font-weight: 900; margin-bottom: 20px; font-size: 22px; color: var(--main); border-left: 8px solid var(--main); padding-left: 15px; }
 
-.log-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 11px; table-layout: fixed; }
-.log-table th { padding: 10px 2px; border-bottom: 2px solid var(--line); background: #fbf9f7; color: #8d6e63; }
-.log-table td { padding: 10px 2px; text-align: center; border-bottom: 1px solid #f3ede6; }
-.select-ui { border: 1px solid var(--line); border-radius: 6px; padding: 2px; font-size: 10px; width: 98%; background: white; outline: none; }
+/* 表格大字體 */
+.log-table { width: 100%; border-collapse: collapse; font-size: 15px; table-layout: fixed; }
+.log-table th { padding: 12px 2px; border-bottom: 3px solid var(--line); background: #fbf9f7; color: #8d6e63; }
+.log-table td { padding: 15px 2px; text-align: center; border-bottom: 1px solid #f3ede6; }
+.select-ui { border: 1px solid var(--line); border-radius: 8px; padding: 6px; font-size: 14px; width: 96%; background: white; font-weight: bold; color: var(--main); }
 
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(62,39,35,0.8); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-.numpad-container { background: white; padding: 25px; border-radius: 32px; width: 320px; }
-.numpad-display { font-size: 44px; font-weight: 800; margin-bottom: 20px; background: #fbe9e7; padding: 15px; border-radius: 18px; text-align: center; color: var(--main); min-height: 60px; border: 2px solid #ffccbc; }
-.numpad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+/* 星星顯示 */
+.star-rating { display: flex; gap: 5px; }
+.star {
+  font-size: 32px; /* 從 26px 放大到 32px，讓 3 顆星在視覺上更平衡 */
+  cursor: pointer;
+  color: #e0e0e0;
+  transition: 0.2s;
+}.star.active { color: var(--star); text-shadow: 0 0 5px rgba(255,202,40,0.5); }
 
-.edit-chip { display: inline-block; background: #f3ede6; padding: 4px 6px; border-radius: 6px; margin: 1px; cursor: pointer; font-weight: 700; color: var(--main); border: 1px solid transparent; }
+/* 九宮格 */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(62,39,35,0.85); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+.numpad-container { background: white; padding: 30px; border-radius: 40px; width: 340px; }
+.numpad-display { font-size: 50px; font-weight: 900; margin-bottom: 20px; background: #fbe9e7; padding: 15px; border-radius: 20px; text-align: center; color: var(--main); min-height: 70px; border: 3px solid #ffccbc; }
+.numpad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+
+.edit-chip { display: inline-block; background: #f3ede6; padding: 6px 10px; border-radius: 10px; margin: 2px; cursor: pointer; font-weight: 800; color: var(--main); border: 1px solid transparent; }
 </style>
 </head>
 <body>
 
 <div id="numPadModal" class="modal-overlay" onclick="closeNumPad()">
     <div class="numpad-container" onclick="event.stopPropagation()">
-        <div id="numPadTitle" style="text-align:center; font-weight:bold; color:var(--main); margin-bottom:12px;">輸入數值</div>
+        <div id="numPadTitle" style="text-align:center; font-weight:bold; color:var(--main); margin-bottom:15px; font-size:20px;">輸入數值</div>
         <div id="numPadDisplay" class="numpad-display">-</div>
         <div class="numpad-grid" id="numpadButtons"></div>
     </div>
@@ -50,77 +61,77 @@ body { margin: 0; font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; 
 
 <div class="container">
   <div class="header-full" style="text-align: center; padding: 10px 0;">
-    <h2 style="color:var(--main); margin:0 0 15px 0;">精品咖啡紀錄器 v63.4</h2>
-    <div style="display:flex; justify-content: center; gap:10px; flex-wrap: wrap;">
-        <button onclick="location.href='https://christypy.github.io/'" style="background:var(--main); color:white; border:none; padding:10px 20px; border-radius:50px; cursor:pointer; font-weight:bold; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">🏠 首頁</button>
-        <button onclick="exportJSON()" style="background:var(--info); color:white; border:none; padding:10px 20px; border-radius:50px; cursor:pointer; font-weight:bold;">📥 匯出</button>
-        <button onclick="document.getElementById('fileInput').click()" style="background:var(--info); color:white; border:none; padding:10px 20px; border-radius:50px; cursor:pointer; font-weight:bold;">📤 匯入</button>
+    <h1 style="color:var(--main); margin:0 0 20px 0; font-size:32px; letter-spacing: 1px;">精品咖啡紀錄器 v63.5</h1>
+    <div style="display:flex; justify-content: center; gap:12px; flex-wrap: wrap;">
+        <button onclick="location.href='https://christypy.github.io/'" style="background:var(--main); color:white; border:none; padding:12px 25px; border-radius:50px; cursor:pointer; font-weight:bold; font-size:18px;">🏠 首頁</button>
+        <button onclick="exportJSON()" style="background:var(--info); color:white; border:none; padding:12px 25px; border-radius:50px; cursor:pointer; font-weight:bold; font-size:18px;">📥 匯出</button>
+        <button onclick="document.getElementById('fileInput').click()" style="background:var(--info); color:white; border:none; padding:12px 25px; border-radius:50px; cursor:pointer; font-weight:bold; font-size:18px;">📤 匯入</button>
         <input type="file" id="fileInput" style="display:none" onchange="importJSON(event)">
-        <button onclick="clearAllHistory()" style="background:var(--danger); color:white; border:none; padding:10px 20px; border-radius:50px; cursor:pointer; font-weight:bold;">🔥 清空</button>
+        <button onclick="clearAllHistory()" style="background:var(--danger); color:white; border:none; padding:12px 25px; border-radius:50px; cursor:pointer; font-weight:bold; font-size:18px;">🔥 清空</button>
     </div>
   </div>
 
   <div>
-    <div class="card" style="margin-bottom:20px;">
-        <div class="section-title">目前沖煮參數</div>
-        <div class="history-tabs" style="display:flex; gap:12px; margin-bottom:20px;">
+    <div class="card" style="margin-bottom:25px;">
+        <div class="section-title">沖煮參數</div>
+        <div style="display:flex; gap:15px; margin-bottom:25px;">
             <button id="m-pour" class="tab-btn active pour" onclick="selectMode('pour')">手沖模式</button>
             <button id="m-esp" class="tab-btn" onclick="selectMode('espresso')">義式模式</button>
         </div>
-        <div id="beanBtns" style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:20px;"></div>
-        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+        <div id="beanBtns" style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:25px;"></div>
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:15px;">
             <div onclick="openNumPad('dose','粉量 (10-60g)',true)">
-                <span style="font-size:12px; font-weight:800; color:#a1887f;">粉量(g)</span>
+                <span style="font-size:14px; font-weight:900; color:#a1887f; display:block; margin-bottom:8px;">粉量(g)</span>
                 <div id="d-dose" class="click-box">20</div>
             </div>
             <div onclick="openNumPad('grind','研磨 (1-10)',true)">
-                <span style="font-size:12px; font-weight:800; color:#a1887f;">研磨度</span>
+                <span style="font-size:14px; font-weight:900; color:#a1887f; display:block; margin-bottom:8px;">研磨度</span>
                 <div id="d-grind" class="click-box">6.0</div>
             </div>
             <div id="temp-row" onclick="openNumPad('temp','水溫 (80-98°C)',false)">
-                <span style="font-size:12px; font-weight:800; color:#a1887f;">水溫(°C)</span>
+                <span style="font-size:14px; font-weight:900; color:#a1887f; display:block; margin-bottom:8px;">水溫(°C)</span>
                 <div id="d-temp" class="click-box">93</div>
             </div>
         </div>
     </div>
 
     <div class="card">
-        <div style="text-align: center; border-radius: 50%; margin: 15px auto; border: 10px solid #f3ede6; width: 190px; height: 190px; display: flex; flex-direction: column; justify-content: center; cursor: pointer;" onclick="handleTimerAction()">
-            <div id="stepName" style="font-weight:900; color:var(--main); font-size:17px;">待機中</div>
-            <div id="timer" style="font-size:46px; font-weight:900; font-family: monospace;">0:00</div>
-            <div id="stepHint" style="font-size:12px; color:#a1887f;">點擊圓圈紀錄</div>
+        <div style="text-align: center; border-radius: 50%; margin: 15px auto; border: 12px solid #f3ede6; width: 220px; height: 220px; display: flex; flex-direction: column; justify-content: center; cursor: pointer; background: #fff;" onclick="handleTimerAction()">
+            <div id="stepName" style="font-weight:900; color:var(--main); font-size:22px;">待機中</div>
+            <div id="timer" style="font-size:58px; font-weight:900; font-family: monospace; color:#3e2723;">0:00</div>
+            <div style="font-size:14px; color:#a1887f; margin-top:5px;">點擊圓圈紀錄</div>
         </div>
-        <div style="display:grid; grid-template-columns: 3fr 1fr; gap:12px;">
-            <button id="mainBtn" onclick="toggleTimer()" style="background:var(--main); color:white; border:none; height:65px; border-radius:18px; font-size:22px; font-weight:900;">START / STOP</button>
-            <button onclick="resetTimer()" style="border:none; background:none; color:#a1887f; font-weight:800;">RESET</button>
+        <div style="display:grid; grid-template-columns: 3fr 1fr; gap:15px;">
+            <button id="mainBtn" onclick="toggleTimer()" style="background:var(--main); color:white; border:none; height:75px; border-radius:20px; font-size:26px; font-weight:900;">START / STOP</button>
+            <button onclick="resetTimer()" style="border:none; background:none; color:#a1887f; font-weight:900; font-size:18px;">RESET</button>
         </div>
 
-        <div style="margin-top:25px; overflow-x:auto;">
+        <div style="margin-top:30px; overflow-x:auto;">
             <table class="log-table">
                 <thead id="logHead"></thead>
                 <tbody id="logs"></tbody>
             </table>
-            <button onclick="addManualRow()" style="width:100%; padding:10px; margin-top:10px; background:transparent; border:2px dashed var(--line); border-radius:10px; color:var(--primary); font-weight:bold; cursor:pointer;">➕ 手動新增紀錄</button>
+            <button onclick="addManualRow()" style="width:100%; padding:15px; margin-top:15px; background:transparent; border:2px dashed var(--line); border-radius:15px; color:var(--primary); font-weight:900; font-size:18px;">➕ 手動新增紀錄</button>
         </div>
 
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:25px; background:#fbf9f7; padding:15px; border-radius:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:30px; background:linear-gradient(135deg, #fbf9f7 0%, #efebe9 100%); padding:25px; border-radius:25px;">
             <div onclick="openNumPad('liquid','最終總量',true)">
-                <span style="font-size:13px; color:var(--primary); font-weight:800;">總量 (Liquid)</span>
-                <div id="d-liquid" class="click-box" style="font-size:24px; border:none; padding:0; background:transparent;">0g</div>
+                <span style="font-size:16px; color:var(--primary); font-weight:900;">總量 (Liquid)</span>
+                <div id="d-liquid" class="click-box" style="font-size:32px; border:none; padding:0; background:transparent; text-align:left;">0g</div>
             </div>
             <div style="text-align:right;">
-                <span style="font-size:13px; color:var(--primary); font-weight:800;">粉水比 (Ratio)</span>
-                <div id="d-ratio" style="font-size:24px; font-weight:900; color:var(--main);">1:-</div>
+                <span style="font-size:16px; color:var(--primary); font-weight:900;">粉水比 (Ratio)</span>
+                <div id="d-ratio" style="font-size:32px; font-weight:900; color:var(--main);">1:-</div>
             </div>
         </div>
-        <div id="evalArea" style="display:flex; flex-direction:column; gap:8px; margin-top:15px;"></div>
-        <button class="tab-btn" onclick="saveRecord()" style="background:var(--success); color:white; font-size:18px; margin-top:20px; width:100%; border-radius:18px; font-weight:900; padding:15px;">儲存此紀錄</button>
+        <div id="evalArea" style="display:flex; flex-direction:column; gap:15px; margin-top:25px;"></div>
+        <button class="tab-btn" onclick="saveRecord()" style="background:var(--success); color:white; font-size:22px; margin-top:30px; width:100%; border-radius:20px; font-weight:900; padding:20px;">儲存此紀錄檔案</button>
     </div>
   </div>
 
   <div>
     <div class="section-title">全歷史日誌檔案</div>
-    <div class="history-tabs" style="display:flex; gap:12px; margin-bottom:20px;">
+    <div style="display:flex; gap:15px; margin-bottom:25px;">
         <button id="tab-p" class="tab-btn active pour" onclick="switchHistoryTab('pour')">手沖紀錄集</button>
         <button id="tab-e" class="tab-btn" onclick="switchHistoryTab('espresso')">義式紀錄集</button>
     </div>
@@ -134,6 +145,7 @@ let params = { dose: 20, grind: 6.0, temp: 93, liquid: 0 };
 let currentEval = {}, historyView = 'pour';
 const baseBeans = ['覺','花','寶','菩','雅','靜','果','福','柔','定','真','潤'];
 
+// --- 模式與初始化 ---
 function selectMode(m) {
     mode = m;
     if (m === 'espresso') { bean = '混豆'; params.dose = 20; params.grind = null; }
@@ -144,6 +156,38 @@ function selectMode(m) {
     buildBeans(); resetTimer();
 }
 
+function renderEvalArea(targetEval = currentEval, isHistory = false, logId = null) {
+    const area = isHistory ? document.getElementById(`eval-hist-${logId}`) : document.getElementById('evalArea');
+    if(!area) return; area.innerHTML = '';
+    const fields = (isHistory ? (historyView === 'pour' ? ['香氣','酸質','醇厚','甜感','餘韻'] : ['Crema','平衡','口感']) : (mode === 'pour' ? ['香氣','酸質','醇厚','甜感','餘韻'] : ['Crema','平衡','口感']));
+    
+    fields.forEach(f => {
+        const row = document.createElement('div'); 
+        row.style = "display:flex; align-items:center; justify-content:space-between; padding:5px 0;";
+        const score = targetEval[f] || 0;
+        row.innerHTML = `<span style="font-weight:900; font-size:18px; color:var(--main);">${f}</span>
+            <div class="star-rating">
+                ${[1,2,3].map(s => `<span class="star ${s <= score ? 'active' : ''}" onclick="setEval('${f}',${s},this,${isHistory},${logId})">★</span>`).join('')}
+            </div>`;
+        area.appendChild(row);
+    });
+}
+
+function setEval(f, s, starEl, isHistory, logId) {
+    event.stopPropagation();
+    const stars = starEl.parentElement.children;
+    for(let i=0; i<stars.length; i++) {
+        stars[i].classList.toggle('active', i < s);
+    }
+    if (isHistory) {
+        const key = historyView === 'pour' ? 'pourLogs' : 'espLogs';
+        let logs = JSON.parse(localStorage.getItem(key));
+        let log = logs.find(l => l.id === logId);
+        log.eval[f] = s; localStorage.setItem(key, JSON.stringify(logs));
+    } else { currentEval[f] = s; }
+}
+
+// --- 核心邏輯 (繼承自 v63.4 並放大字體) ---
 function handleTimerAction() {
     if (!isRunning && !wasStarted) { toggleTimer(); return; }
     if (!isRunning) return;
@@ -159,10 +203,7 @@ function handleTimerAction() {
         }
     } else {
         if (pours.length === 0) pours.push({ name:'預浸', total:formatTime(elapsed), diff:nowSec+'s', absSec:nowSec });
-        else if (pours.length === 1) { 
-            pours.push({ name:'萃取', total:formatTime(elapsed), diff:(nowSec-pours[0].absSec)+'s', absSec:nowSec }); 
-            toggleTimer(); 
-        }
+        else if (pours.length === 1) { pours.push({ name:'萃取', total:formatTime(elapsed), diff:(nowSec-pours[0].absSec)+'s', absSec:nowSec }); toggleTimer(); }
     }
     updateUI();
 }
@@ -171,18 +212,18 @@ function renderLogs() {
     const wrap = document.getElementById('logs'); wrap.innerHTML = '';
     const head = document.getElementById('logHead');
     if (mode === 'pour') {
-        head.innerHTML = `<tr><th style="width:13%">動作</th><th style="width:14%">時間</th><th style="width:18%">路徑</th><th style="width:15%">水流</th><th style="width:15%">水位</th><th style="width:13%">累積</th><th style="width:12%">增量</th></tr>`;
+        head.innerHTML = `<tr><th style="width:14%">動作</th><th style="width:15%">時間</th><th style="width:18%">路徑</th><th style="width:14%">水流</th><th style="width:14%">水位</th><th style="width:13%">累積</th><th style="width:12%">增量</th></tr>`;
         pours.forEach((p, i) => {
             const tr = document.createElement('tr');
             const isWait = p.name === "斷水";
             tr.innerHTML = `
                 <td><b>${p.name}</b></td>
                 <td><div class="edit-chip" onclick="openNumPad('absSec','時間',false,${i})">${p.total}</div></td>
-                <td>${isWait ? `<select class="select-ui" onchange="pours[${i}].path=this.value"><option>◎中心沖</option><option selected>○繞圈</option><option>⊙混合</option></select>` : '-'}</td>
-                <td>${isWait ? `<select class="select-ui" onchange="pours[${i}].flow=this.value"><option>大</option><option selected>中</option><option>小</option><option>滴濾</option></select>` : '-'}</td>
+                <td>${isWait ? `<select class="select-ui" onchange="pours[${i}].path=this.value"><option>◎ 中心</option><option selected>○ 繞圈</option><option>⊙ 混合</option></select>` : '-'}</td>
+                <td>${isWait ? `<select class="select-ui" onchange="pours[${i}].flow=this.value"><option>大</option><option selected>中</option><option>小</option></select>` : '-'}</td>
                 <td>${isWait ? `<select class="select-ui" onchange="pours[${i}].level=this.value"><option>高</option><option selected>中</option><option>低</option></select>` : '-'}</td>
                 <td>${p.name==='注水' ? `<div class="edit-chip" onclick="openNumPad('cumLiquid','水量',true,${i})">${p.cumLiquid}</div>` : '-'}</td>
-                <td style="color:var(--primary); font-weight:bold;">${p.name==='注水' ? `+${p.diffLiquid}` : '-'}</td>`;
+                <td style="color:var(--primary); font-weight:900;">${p.name==='注水' ? `+${p.diffLiquid}` : '-'}</td>`;
             wrap.appendChild(tr);
         });
     } else {
@@ -195,56 +236,49 @@ function renderLogs() {
     }
 }
 
-// --- 手動新增 ---
-function addManualRow() {
-    if (mode === 'pour') {
-        pours.push({ name: (pours.length % 2 === 0 ? "注水" : "斷水"), total: "0:00", absSec: 0, cumLiquid: 0, diffLiquid: 0, path: "○繞圈", level: "中水位", flow:"中水流", isManual: true });
-    } else {
-        const name = pours.length === 0 ? "預浸" : (pours.length === 1 ? "萃取" : "完成");
-        pours.push({ name: name, total: "0:00", diff: "0s", absSec: 0, isManual: true });
-    }
-    updateUI();
+// --- 歷史日誌渲染 ---
+function renderHistory() {
+    const wrap = document.getElementById('historyList'); wrap.innerHTML = '';
+    const key = historyView === 'pour' ? 'pourLogs' : 'espLogs';
+    const logs = JSON.parse(localStorage.getItem(key) || '[]');
+    logs.forEach(log => {
+        const item = document.createElement('div');
+        item.style = `background:white; border-radius:24px; padding:22px; margin-bottom:20px; border-left:10px solid ${historyView==='pour'?'var(--main)':'var(--esp-bg)'}; box-shadow:0 6px 20px rgba(0,0,0,0.06); cursor:pointer;`;
+        item.onclick = () => { const el = document.getElementById(`details-${log.id}`); el.style.display = (el.style.display==='block'?'none':'block'); };
+        item.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong style="font-size:20px; color:var(--main);">${log.bean}</strong> 
+                <small style="font-weight:bold; color:#a1887f;">${log.time}</small>
+            </div>
+            <div style="margin-top:15px;">
+                <span class="edit-chip" onclick="event.stopPropagation(); openNumPad('dose','粉量',true,-1,${log.id})">${log.params.dose}g</span>
+                <span class="edit-chip" onclick="event.stopPropagation(); openNumPad('grind','研磨',true,-1,${log.id})">研磨 ${log.params.grind || '--'}</span>
+                <span class="edit-chip" onclick="event.stopPropagation(); openNumPad('liquid','總量',true,-1,${log.id})">總萃 ${log.params.liquid}g</span>
+                <span style="font-size:16px; font-weight:900; color:var(--primary); margin-left:10px;">1:${(log.params.liquid/log.params.dose).toFixed(1)}</span>
+            </div>
+            <div id="details-${log.id}" style="display:none; margin-top:20px; border-top:2px dashed #ece0d1; padding-top:15px;">
+                <div id="eval-hist-${log.id}"></div>
+                <table class="log-table" style="margin-top:15px;">
+                    ${log.mode==='pour' ? log.details.map((d,idx) => `<tr>
+                        <td><b>${d.name}</b></td>
+                        <td><span class="edit-chip" onclick="openNumPad('absSec','時間',false,${idx},${log.id})">${d.total}</span></td>
+                        <td>${d.path||'-'}</td>
+                        <td>${d.flow||'-'}</td>
+                        <td>${d.level||'-'}</td>
+                        <td>${d.name==='注水' ? `<span class="edit-chip" onclick="openNumPad('cumLiquid','水量',true,${idx},${log.id})">${d.cumLiquid}g</span>` : '-'}</td>
+                    </tr>`).join('') : log.details.map((d,idx) => `<tr><td><b>${d.name}</b></td><td>${d.diff}</td><td>${d.total}</td></tr>`).join('')}
+                </table>
+                <div style="display:flex; gap:15px; margin-top:20px;">
+                    <button class="tab-btn" style="background:var(--danger); color:white; padding:12px;" onclick="deleteRecord('${key}', ${log.id})">🗑️ 刪除紀錄</button>
+                    <button class="tab-btn" style="background:var(--star); color:white; padding:12px;" onclick="toggleStar('${key}', ${log.id})">⭐ 收藏</button>
+                </div>
+            </div>`;
+        wrap.appendChild(item);
+        renderEvalArea(log.eval, true, log.id);
+    });
 }
 
-// --- 九宮格邏輯 ---
-let activeField = '', currentInputStr = '', tableIdx = -1, isFirstKey = true, editHistoryId = null;
-function initNumpad() {
-    const keys = ['1','2','3','4','5','6','7','8','9','.', '0', 'C'];
-    document.getElementById('numpadButtons').innerHTML = keys.map(k => `<button class="tab-btn" onclick="pressKey('${k}')" style="height:60px; font-size:22px; background:#fff; border:1px solid #eee; border-radius:15px; color:var(--main);">${k}</button>`).join('') 
-                   + `<button class="tab-btn" onclick="confirmInput()" style="grid-column:span 3; background:var(--success); color:white; height:65px; font-size:20px; border-radius:15px;">確認 OK</button>`;
-}
-function openNumPad(field, title, dot, idx = -1, historyId = null) {
-    activeField = field; tableIdx = idx; editHistoryId = historyId;
-    isFirstKey = true; currentInputStr = '';
-    document.getElementById('numPadTitle').textContent = title;
-    document.getElementById('numPadDisplay').textContent = "-";
-    document.getElementById('numPadModal').style.display = 'flex';
-}
-function pressKey(k) {
-    if (k === 'C') { currentInputStr = ''; document.getElementById('numPadDisplay').textContent = "-"; isFirstKey = true; return; }
-    if (isFirstKey) { currentInputStr = (k === '.') ? '0.' : k; isFirstKey = false; }
-    else { if (k === '.' && currentInputStr.includes('.')) return; currentInputStr += k; }
-    document.getElementById('numPadDisplay').textContent = currentInputStr;
-}
-function closeNumPad() { document.getElementById('numPadModal').style.display = 'none'; }
-
-function confirmInput() {
-    let val = parseFloat(currentInputStr) || 0;
-    if (activeField === 'dose' && (val < 10 || val > 60)) { alert("粉量限制 10-60g"); return; }
-    if (activeField === 'grind' && (val < 1 || val > 10)) { alert("研磨限制 1.0-10.0"); return; }
-    if (mode === 'pour' && activeField === 'temp' && (val < 80 || val > 98)) { alert("水溫限制 80-98°C"); return; }
-
-    if (editHistoryId) { updateHistoryContent(editHistoryId, activeField, tableIdx, val); } 
-    else {
-        if (tableIdx === -1) { params[activeField] = val; }
-        else {
-            if (activeField === 'absSec') { pours[tableIdx].absSec = Math.round(val); pours[tableIdx].total = formatTime(pours[tableIdx].absSec * 1000); pours[tableIdx].diff = pours[tableIdx].absSec + 's'; }
-            else if (activeField === 'cumLiquid') { pours[tableIdx].cumLiquid = val; }
-        }
-    }
-    updateUI(); closeNumPad(); if(editHistoryId) renderHistory();
-}
-
+// --- 其餘工具函數 (繼承自 v63.4) ---
 function updateUI() {
     const grindBox = document.getElementById('d-grind');
     if (params.grind === null) { grindBox.textContent = "--"; grindBox.classList.add('empty'); }
@@ -258,64 +292,11 @@ function updateUI() {
     document.getElementById('stepName').textContent = (!wasStarted)?"待機中":(mode==='pour'?currentAction:(pours.length>=2?"結束":(pours.length===0?"預浸":"萃取")));
     renderLogs();
 }
-
-// --- 歷史紀錄渲染 ---
-function renderHistory() {
-    const wrap = document.getElementById('historyList'); wrap.innerHTML = '';
-    const key = historyView === 'pour' ? 'pourLogs' : 'espLogs';
-    const logs = JSON.parse(localStorage.getItem(key) || '[]');
-    logs.forEach(log => {
-        const item = document.createElement('div');
-        item.style = `background:white; border-radius:20px; padding:18px; margin-bottom:15px; border-left:8px solid ${historyView==='pour'?'var(--main)':'var(--esp-bg)'}; box-shadow:0 4px 15px rgba(0,0,0,0.05); cursor:pointer;`;
-        item.onclick = () => { const el = document.getElementById(`details-${log.id}`); el.style.display = (el.style.display==='block'?'none':'block'); };
-        item.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <strong style="font-size:16px;">${log.bean}</strong> <small>${log.time}</small>
-            </div>
-            <div style="margin-top:10px;">
-                <span class="edit-chip" onclick="event.stopPropagation(); openNumPad('dose','粉量',true,-1,${log.id})">${log.params.dose}g</span>
-                <span class="edit-chip" onclick="event.stopPropagation(); openNumPad('grind','研磨',true,-1,${log.id})">研磨 ${log.params.grind || '--'}</span>
-                <span class="edit-chip" onclick="event.stopPropagation(); openNumPad('liquid','總量',true,-1,${log.id})">總萃 ${log.params.liquid}g</span>
-            </div>
-            <div id="details-${log.id}" style="display:none; margin-top:15px; border-top:1px dashed #ece0d1; padding-top:10px;">
-                <div id="eval-hist-${log.id}"></div>
-                <table class="log-table" style="margin-top:10px;">
-                    ${log.mode==='pour' ? log.details.map((d,idx) => `<tr>
-                        <td><b>${d.name}</b></td>
-                        <td><span class="edit-chip" onclick="openNumPad('absSec','時間',false,${idx},${log.id})">${d.total}</span></td>
-                        <td>${d.path||'-'}</td>
-                        <td>${d.flow||'-'}</td>
-                        <td>${d.level||'-'}</td>
-                        <td>${d.name==='注水' ? `<span class="edit-chip" onclick="openNumPad('cumLiquid','水量',true,${idx},${log.id})">${d.cumLiquid}g</span>` : '-'}</td>
-                    </tr>`).join('') : log.details.map((d,idx) => `<tr><td><b>${d.name}</b></td><td>${d.diff}</td><td>${d.total}</td></tr>`).join('')}
-                </table>
-                <div style="display:flex; gap:10px; margin-top:15px;">
-                    <button class="tab-btn" style="background:var(--danger); color:white; padding:8px;" onclick="deleteRecord('${key}', ${log.id})">🗑️</button>
-                    <button class="tab-btn" style="background:var(--star); color:white; padding:8px;" onclick="toggleStar('${key}', ${log.id})">⭐</button>
-                </div>
-            </div>`;
-        wrap.appendChild(item);
-        renderEvalArea(log.eval, true, log.id);
-    });
+function addManualRow() {
+    if (mode === 'pour') pours.push({ name: (pours.length % 2 === 0 ? "注水" : "斷水"), total: "0:00", absSec: 0, cumLiquid: 0, diffLiquid: 0, path: "○ 繞圈", level: "中水位", flow:"中水流", isManual: true });
+    else { const name = pours.length === 0 ? "預浸" : (pours.length === 1 ? "萃取" : "完成"); pours.push({ name: name, total: "0:00", diff: "0s", absSec: 0, isManual: true }); }
+    updateUI();
 }
-
-function updateHistoryContent(hid, field, idx, val) {
-    const key = historyView === 'pour' ? 'pourLogs' : 'espLogs';
-    let logs = JSON.parse(localStorage.getItem(key));
-    let log = logs.find(l => l.id === hid);
-    if (!log) return;
-    if (idx === -1) { log.params[field] = val; }
-    else {
-        if (field === 'absSec') { log.details[idx].absSec = Math.round(val); log.details[idx].total = formatTime(log.details[idx].absSec * 1000); log.details[idx].diff = log.details[idx].absSec + 's'; }
-        else if (field === 'cumLiquid') { log.details[idx].cumLiquid = val; }
-    }
-    let last = 0; log.details.forEach(d => { if(d.name==="注水"){ d.diffLiquid = d.cumLiquid - last; last = d.cumLiquid; } });
-    log.params.liquid = (log.mode==='pour') ? last : log.params.liquid;
-    log.ratio = `1:${(log.params.liquid / log.params.dose).toFixed(1)}`;
-    localStorage.setItem(key, JSON.stringify(logs));
-}
-
-// --- 基礎工具 ---
 function toggleTimer() {
     if (params.grind === null) { alert("請先設定研磨度！"); openNumPad('grind','研磨 (1-10)',true); return; }
     if (!isRunning) { isRunning = true; wasStarted = true; startTime = Date.now() - elapsed; timerInt = setInterval(() => { elapsed = Date.now() - startTime; document.getElementById('timer').textContent = formatTime(elapsed); }, 100); }
@@ -329,31 +310,47 @@ function buildBeans() {
     const wrap = document.getElementById('beanBtns'); wrap.innerHTML = '';
     (mode === 'espresso' ? [...baseBeans, '混豆'] : baseBeans).forEach(b => {
         const btn = document.createElement('button'); btn.textContent = b; btn.className = 'tab-btn' + (b===bean?' active pour':'');
-        btn.style.padding = "10px"; btn.onclick = () => { bean = b; buildBeans(); }; wrap.appendChild(btn);
+        btn.style.padding = "12px"; btn.style.fontSize = "16px"; btn.onclick = () => { bean = b; buildBeans(); }; wrap.appendChild(btn);
     });
 }
 function saveRecord() {
-    if(params.liquid <= 0 || params.grind === null) { alert("請檢查萃取量或研磨度是否設定"); return; }
+    if(params.liquid <= 0 || params.grind === null) { alert("請檢查萃取量或研磨度"); return; }
     const record = { id: Date.now(), mode, bean, params: {...params}, ratio: `1:${(params.liquid/params.dose).toFixed(1)}`, time: new Date().toLocaleString('zh-TW'), details: JSON.parse(JSON.stringify(pours)), eval: {...currentEval}, starred: false };
     const key = mode === 'pour' ? 'pourLogs' : 'espLogs';
     const logs = JSON.parse(localStorage.getItem(key) || '[]');
     logs.unshift(record); localStorage.setItem(key, JSON.stringify(logs));
     resetTimer(); switchHistoryTab(mode);
 }
-function renderEvalArea(targetEval = currentEval, isHistory = false, logId = null) {
-    const area = isHistory ? document.getElementById(`eval-hist-${logId}`) : document.getElementById('evalArea');
-    if(!area) return; area.innerHTML = '';
-    const fields = (isHistory ? (historyView === 'pour' ? ['香氣','酸質','醇厚','甜感','餘韻'] : ['Crema','平衡','口感']) : (mode === 'pour' ? ['香氣','酸質','醇厚','甜感','餘韻'] : ['Crema','平衡','口感']));
-    fields.forEach(f => {
-        const row = document.createElement('div'); row.style.display="flex"; row.style.alignItems="center"; row.style.gap="10px";
-        row.innerHTML = `<span style="width:45px; font-size:12px; font-weight:900;">${f}</span>
-            <div style="display:flex; gap:6px; flex:1;">
-                ${[1,2,3].map(s => `<button class="tab-btn" style="padding:6px; background:${targetEval[f]==s?'var(--star)':'#fff'}; border:1px solid #eee; border-radius:10px;" onclick="setEval('${f}',${s},this,${isHistory},${logId})">${s}</button>`).join('')}
-            </div>`;
-        area.appendChild(row);
-    });
+
+// --- 九宮格 ---
+let activeField = '', currentInputStr = '', tableIdx = -1, isFirstKey = true, editHistoryId = null;
+function initNumpad() {
+    const keys = ['1','2','3','4','5','6','7','8','9','.', '0', 'C'];
+    document.getElementById('numpadButtons').innerHTML = keys.map(k => `<button class="tab-btn" onclick="pressKey('${k}')" style="height:70px; font-size:26px; background:#fff; border:1px solid #eee; border-radius:20px;">${k}</button>`).join('') 
+                   + `<button class="tab-btn" onclick="confirmInput()" style="grid-column:span 3; background:var(--success); color:white; height:75px; font-size:24px;">確認 OK</button>`;
 }
-function setEval(f, s, btn, isHistory, logId) { event.stopPropagation(); btn.parentElement.querySelectorAll('button').forEach(b => b.style.background = '#fff'); btn.style.background = 'var(--star)'; if (isHistory) { const key = historyView === 'pour' ? 'pourLogs' : 'espLogs'; let logs = JSON.parse(localStorage.getItem(key)); let log = logs.find(l => l.id === logId); log.eval[f] = s; localStorage.setItem(key, JSON.stringify(logs)); } else { currentEval[f] = s; } }
+function openNumPad(f, t, d, i = -1, hid = null) { activeField = f; tableIdx = i; editHistoryId = hid; isFirstKey = true; currentInputStr = ''; document.getElementById('numPadTitle').textContent = t; document.getElementById('numPadDisplay').textContent = "-"; document.getElementById('numPadModal').style.display = 'flex'; }
+function pressKey(k) { if (k === 'C') { currentInputStr = ''; document.getElementById('numPadDisplay').textContent = "-"; isFirstKey = true; return; } if (isFirstKey) { currentInputStr = (k === '.') ? '0.' : k; isFirstKey = false; } else { if (k === '.' && currentInputStr.includes('.')) return; currentInputStr += k; } document.getElementById('numPadDisplay').textContent = currentInputStr; }
+function closeNumPad() { document.getElementById('numPadModal').style.display = 'none'; }
+function confirmInput() {
+    let val = parseFloat(currentInputStr) || 0;
+    if (activeField === 'dose' && (val < 10 || val > 60)) { alert("粉量限制 10-60g"); return; }
+    if (activeField === 'grind' && (val < 1 || val > 10)) { alert("研磨限制 1.0-10.0"); return; }
+    if (mode === 'pour' && activeField === 'temp' && (val < 80 || val > 98)) { alert("水溫限制 80-98°C"); return; }
+    if (editHistoryId) { updateHistoryContent(editHistoryId, activeField, tableIdx, val); } 
+    else { if (tableIdx === -1) { params[activeField] = val; } else { if (activeField === 'absSec') { pours[tableIdx].absSec = Math.round(val); pours[tableIdx].total = formatTime(pours[tableIdx].absSec * 1000); pours[tableIdx].diff = pours[tableIdx].absSec + 's'; } else if (activeField === 'cumLiquid') { pours[tableIdx].cumLiquid = val; } } }
+    updateUI(); closeNumPad(); if(editHistoryId) renderHistory();
+}
+function updateHistoryContent(hid, field, idx, val) {
+    const key = historyView === 'pour' ? 'pourLogs' : 'espLogs';
+    let logs = JSON.parse(localStorage.getItem(key));
+    let log = logs.find(l => l.id === hid);
+    if (idx === -1) { log.params[field] = val; } else { if (field === 'absSec') { log.details[idx].absSec = Math.round(val); log.details[idx].total = formatTime(log.details[idx].absSec * 1000); log.details[idx].diff = log.details[idx].absSec + 's'; } else if (field === 'cumLiquid') { log.details[idx].cumLiquid = val; } }
+    let last = 0; log.details.forEach(d => { if(d.name==="注水"){ d.diffLiquid = d.cumLiquid - last; last = d.cumLiquid; } });
+    log.params.liquid = (log.mode==='pour') ? last : log.params.liquid;
+    log.ratio = `1:${(log.params.liquid / log.params.dose).toFixed(1)}`;
+    localStorage.setItem(key, JSON.stringify(logs));
+}
 function deleteRecord(k, id) { event.stopPropagation(); if(confirm("確定刪除此紀錄？")) { let l = JSON.parse(localStorage.getItem(k)); l = l.filter(x => x.id !== id); localStorage.setItem(k, JSON.stringify(l)); renderHistory(); } }
 function toggleStar(k, id) { event.stopPropagation(); let l = JSON.parse(localStorage.getItem(k)); let x = l.find(i => i.id === id); x.starred = !x.starred; localStorage.setItem(k, JSON.stringify(l)); renderHistory(); }
 function exportJSON() { const d = { pour: JSON.parse(localStorage.getItem('pourLogs')||'[]'), esp: JSON.parse(localStorage.getItem('espLogs')||'[]') }; const b = new Blob([JSON.stringify(d)], {type:'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'coffee_logs.json'; a.click(); }
