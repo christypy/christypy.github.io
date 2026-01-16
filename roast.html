@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoastMaster Pro | 專業烘豆紀錄</title>
+    <style>
+        :root {
+            --primary: #4e342e;
+            --secondary: #795548;
+            --accent: #d4a373;
+            --bg: #fdfaf7;
+            --text: #2d2424;
+            --white: #ffffff;
+            --danger: #e63946;
+            --success: #2a9d8f;
+            --border: #e0e0e0;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Noto Sans TC', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 15px;
+            line-height: 1.5;
+        }
+
+        .container { max-width: 1000px; margin: auto; }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 20px;
+            border-radius: 15px;
+            color: var(--white);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header h1 { margin: 0; font-size: 20px; }
+        .nav-btn {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 50px;
+            color: white;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            border: 1px solid #f1ece7;
+        }
+
+        h2 { font-size: 18px; margin-top: 0; color: var(--primary); margin-bottom: 15px; }
+
+        /* 關鍵修正：按鈕容器佈局 */
+        .option-group {
+            display: flex;
+            flex-wrap: wrap; /* 自動換行 */
+            gap: 10px; /* 按鈕間距 */
+            margin-bottom: 20px;
+        }
+
+        .btn-opt {
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            white-space: nowrap; /* 禁止文字換行 */
+            flex: 0 1 auto; /* 不要強制撐開 */
+        }
+
+        .btn-opt:hover { border-color: var(--accent); background: #fffcf9; }
+        .btn-opt.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
+        /* 輸入框格線優化 */
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: var(--secondary); }
+        
+        input, select, textarea {
+            width: 100%; padding: 10px; border: 1px solid var(--border);
+            border-radius: 8px; font-size: 15px; box-sizing: border-box;
+        }
+
+        /* 儲存按鈕樣式 */
+        .submit-container { margin-top: 10px; display: flex; flex-direction: column; gap: 10px; }
+        .btn-main {
+            padding: 14px; border-radius: 10px; border: none; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.3s;
+        }
+        .btn-save { background: var(--primary); color: white; }
+        .btn-update { background: var(--success); color: white; display: none; }
+        .btn-cancel { background: #eee; color: #666; display: none; }
+
+        .star-box {
+            background: #fff9f0; padding: 12px; border-radius: 10px;
+            display: flex; align-items: center; gap: 10px; border: 1px dashed var(--accent);
+            margin-bottom: 10px;
+        }
+        .btn-star { font-size: 24px; cursor: pointer; color: #ddd; border: none; background: none; padding: 0; line-height: 1; }
+        .btn-star.active { color: #ffb100; }
+
+        /* 表格優化 */
+        .table-wrapper { overflow-x: auto; margin-top: 10px; border-radius: 10px; border: 1px solid #eee; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; font-size: 14px; }
+        th { background: #f8f5f2; padding: 12px; text-align: left; color: var(--secondary); border-bottom: 2px solid #eee; }
+        td { padding: 12px; border-bottom: 1px solid #f9f9f9; }
+        
+        /* 歷史操作列 */
+        .tool-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
+        .btn-tool { padding: 6px 12px; border: 1px solid #ddd; border-radius: 6px; background: white; cursor: pointer; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header class="header">
+        <h1>RoastMaster Pro</h1>
+        <a href="https://christypy.github.io/" target="_blank" class="nav-btn">🔗 首頁</a>
+    </header>
+
+    <div class="card">
+        <h2>☕ 新增烘豆紀錄</h2>
+        
+        <label>選取豆種</label>
+        <div id="beanSelector" class="option-group"></div>
+
+        <div class="input-grid">
+            <div class="form-group">
+                <label>烘焙日期</label>
+                <input type="date" id="date" onchange="autoBatch()">
+            </div>
+            <div class="form-group">
+                <label>第幾鍋 (Batch)</label>
+                <input type="number" id="batch">
+            </div>
+            <div class="form-group">
+                <label>生豆重量 (g)</label>
+                <input type="number" id="weight" value="250">
+            </div>
+        </div>
+
+        <div class="input-grid">
+            <div class="form-group">
+                <label>下豆溫度 (°C)</label>
+                <input type="number" step="0.1" id="temp">
+            </div>
+            <div class="form-group">
+                <label>下豆時間</label>
+                <div style="display:flex; align-items:center; gap:5px;">
+                    <input type="number" id="timeMin" placeholder="分"> : 
+                    <input type="number" id="timeSec" placeholder="秒" max="59">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>烘豆曲線 <span onclick="toggleCurveMgr()" style="color:var(--accent); cursor:pointer; font-size:11px; text-decoration:underline; margin-left:5px;">[管理清單]</span></label>
+                <select id="curveSelect"></select>
+            </div>
+        </div>
+
+        <label>爆聲狀態</label>
+        <div id="crackSelector" class="option-group">
+            <button class="btn-opt" onclick="setCrack(this, '劇烈連續')">🔥 劇烈連續</button>
+            <button class="btn-opt" onclick="setCrack(this, '一兩聲')">💧 一兩聲</button>
+            <button class="btn-opt" onclick="setCrack(this, '無爆聲')">💤 無爆聲</button>
+        </div>
+
+        <label>備註</label>
+        <textarea id="note" rows="2" placeholder="詳細紀錄細節..."></textarea>
+
+        <div class="star-box">
+            <button id="starBtn" class="btn-star" onclick="savePref()">★</button>
+            <span style="font-size:12px;">點擊星星：將此「溫/時/重/線」設為此豆預設範本</span>
+        </div>
+
+        <div class="submit-container">
+            <input type="hidden" id="editingId">
+            <button id="btnSave" class="btn-main btn-save" onclick="saveRecord()">確認儲存</button>
+            <button id="btnUpdate" class="btn-main btn-update" onclick="updateRecord()">更新紀錄</button>
+            <button id="btnCancel" class="btn-main btn-cancel" onclick="cancelEdit()">取消修改</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>📜 烘焙歷史</h2>
+        <div class="tool-bar">
+            <input type="text" id="search" placeholder="🔍 搜尋..." style="width:180px; padding:6px;" oninput="renderTable()">
+            <button class="btn-tool" onclick="exportData()">📤 匯出備份</button>
+            <button class="btn-tool" onclick="document.getElementById('importFile').click()">📥 匯入</button>
+            <input type="file" id="importFile" style="display:none" accept=".json" onchange="importData(this)">
+            <button class="btn-tool" style="color:var(--danger);" onclick="clearAll()">🗑️ 全部清空</button>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>日期</th>
+                        <th>豆種</th>
+                        <th>鍋</th>
+                        <th>重量</th>
+                        <th>溫/時</th>
+                        <th>曲線</th>
+                        <th>爆聲</th>
+                        <th>備註</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="recordBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="curveModal" style="display:none; position:fixed; top:20%; left:50%; transform:translateX(-50%); width:280px; background:white; padding:20px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.2); z-index:1000;">
+    <h3 style="margin:0 0 10px 0; font-size:16px;">曲線管理</h3>
+    <input type="text" id="newCurveInput" placeholder="新曲線名稱" style="margin-bottom:10px;">
+    <button class="btn-opt" onclick="addCurve()" style="width:100%; margin-bottom:15px;">+ 新增</button>
+    <div id="curveList" style="max-height:150px; overflow-y:auto; font-size:13px; border-top:1px solid #eee;"></div>
+    <button class="btn-main" onclick="toggleCurveMgr()" style="margin-top:10px; padding:8px; width:100%; font-size:14px;">關閉</button>
+</div>
+<div id="overlay" onclick="toggleCurveMgr()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); z-index:999;"></div>
+
+<script>
+    // 邏輯部分保持不變，但更新選擇器與 UI 綁定
+    const baseBeans = ['覺','花','寶','菩','雅','靜','果','福','柔','定','真','潤'];
+    let records = JSON.parse(localStorage.getItem('roast_v5_data')) || [];
+    let curves = JSON.parse(localStorage.getItem('roast_v5_curves')) || ['標準曲線', '極淺焙'];
+    let prefs = JSON.parse(localStorage.getItem('roast_v5_prefs')) || {};
+    let currentBean = '';
+    let currentCrack = '';
+
+    window.onload = function() {
+        initBeans();
+        updateCurveSelect();
+        document.getElementById('date').valueAsDate = new Date();
+        autoBatch();
+        renderTable();
+    };
+
+    function initBeans() {
+        const box = document.getElementById('beanSelector');
+        baseBeans.forEach(b => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-opt';
+            btn.innerText = b;
+            btn.onclick = () => {
+                document.querySelectorAll('#beanSelector .btn-opt').forEach(el => el.classList.remove('active'));
+                btn.classList.add('active');
+                currentBean = b;
+                applyPref(b);
+            };
+            box.appendChild(btn);
+        });
+    }
+
+    function applyPref(bean) {
+        if (prefs[bean]) {
+            const p = prefs[bean];
+            document.getElementById('temp').value = p.temp;
+            document.getElementById('timeMin').value = p.min;
+            document.getElementById('timeSec').value = p.sec;
+            document.getElementById('weight').value = p.weight;
+            document.getElementById('curveSelect').value = p.curve;
+            document.getElementById('starBtn').classList.add('active');
+        } else {
+            document.getElementById('temp').value = '';
+            document.getElementById('timeMin').value = '';
+            document.getElementById('timeSec').value = '';
+            document.getElementById('weight').value = 250;
+            document.getElementById('starBtn').classList.remove('active');
+        }
+        autoBatch();
+    }
+
+    function autoBatch() {
+        const d = document.getElementById('date').value;
+        const count = records.filter(r => r.date === d).length;
+        document.getElementById('batch').value = count + 1;
+    }
+
+    function saveRecord() {
+        if(!currentBean) return alert('請先選擇豆種');
+        const data = {
+            id: Date.now(),
+            ts: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+            date: document.getElementById('date').value,
+            bean: currentBean,
+            batch: document.getElementById('batch').value,
+            weight: document.getElementById('weight').value,
+            temp: document.getElementById('temp').value,
+            min: document.getElementById('timeMin').value || 0,
+            sec: document.getElementById('timeSec').value || 0,
+            curve: document.getElementById('curveSelect').value,
+            crack: currentCrack,
+            note: document.getElementById('note').value
+        };
+        records.unshift(data);
+        sync();
+        alert('儲存成功');
+    }
+
+    function editRecord(id) {
+        const r = records.find(item => item.id === id);
+        if(!r) return;
+        document.getElementById('editingId').value = id;
+        document.getElementById('date').value = r.date;
+        document.getElementById('batch').value = r.batch;
+        document.getElementById('weight').value = r.weight;
+        document.getElementById('temp').value = r.temp;
+        document.getElementById('timeMin').value = r.min;
+        document.getElementById('timeSec').value = r.sec;
+        document.getElementById('curveSelect').value = r.curve;
+        document.getElementById('note').value = r.note;
+        currentBean = r.bean;
+        document.querySelectorAll('#beanSelector .btn-opt').forEach(b => b.classList.toggle('active', b.innerText === r.bean));
+        
+        document.getElementById('btnSave').style.display = 'none';
+        document.getElementById('btnUpdate').style.display = 'block';
+        document.getElementById('btnCancel').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function updateRecord() {
+        const id = parseInt(document.getElementById('editingId').value);
+        const idx = records.findIndex(r => r.id === id);
+        records[idx] = { ...records[idx], date: document.getElementById('date').value, batch: document.getElementById('batch').value, weight: document.getElementById('weight').value, temp: document.getElementById('temp').value, min: document.getElementById('timeMin').value, sec: document.getElementById('timeSec').value, curve: document.getElementById('curveSelect').value, note: document.getElementById('note').value, bean: currentBean, crack: currentCrack };
+        sync(); cancelEdit(); alert('資料已更新');
+    }
+
+    function cancelEdit() {
+        document.getElementById('editingId').value = "";
+        document.getElementById('btnSave').style.display = 'block';
+        document.getElementById('btnUpdate').style.display = 'none';
+        document.getElementById('btnCancel').style.display = 'none';
+        document.getElementById('note').value = "";
+    }
+
+    function sync() {
+        localStorage.setItem('roast_v5_data', JSON.stringify(records));
+        localStorage.setItem('roast_v5_curves', JSON.stringify(curves));
+        localStorage.setItem('roast_v5_prefs', JSON.stringify(prefs));
+        renderTable();
+    }
+
+    function renderTable() {
+        const q = document.getElementById('search').value.toLowerCase();
+        const body = document.getElementById('recordBody');
+        body.innerHTML = '';
+        records.filter(r => r.bean.includes(q) || r.date.includes(q)).forEach(r => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${r.date}</td><td><strong>${r.bean}</strong></td><td>${r.batch}</td><td>${r.weight}g</td><td>${r.temp}°C / ${r.min}'${r.sec}"</td><td>${r.curve}</td><td>${r.crack}</td><td>${r.note.substring(0,10)}</td><td><button class="btn-tool" onclick="editRecord(${r.id})">✏️</button><button class="btn-tool" onclick="deleteRecord(${r.id})">🗑️</button></td>`;
+            body.appendChild(tr);
+        });
+    }
+
+    function deleteRecord(id) { if(confirm('刪除紀錄？')) { records = records.filter(r => r.id !== id); sync(); } }
+
+    function toggleCurveMgr() {
+        const m = document.getElementById('curveModal');
+        const o = document.getElementById('overlay');
+        const show = m.style.display === 'none';
+        m.style.display = show ? 'block' : 'none';
+        o.style.display = show ? 'block' : 'none';
+        if(show) renderCurveList();
+    }
+
+    function renderCurveList() {
+        document.getElementById('curveList').innerHTML = curves.map((c, i) => `<div style="display:flex; justify-content:space-between; padding:8px 0;"><span>${c}</span><button onclick="delCurve(${i})" style="color:red; border:none; background:none;">X</button></div>`).join('');
+    }
+
+    function addCurve() {
+        const val = document.getElementById('newCurveInput').value;
+        if(val) { curves.push(val); sync(); updateCurveSelect(); renderCurveList(); document.getElementById('newCurveInput').value = ''; }
+    }
+
+    function delCurve(i) { curves.splice(i, 1); sync(); updateCurveSelect(); renderCurveList(); }
+
+    function updateCurveSelect() { document.getElementById('curveSelect').innerHTML = curves.map(c => `<option value="${c}">${c}</option>`).join(''); }
+
+    function savePref() {
+        if(!currentBean) return;
+        const btn = document.getElementById('starBtn');
+        if(btn.classList.contains('active')) { delete prefs[currentBean]; btn.classList.remove('active'); } 
+        else { prefs[currentBean] = { temp: document.getElementById('temp').value, min: document.getElementById('timeMin').value, sec: document.getElementById('timeSec').value, weight: document.getElementById('weight').value, curve: document.getElementById('curveSelect').value }; btn.classList.add('active'); }
+        sync();
+    }
+
+    function setCrack(btn, val) {
+        document.querySelectorAll('#crackSelector .btn-opt').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentCrack = val;
+    }
+
+    function exportData() {
+        const blob = new Blob([JSON.stringify({records, curves, prefs})], {type: 'application/json'});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `RoastBackup.json`; a.click();
+    }
+
+    function importData(input) {
+        const reader = new FileReader();
+        reader.onload = e => { const data = JSON.parse(e.target.result); records = data.records; curves = data.curves; prefs = data.prefs; sync(); updateCurveSelect(); alert('匯入成功'); };
+        reader.readAsText(input.files[0]);
+    }
+
+    function clearAll() { if(confirm('清空所有？')) { records = []; sync(); } }
+</script>
+</body>
+</html>
