@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>咖啡價目表</title>
+    <style>
+        :root {
+            --primary: #3d2b1f;
+            --secondary: #8d6e63;
+            --bg: #fdfaf7;
+            --light-roast: #d4a373;
+            --med-roast: #bc6c25;
+            --dark-roast: #5d4037;
+            --price: #a44a3f;
+        }
+
+        /* 統一字體設定 */
+        * { 
+            box-sizing: border-box; 
+            font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: #444;
+            margin: 0;
+            padding: 20px;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* 確保不跑版，固定在視窗內 */
+        }
+
+        header {
+            text-align: center;
+            padding: 10px 0 20px 0;
+            flex-shrink: 0;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2em;
+            letter-spacing: 12px;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        /* 自動適應網格 */
+        #menuGrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            grid-auto-rows: 1fr; /* 讓所有卡片等高 */
+            gap: 15px;
+            flex-grow: 1;
+            overflow-y: auto; /* 若豆子過多，僅此區域可捲動 */
+            padding-bottom: 10px;
+        }
+
+        /* 電腦/平板橫向優化：確保 4 欄排列 */
+        @media (min-width: 1024px) {
+            #menuGrid { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid #e0dcd8;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transition: transform 0.2s;
+        }
+
+        .roast-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-size: 0.75em;
+            padding: 3px 10px;
+            color: #fff;
+            font-weight: bold;
+        }
+        .lr { background: var(--light-roast); }
+        .mr { background: var(--med-roast); }
+        .dr { background: var(--dark-roast); }
+
+        .theme-word {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: var(--primary);
+            text-align: center;
+            margin: 5px 0;
+        }
+
+        .origin {
+            font-size: 0.9em;
+            font-weight: bold;
+            text-align: center;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .process {
+            background: #f0ebe5;
+            color: var(--secondary);
+            font-size: 0.8em;
+            text-align: center;
+            padding: 2px 8px;
+            border-radius: 2px;
+            width: fit-content;
+            margin: 0 auto 10px auto;
+        }
+
+        .flavor {
+            font-size: 0.8em;
+            color: #777;
+            text-align: center;
+            line-height: 1.4;
+            margin-bottom: 10px;
+            flex-grow: 1; /* 推擠價格區塊到底部 */
+        }
+
+        .price-box {
+            border-top: 1px solid #f0f0f0;
+            padding-top: 10px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .price-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85em;
+            padding: 0 5px;
+        }
+
+        .p-label { color: #aaa; }
+        .p-val { font-weight: bold; color: var(--price); }
+        .p-val::before { content: '$'; font-size: 0.9em; margin-right: 1px; }
+
+        /* 針對平板直向優化 */
+        @media (max-width: 768px) {
+            #menuGrid { grid-template-columns: repeat(2, 1fr); }
+            body { overflow-y: auto; height: auto; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>咖啡價目表</h1>
+</header>
+
+<div id="menuGrid">
+    </div>
+
+<script>
+    // 資料統一管理
+    const coffeeData = [
+        { name: "覺", origin: "哥斯大黎加 奇里波", process: "日曬", roast: "lr", roastName: "淺焙", flavor: "酒漬櫻桃、黑莓、蜜鳳梨、萊姆酒香、黑巧克力", take: 200, stay: 250, pound: 950, drip: 60 },
+        { name: "花", origin: "衣索比亞 露西藝伎", process: "水洗", roast: "lr", roastName: "淺焙", flavor: "白玫瑰、蘋果、檸檬、百香果", take: 180, stay: 230, pound: 850, drip: 55 },
+        { name: "寶", origin: "衣索比亞 吉瑪莉姆", process: "藝伎日曬", roast: "lr", roastName: "淺焙", flavor: "芒果乾、檸檬糖、白花、酸奶", take: 180, stay: 230, pound: 850, drip: 55 },
+        { name: "菩", origin: "衣索比亞 柯契爾", process: "蜜處理", roast: "mr", roastName: "淺中", flavor: "楓糖、蜂蜜、波斯紅茶", take: 130, stay: 180, pound: 700, drip: 45 },
+        { name: "靜", origin: "衣索比亞 西達摩", process: "日曬", roast: "lr", roastName: "淺焙", flavor: "佛手柑、清淨無染玫瑰香", take: 130, stay: 180, pound: 650, drip: 45 },
+        { name: "果", origin: "衣索比亞 西達摩", process: "日曬", roast: "lr", roastName: "淺焙", flavor: "水蜜桃、荔枝、佛手柑果韻", take: 130, stay: 180, pound: 600, drip: 45 },
+        { name: "雅", origin: "衣索比亞 西達摩", process: "水洗", roast: "lr", roastName: "淺焙", flavor: "荔枝、蜂蜜、烏龍茶感", take: 130, stay: 180, pound: 650, drip: 45 },
+        { name: "福", origin: "哥斯大黎加 拉米尼塔", process: "水洗", roast: "mr", roastName: "中焙", flavor: "奶油、核桃、太妃糖", take: 130, stay: 180, pound: 550, drip: 40 },
+        { name: "幻", origin: "肯亞 凱蘭波勒", process: "水洗", roast: "lr", roastName: "淺焙", flavor: "紫藤花、梔子、小紅莓、柑橘、楊桃", take: 130, stay: 180, pound: 680, drip: "-" },
+        { name: "幻", origin: "肯亞 凱蘭波勒", process: "水洗", roast: "dr", roastName: "中深", flavor: "黑巧克力、煙燻香料、烏梅", take: 130, stay: 180, pound: 680, drip: "-" },
+        { name: "柔", origin: "巴西 喜拉朵", process: "日曬", roast: "mr", roastName: "中焙", flavor: "溫和堅果、可可、絲滑奶油", take: 130, stay: 180, pound: 450, drip: 35 },
+        // { name: "定", origin: "特選特調豆", process: "職人調合", roast: "mr", roastName: "中焙", flavor: "穩定心神、回甘平衡", take: 130, stay: 180, pound: 650, drip: "-" },
+        // { name: "潤", origin: "經典深焙系列", process: "法式深焙", roast: "dr", roastName: "深焙", flavor: "溫潤厚實、焦糖餘韻", take: "-", stay: "-", pound: "-", drip: "-" }
+    ];
+
+    const grid = document.getElementById('menuGrid');
+
+    function render() {
+        grid.innerHTML = coffeeData.map(c => `
+            <div class="card">
+                <span class="roast-badge ${c.roast}">${c.roastName}</span>
+                <div class="theme-word">${c.name}</div>
+                <div class="origin">${c.origin}</div>
+                <div class="process">${c.process}</div>
+                <div class="flavor">${c.flavor}</div>
+                <div class="price-box">
+                    <div class="price-item"><span class="p-label">外帶</span><span class="p-val">${c.take}</span></div>
+                    <div class="price-item"><span class="p-label">內用</span><span class="p-val">${c.stay}</span></div>
+                    <div class="price-item"><span class="p-label">半磅</span><span class="p-val">${c.pound}</span></div>
+                    <div class="price-item"><span class="p-label">濾掛</span><span class="p-val">${c.drip}</span></div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    render();
+</script>
+
+</body>
+</html>
