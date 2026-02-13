@@ -3,26 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>咖啡價目表</title>
+    <title>咖啡豆單價目表</title>
     <style>
         :root {
-            --primary: #3d2b1f;
-            --secondary: #8d6e63;
-            --bg: #fdfaf7;
-            --light-roast: #d4a373;
-            --med-roast: #bc6c25;
-            --dark-roast: #5d4037;
-            --price: #a44a3f;
+            --primary: #3d2b1f; /* 深焦糖褐 */
+            --secondary: #8d6e63; /* 拿鐵色 */
+            --bg: #f9f7f2; /* 奶油暖白 */
+            --card-bg: #ffffff;
+            --light-roast: #e6b37e; /* 淺焙：金黃色 */
+            --med-roast: #bc6c25;   /* 中焙：琥珀色 */
+            --dark-roast: #4a3728;  /* 深焙：深可可 */
+            --price: #a44a3f;       /* 價格：磚紅色 */
+            --font-main: "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
         }
 
-        /* 統一字體設定 */
-        * { 
-            box-sizing: border-box; 
-            font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
-        }
+        * { box-sizing: border-box; font-family: var(--font-main); }
 
         body {
             background-color: var(--bg);
+            background-image: radial-gradient(#e0dcd8 0.5px, transparent 0.5px); /* 極細微背景點綴 */
+            background-size: 20px 20px;
             color: #444;
             margin: 0;
             padding: 20px;
@@ -30,173 +30,229 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* 確保不跑版，固定在視窗內 */
+            overflow: hidden;
         }
 
         header {
             text-align: center;
-            padding: 10px 0 20px 0;
+            padding: 10px 0 25px 0;
             flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
         }
 
         header h1 {
             margin: 0;
-            font-size: 2em;
+            font-size: 2.2em;
             letter-spacing: 12px;
             color: var(--primary);
-            font-weight: bold;
+            font-weight: 900;
+            text-shadow: 1px 1px 0px rgba(255,255,255,0.8);
         }
 
-        /* 自動適應網格 */
+        /* --- 升級版按鈕樣式 --- */
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 32px;
+            background-color: rgba(61, 43, 31, 0.03);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            text-decoration: none;
+            font-size: 0.9em;
+            font-weight: 600;
+            letter-spacing: 4px;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            border-radius: 40px; /* 圓角膠囊型更具現代感 */
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-btn::before { /* 懸停閃光效果 */
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: all 0.6s;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--primary);
+            color: #fff;
+            box-shadow: 0 8px 20px rgba(61, 43, 31, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:hover::before { left: 100%; }
+
+        /* --- 網格佈局 --- */
         #menuGrid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            grid-auto-rows: 1fr; /* 讓所有卡片等高 */
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-auto-rows: 1fr;
+            gap: 20px;
             flex-grow: 1;
-            overflow-y: auto; /* 若豆子過多，僅此區域可捲動 */
-            padding-bottom: 10px;
+            overflow-y: auto;
+            padding: 10px 5px 30px 5px;
         }
 
-        /* 電腦/平板橫向優化：確保 4 欄排列 */
-        @media (min-width: 1024px) {
-            #menuGrid { grid-template-columns: repeat(4, 1fr); }
-        }
+        @media (min-width: 1200px) { #menuGrid { grid-template-columns: repeat(4, 1fr); } }
 
+        /* --- 卡片美化 --- */
         .card {
-            background: #fff;
-            border: 1px solid #e0dcd8;
-            padding: 15px;
+            background: var(--card-bg);
+            border-radius: 12px; /* 增加圓角 */
+            border: 1px solid rgba(224, 220, 216, 0.6);
+            padding: 24px 20px;
             display: flex;
             flex-direction: column;
             position: relative;
-            transition: transform 0.2s;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(61, 43, 31, 0.08);
+            border-color: var(--secondary);
         }
 
         .roast-badge {
             position: absolute;
-            top: 0;
-            right: 0;
-            font-size: 0.75em;
-            padding: 3px 10px;
+            top: 12px;
+            right: 12px;
+            font-size: 0.7em;
+            padding: 4px 12px;
             color: #fff;
             font-weight: bold;
+            border-radius: 20px;
+            letter-spacing: 1px;
         }
         .lr { background: var(--light-roast); }
         .mr { background: var(--med-roast); }
         .dr { background: var(--dark-roast); }
 
         .theme-word {
-            font-size: 2.5em;
+            font-size: 2.8em;
             font-weight: bold;
             color: var(--primary);
             text-align: center;
-            margin: 5px 0;
+            margin: 10px 0 5px 0;
+            font-family: serif; /* 使用襯線體增加人文感 */
         }
 
         .origin {
-            font-size: 0.9em;
-            font-weight: bold;
+            font-size: 0.95em;
+            font-weight: 700;
             text-align: center;
-            color: #333;
-            margin-bottom: 4px;
+            color: var(--secondary);
+            margin-bottom: 6px;
         }
 
         .process {
-            background: #f0ebe5;
-            color: var(--secondary);
-            font-size: 0.8em;
+            background: #fdf1e6;
+            color: #9d6b42;
+            font-size: 0.75em;
             text-align: center;
-            padding: 2px 8px;
-            border-radius: 2px;
+            padding: 3px 12px;
+            border-radius: 4px;
             width: fit-content;
-            margin: 0 auto 10px auto;
+            margin: 0 auto 15px auto;
+            font-weight: 600;
         }
 
         .flavor {
-            font-size: 0.8em;
-            color: #777;
+            font-size: 0.85em;
+            color: #666;
             text-align: center;
-            line-height: 1.4;
-            margin-bottom: 10px;
-            flex-grow: 1; /* 推擠價格區塊到底部 */
+            line-height: 1.6;
+            margin-bottom: 15px;
+            flex-grow: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
+        /* --- 價格區塊 --- */
         .price-box {
-            border-top: 1px solid #f0f0f0;
-            padding-top: 10px;
+            border-top: 1px solid #f2f2f2;
+            padding-top: 15px;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 6px;
+            gap: 10px;
         }
 
         .price-item {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             font-size: 0.85em;
-            padding: 0 5px;
         }
 
-        .p-label { color: #aaa; }
-        .p-val { font-weight: bold; color: var(--price); }
-        .p-val::before { content: '$'; font-size: 0.9em; margin-right: 1px; }
+        .p-label { color: #999; font-size: 0.8em; }
+        .p-val { font-weight: 800; color: var(--price); font-size: 1.05em; }
+        .p-val::before { content: '$'; font-size: 0.8em; margin-right: 1px; }
 
-        /* 針對平板直向優化 */
+        /* --- 平板/手機適配 --- */
         @media (max-width: 768px) {
-            #menuGrid { grid-template-columns: repeat(2, 1fr); }
-            body { overflow-y: auto; height: auto; }
+            body { padding: 15px; overflow-y: auto; height: auto; }
+            #menuGrid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            header h1 { font-size: 1.8em; letter-spacing: 6px; }
+            .theme-word { font-size: 2.2em; }
         }
     </style>
 </head>
+
 <body>
 
-<header>
-    <h1>單品豆單</h1>
-</header>
+    <header>
+        <h1>單品豆單</h1>
+        <a href="https://christypy.github.io/" class="nav-btn">🔗首頁</a>
+    </header>
 
-<div id="menuGrid">
-    </div>
+    <div id="menuGrid">
+        </div>
 
-<script>
-    // 資料統一管理
-    const coffeeData = [
-        { name: "覺", origin: "哥斯大黎加 奇里波", process: "日曬", roast: "lr", roastName: "淺焙", flavor: "酒漬櫻桃、黑莓、蜜鳳梨、萊姆酒香、黑巧克力", take: 200, stay: 250, pound: 950, drip: 60 },
-        { name: "花", origin: "衣索比亞 露西藝伎", process: "藝伎水洗", roast: "lr", roastName: "淺焙", flavor: "白玫瑰、蘋果、檸檬、百香果", take: 180, stay: 230, pound: 850, drip: 55 },
-        { name: "寶", origin: "衣索比亞 吉瑪莉姆", process: "藝伎日曬", roast: "lr", roastName: "淺焙", flavor: "芒果乾、檸檬糖、葡萄、白色花香、甜奶油", take: 180, stay: 230, pound: 850, drip: 55 },
-        { name: "菩", origin: "衣索比亞 柯契爾", process: "蜜處理", roast: "mr", roastName: "淺中", flavor: "楓糖、蜂蜜、波斯紅茶", take: 130, stay: 180, pound: 700, drip: 45 },
-        { name: "靜", origin: "衣索比亞 西達摩", process: "日曬", roast: "lr", roastName: "淺焙", flavor: "葡萄、藍莓、佛手柑、水蜜桃、玫瑰", take: 130, stay: 180, pound: 650, drip: 45 },
-        { name: "果", origin: "衣索比亞 西達摩", process: "日曬", roast: "lr", roastName: "淺焙", flavor: "水蜜桃、荔枝、佛手柑果韻", take: 130, stay: 180, pound: 600, drip: 45 },
-        { name: "雅", origin: "衣索比亞 西達摩", process: "水洗", roast: "lr", roastName: "淺焙", flavor: "荔枝、蜂蜜、烏龍、檸檬", take: 130, stay: 180, pound: 650, drip: 45 },
-        { name: "福", origin: "哥斯大黎加 拉米尼塔", process: "水洗", roast: "mr", roastName: "中焙", flavor: "奶油、核桃、太妃糖", take: 130, stay: 180, pound: 550, drip: 40 },
-        { name: "幻", origin: "肯亞 凱蘭波勒", process: "水洗", roast: "lr", roastName: "淺焙", flavor: "紫藤花、梔子、小紅莓、柑橘、楊桃", take: 130, stay: 180, pound: 680, drip: "-" },
-        { name: "幻", origin: "肯亞 凱蘭波勒", process: "水洗", roast: "dr", roastName: "中深", flavor: "黑巧克力、煙燻香料、烏梅、桑椹", take: 130, stay: 180, pound: 680, drip: "-" },
-        { name: "柔", origin: "巴西 喜拉朵", process: "日曬", roast: "mr", roastName: "中焙", flavor: "堅果、可可、奶油、焦糖", take: 130, stay: 180, pound: 450, drip: 35 },
-        // { name: "定", origin: "特選特調豆", process: "職人調合", roast: "mr", roastName: "中焙", flavor: "穩定心神、回甘平衡", take: 130, stay: 180, pound: 650, drip: "-" },
-        // { name: "潤", origin: "經典深焙系列", process: "法式深焙", roast: "dr", roastName: "深焙", flavor: "溫潤厚實、焦糖餘韻", take: "-", stay: "-", pound: "-", drip: "-" }
-    ];
+    <script>
+        const coffeeData = [
+            { name: "覺", origin: "哥斯大黎加 奇里波", process: "日曬", roast: "lr", roastName: "淺焙", flavor: "酒漬櫻桃、黑莓、蜜鳳梨、萊姆酒香、黑巧克力", take: 200, stay: 250, pound: 950, drip: 60 },
+            { name: "花", origin: "衣索比亞 露西藝伎", process: "藝伎水洗", roast: "lr", roastName: "淺焙", flavor: "白玫瑰、蘋果、檸檬、百香果", take: 180, stay: 230, pound: 850, drip: 55 },
+            { name: "寶", origin: "衣索比亞 吉瑪莉姆", process: "藝伎日曬", roast: "lr", roastName: "淺焙", flavor: "芒果乾、檸檬糖、葡萄、白色花香、甜奶油", take: 180, stay: 230, pound: 850, drip: 55 },
+            { name: "菩", origin: "衣索比亞 柯契爾", process: "蜜處理", roast: "mr", roastName: "淺中", flavor: "楓糖、蜂蜜、波斯紅茶", take: 130, stay: 180, pound: 700, drip: 45 },
+            { name: "靜", origin: "衣索比亞 西達摩", process: "日曬", roast: "lr", roastName: "淺焙", flavor: "葡萄、藍莓、佛手柑、水蜜桃、玫瑰", take: 130, stay: 180, pound: 650, drip: 45 },
+            { name: "果", origin: "衣索比亞 西達摩", process: "日曬", roast: "lr", roastName: "淺焙", flavor: "水蜜桃、荔枝、佛手柑果韻", take: 130, stay: 180, pound: 600, drip: 45 },
+            { name: "雅", origin: "衣索比亞 西達摩", process: "水洗", roast: "lr", roastName: "淺焙", flavor: "荔枝、蜂蜜、烏龍、檸檬", take: 130, stay: 180, pound: 650, drip: 45 },
+            { name: "福", origin: "哥斯大黎加 拉米尼塔", process: "水洗", roast: "mr", roastName: "中焙", flavor: "奶油、核桃、太妃糖", take: 130, stay: 180, pound: 550, drip: 40 },
+            { name: "幻", origin: "肯亞 凱蘭波勒", process: "水洗", roast: "lr", roastName: "淺焙", flavor: "紫藤花、梔子、小紅莓、柑橘、楊桃", take: 130, stay: 180, pound: 680, drip: "-" },
+            { name: "幻", origin: "肯亞 凱蘭波勒", process: "水洗", roast: "dr", roastName: "中深", flavor: "黑巧克力、煙燻香料、烏梅、桑椹", take: 130, stay: 180, pound: 680, drip: "-" },
+            { name: "柔", origin: "巴西 喜拉朵", process: "日曬", roast: "mr", roastName: "中焙", flavor: "堅果、可可、奶油、焦糖", take: 130, stay: 180, pound: 450, drip: 35 }
+        ];
 
-    const grid = document.getElementById('menuGrid');
+        const grid = document.getElementById('menuGrid');
 
-    function render() {
-        grid.innerHTML = coffeeData.map(c => `
-            <div class="card">
-                <span class="roast-badge ${c.roast}">${c.roastName}</span>
-                <div class="theme-word">${c.name}</div>
-                <div class="origin">${c.origin}</div>
-                <div class="process">${c.process}</div>
-                <div class="flavor">${c.flavor}</div>
-                <div class="price-box">
-                    <div class="price-item"><span class="p-label">外帶</span><span class="p-val">${c.take}</span></div>
-                    <div class="price-item"><span class="p-label">內用</span><span class="p-val">${c.stay}</span></div>
-                    <div class="price-item"><span class="p-label">半磅</span><span class="p-val">${c.pound}</span></div>
-                    <div class="price-item"><span class="p-label">濾掛</span><span class="p-val">${c.drip}</span></div>
+        function render() {
+            grid.innerHTML = coffeeData.map(c => `
+                <div class="card">
+                    <span class="roast-badge ${c.roast}">${c.roastName}</span>
+                    <div class="theme-word">${c.name}</div>
+                    <div class="origin">${c.origin}</div>
+                    <div class="process">${c.process}</div>
+                    <div class="flavor">${c.flavor}</div>
+                    <div class="price-box">
+                        <div class="price-item"><span class="p-label">外帶</span><span class="p-val">${c.take}</span></div>
+                        <div class="price-item"><span class="p-label">內用</span><span class="p-val">${c.stay}</span></div>
+                        <div class="price-item"><span class="p-label">半磅</span><span class="p-val">${c.pound}</span></div>
+                        <div class="price-item"><span class="p-label">濾掛</span><span class="p-val">${c.drip}</span></div>
+                    </div>
                 </div>
-            </div>
-        `).join('');
-    }
-
-    render();
-</script>
-
+            `).join('');
+        }
+        render();
+    </script>
 </body>
 </html>
