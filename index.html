@@ -658,16 +658,19 @@
             價格
         </button>
         <button class="fab-btn" onclick="window.location.href='https://christypy.github.io/been'">
-            單品豆
+            豆單菜單
         </button>
         <button class="fab-btn" onclick="window.location.href='https://christypy.github.io/record'">
             記錄器
         </button>
-
-        
-        <button class="fab-btn" onclick="window.location.href='https://christypy.github.io/roast'">
-            烘豆
+        <button class="fab-btn"
+            onclick="document.getElementById('method').scrollIntoView({ behavior: 'smooth' })">
+            作法
         </button>
+        
+        <!-- <button class="fab-btn" onclick="window.location.href='https://christypy.github.io/roast'">
+            烘豆
+        </button> -->
     </div>
 
 
@@ -855,7 +858,7 @@
         </table>
     </div>
 
-    <div class="price-card-container" style="margin-top: 25px;">
+    <div class="price-card-container" id="method" style="margin-top: 25px;">
         <div class="price-card">
             <div class="price-card-header" style="background: var(--color-secondary);">📖 咖啡調製做法</div>
             <div style="padding: 15px; font-size: 14px; line-height: 1.8;">
