@@ -1007,7 +1007,8 @@
         function renderMemos(todaysOrders) {
             const memoList = document.getElementById('dynamicMemoList');
             const staticList = document.getElementById('staticMemoList');
-            const dynamicMemos = todaysOrders.filter(c => c.tag && !c.tag.includes('寄杯') && !isGroupAbsent(c.groupId));
+            // const dynamicMemos = todaysOrders.filter(c => c.tag && !c.tag.includes('寄杯') && !isGroupAbsent(c.groupId));
+            const dynamicMemos = todaysOrders.filter(c => c.tag && !c.tag.includes('寄杯'));
             const filterMemos = dynamicMemos.filter(c => {
                 for (let i = 0; i < (c.count || 1); i++) if (!isItemDone(c.name, c.item, c.loc, i)) return true;
                 return false;
@@ -1046,7 +1047,8 @@
                 let target = (c.loc.includes("鄰居")) ? sNeigh : sOther;
                 let isAbsent = isGroupAbsent(c.groupId);
                 if (typeNames[c.type]) {
-                    if (!isAbsent) target[c.type].total += (c.count || 1);
+                    //if (!isAbsent) target[c.type].total += (c.count || 1);
+                    target[c.type].total += (c.count || 1);
                     for (let i = 0; i < (c.count || 1); i++) {
                         let done = isItemDone(c.name, c.item, c.loc, i);
                         if (done && !isAbsent) target[c.type].done++;
