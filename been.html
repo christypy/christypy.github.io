@@ -68,25 +68,25 @@
 
         /* 文字排版 */
         .theme-word { font-size: 2.6em; font-weight: bold; color: var(--primary); text-align: center; margin: 4px 0; font-family: "Georgia", serif; flex-shrink: 0; }
-        .origin { font-size: 0.9em; font-weight: 700; text-align: center; color: var(--secondary); margin-bottom: 4px; flex-shrink: 0; }
-        .process { background: #fdf1e6; color: #9d6b42; font-size: 0.7em; text-align: center; padding: 2px 8px; border-radius: 4px; width: fit-content; margin: 0 auto 12px auto; font-weight: 600; flex-shrink: 0; }
+        .origin { font-size: 1em; font-weight: 700; text-align: center; color: var(--secondary); margin-bottom: 4px; flex-shrink: 0; }
+        .process { background: #fdf1e6; color: #9d6b42; font-size: 0.85em; text-align: center; padding: 2px 8px; border-radius: 4px; width: fit-content; margin: 0 auto 12px auto; font-weight: 600; flex-shrink: 0; }
         
         /* 風味敘述區塊：關鍵在於 flex-grow: 1，它會吃掉剩餘空間，將價格推到底部 */
-        .flavor { font-size: 0.85em; color: #777; text-align: center; line-height: 1.6; margin-bottom: 15px; flex-grow: 1; display: flex; align-items: center; justify-content: center; }
+        .flavor { font-size: 0.95em; color: #777; text-align: center; line-height: 1.6; margin-bottom: 15px; flex-grow: 1; display: flex; align-items: center; justify-content: center; }
 
         /* --- 經典飲品清單 --- */
         .classic-list { list-style: none; padding: 0; margin: 0; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
         .classic-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed #eee; }
         .classic-item:last-child { border-bottom: none; }
-        .classic-name { font-weight: 600; color: var(--primary); font-size: 0.95em; }
-        .classic-price { font-weight: 800; color: var(--price); font-size: 1.05em; }
+        .classic-name { font-weight: 600; color: var(--primary); font-size: 1.05em; }
+        .classic-price { font-weight: 800; color: var(--price); font-size: 1.15em; }
         .classic-price::before { content: '$'; font-size: 0.8em; margin-right: 2px; }
 
         /* 價格區塊：固定在底部 */
         .price-box { border-top: 1px solid #f8f8f8; padding-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; flex-shrink: 0; }
-        .price-item { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.8em; }
+        .price-item { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.9em; }
         .p-label { color: #bbb; }
-        .p-val { font-weight: 800; color: var(--price); font-size: 1.1em; }
+        .p-val { font-weight: 800; color: var(--price); font-size: 1.2em; }
         .p-val::before { content: '$'; font-size: 0.8em; margin-right: 1px; }
 
         /* --- 管理功能與 Modal --- */
@@ -106,52 +106,59 @@
         #modal.active { display: flex; }
         .modal-card { 
             width: 360px;
-            max-width: calc(100vw - 48px);
+            max-width: calc(100vw - 40px);
             background: white; 
             border-radius: 24px; 
-            padding: 30px 25px; 
+            padding: 30px 28px; 
             position: relative;
             display: flex;
             flex-direction: column;
-            height: 420px;
+            height: 460px;
         }
-        .modal-card .theme-word { font-size: 3em; }
-        .modal-card .origin { font-size: 1em; }
-        .modal-card .process { font-size: 0.85em; }
+        .modal-card .theme-word { font-size: 3.2em; }
+        .modal-card .origin { font-size: 1.1em; }
+        .modal-card .process { font-size: 0.95em; }
         .modal-card .flavor { 
             flex-grow: 1; 
             display: flex; 
             align-items: center; 
             justify-content: center;
             text-align: center;
-            font-size: 1em;
+            font-size: 1.1em;
             color: #777;
-            line-height: 1.7;
+            line-height: 1.8;
             overflow: hidden;
         }
         .modal-card .price-box { flex-shrink: 0; }
-        .modal-card .p-label { font-size: 0.9em; }
-        .modal-card .p-val { font-size: 1.2em; }
+        .modal-card .price-item { font-size: 1em; }
+        .modal-card .p-label { font-size: 1em; color: #999; }
+        .modal-card .p-val { font-size: 1.35em; }
 
         @media (max-width: 768px) {
             #menuGrid { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 16px 8px 140px 8px; }
             .card { padding: 16px 12px; }
-            .theme-word { font-size: 2.2em; }
-            .origin { font-size: 0.92em; }
-            .process { font-size: 0.82em; }
-            .flavor { font-size: 0.9em; }
-            .p-label { font-size: 0.88em; }
-            .p-val { font-size: 1.08em; }
-            .classic-name { font-size: 1em; }
-            .classic-price { font-size: 1.1em; }
-            .roast-badge { font-size: 0.72em; }
-            .modal-card { height: 420px; }
-            .modal-card .theme-word { font-size: 2.8em; }
-            .modal-card .origin { font-size: 1em; }
-            .modal-card .process { font-size: 0.85em; }
-            .modal-card .flavor { font-size: 1em; }
-            .modal-card .p-label { font-size: 0.92em; }
-            .modal-card .p-val { font-size: 1.2em; }
+            .theme-word { font-size: 2.6em; }
+            .origin { font-size: 1.05em; }
+            .process { font-size: 0.92em; }
+            .flavor { font-size: 1em; }
+            .p-label { font-size: 1em; }
+            .p-val { font-size: 1.2em; }
+            .classic-name { font-size: 1.1em; }
+            .classic-price { font-size: 1.2em; }
+            .roast-badge { font-size: 0.82em; }
+            .modal-card { 
+                width: calc(100vw - 40px);
+                max-width: calc(100vw - 40px);
+                height: auto;
+                min-height: 480px;
+                padding: 28px 24px;
+            }
+            .modal-card .theme-word { font-size: 4em; }
+            .modal-card .origin { font-size: 1.2em; }
+            .modal-card .process { font-size: 1em; }
+            .modal-card .flavor { font-size: 1.2em; padding: 16px 0; }
+            .modal-card .p-label { font-size: 1.05em; }
+            .modal-card .p-val { font-size: 1.5em; }
         }
     </style>
 </head>
