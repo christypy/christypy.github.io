@@ -104,16 +104,50 @@
 
         #modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(30, 20, 10, 0.85); backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
         #modal.active { display: flex; }
-        .modal-card { width: 100%; max-width: 400px; background: white; border-radius: 24px; padding: 35px 25px; position: relative; }
+        .modal-card { 
+            width: 360px;
+            max-width: calc(100vw - 48px);
+            background: white; 
+            border-radius: 24px; 
+            padding: 30px 25px; 
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 420px;
+        }
+        .modal-card .theme-word { font-size: 3em; }
+        .modal-card .flavor { 
+            flex-grow: 1; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            text-align: center;
+            font-size: 0.9em;
+            color: #777;
+            line-height: 1.6;
+            overflow: hidden;
+        }
+        .modal-card .price-box { flex-shrink: 0; }
+        @media (max-width: 768px) {
+            .modal-card { 
+                height: 380px;
+            }
+            .modal-card .theme-word { font-size: 2.4em; }
+            .modal-card .flavor { font-size: 0.82em; }
+        }
 
         @media (max-width: 768px) {
             #menuGrid { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 16px 8px 140px 8px; }
             .card { padding: 16px 12px; }
-            .theme-word { font-size: 1.8em; }
-            .origin { font-size: 0.75em; }
-            .flavor { font-size: 0.72em; }
-            .classic-name { font-size: 0.85em; }
-            .classic-price { font-size: 0.95em; }
+            .theme-word { font-size: 2.2em; }
+            .origin { font-size: 0.88em; }
+            .process { font-size: 0.78em; }
+            .flavor { font-size: 0.82em; }
+            .p-label { font-size: 0.85em; }
+            .p-val { font-size: 1.05em; }
+            .classic-name { font-size: 0.95em; }
+            .classic-price { font-size: 1.05em; }
+            .roast-badge { font-size: 0.72em; }
         }
     </style>
 </head>
