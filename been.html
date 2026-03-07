@@ -36,17 +36,20 @@
         header { text-align: center; padding: 15px 0 25px 0; flex-shrink: 0; }
         header h1 { margin: 0; font-size: 2.2em; letter-spacing: 12px; color: var(--primary); font-weight: 900; text-indent: 12px; }
 
-        /* --- 側邊懸浮按鈕 (防誤觸設計) --- */
+        /* --- 側邊懸浮按鈕 (預設隱藏) --- */
         .fab-container {
             position: fixed;
             bottom: 40px;
-            right: 0; /* 貼緊右側 */
-            display: flex;
+            right: 0;
+            display: none; /* 預設完全不顯示 */
             flex-direction: column;
             gap: 12px;
             z-index: 999;
             align-items: flex-end;
         }
+
+        /* 當符合管理者條件時，透過 JS 開啟顯示 */
+        .fab-container.is-visible { display: flex; }
 
         .fab {
             height: 48px;
@@ -55,7 +58,7 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(61, 43, 31, 0.15);
             border-right: none;
-            border-radius: 24px 0 0 24px; /* 半圓形靠右 */
+            border-radius: 24px 0 0 24px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -74,7 +77,6 @@
             white-space: nowrap;
         }
 
-        /* 展開狀態 */
         .fab:active, .fab:hover {
             width: 120px;
             background: var(--primary);
@@ -94,7 +96,7 @@
             gap: 20px;
             flex-grow: 1;
             overflow-y: auto;
-            padding: 10px 15px 120px 15px; /* 底部留出安全滑動空間 */
+            padding: 10px 15px 120px 15px;
         }
 
         /* --- 卡片樣式 --- */
@@ -122,6 +124,7 @@
         .process { background: #fdf1e6; color: #9d6b42; font-size: 0.75em; text-align: center; padding: 2px 10px; border-radius: 4px; width: fit-content; margin: 0 auto 12px auto; }
         .flavor { font-size: 0.85em; color: #666; text-align: center; line-height: 1.5; margin-bottom: 15px; flex-grow: 1; }
 
+        /* --- 價格區塊 --- */
         .price-box { border-top: 1px solid #f2f2f2; padding-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 15px; }
         .price-item { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.85em; }
         .p-label { color: #999; }
@@ -143,13 +146,10 @@
         #modal.active { display: flex; }
 
         .modal-card {
-            width: 100%; max-width: 420px; background: white; border-radius: 28px;
+            width: 100%; max-width: 420px; min-height: 580px; background: white; border-radius: 28px;
             padding: 40px 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.3);
             display: flex; flex-direction: column; position: relative;
-            animation: modalIn 0.3s ease-out;
         }
-
-        @keyframes modalIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         .modal-card .theme-word { font-size: 4.5em; margin: 15px 0; }
         .modal-card .flavor { font-size: 1.25em; line-height: 1.7; margin: 30px 0; border-bottom: 1px solid #eee; padding-bottom: 30px; }
@@ -166,12 +166,13 @@
 
 <body>
 
-    <!-- <header>
-    </header> -->
+    <header>
+        <h1>單品豆單</h1>
+    </header>
 
     <div id="menuGrid"></div>
 
-    <div class="fab-container">
+    <div class="fab-container" id="fabLayer">
         <a href="https://christypy.github.io/" class="fab"><i>🏠</i><span>回到首頁</span></a>
         <div class="fab" id="adminBtn" onclick="toggleAdminMode()"><i>⚙️</i><span>管理模式</span></div>
     </div>
@@ -196,9 +197,20 @@
         ];
 
         let coffeeData = [];
-        let isAdmin = false;
+        let isAdminActive = false;
+
+        // --- 核心權限檢查：檢查 URL 是否包含 ?mode=admin ---
+        function checkPermission() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const mode = urlParams.get('mode');
+            
+            if (mode === 'admin') {
+                document.getElementById('fabLayer').classList.add('is-visible');
+            }
+        }
 
         function initData() {
+            checkPermission();
             const hiddenIds = JSON.parse(localStorage.getItem('hiddenCoffeeIds')) || [];
             coffeeData = initialCoffeeData.map(item => ({ ...item, available: !hiddenIds.includes(item.id) }));
             render();
@@ -210,10 +222,10 @@
         }
 
         function toggleAdminMode() {
-            isAdmin = !isAdmin;
+            isAdminActive = !isAdminActive;
             const btn = document.getElementById('adminBtn');
             btn.classList.toggle('admin-active');
-            btn.querySelector('span').innerText = isAdmin ? "完成編輯" : "管理模式";
+            btn.querySelector('span').innerText = isAdminActive ? "完成編輯" : "管理模式";
             document.body.classList.toggle('admin-mode');
             render();
         }
@@ -226,7 +238,7 @@
         }
 
         function openModal(id) {
-            if (isAdmin) return;
+            if (isAdminActive) return;
             const item = coffeeData.find(c => c.id === id);
             const modalContent = document.getElementById('modalContent');
             modalContent.innerHTML = `
@@ -252,7 +264,7 @@
         function render() {
             const grid = document.getElementById('menuGrid');
             grid.innerHTML = coffeeData
-                .filter(item => isAdmin || item.available)
+                .filter(item => isAdminActive || item.available)
                 .map(item => `
                     <div class="card ${!item.available ? 'is-hidden' : ''}" onclick="openModal(${item.id})">
                         <span class="roast-badge ${item.roast}">${item.roastName}</span>
