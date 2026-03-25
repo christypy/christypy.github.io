@@ -660,15 +660,14 @@
         <button class="fab-btn" onclick="window.location.href='https://christypy.github.io/been.html?mode=admin'">
             豆單菜單
         </button>
-                <button class="fab-btn"
-            onclick="document.getElementById('method').scrollIntoView({ behavior: 'smooth' })">
+        <button class="fab-btn" onclick="document.getElementById('method').scrollIntoView({ behavior: 'smooth' })">
             作法
         </button>
         <button class="fab-btn" onclick="window.location.href='https://christypy.github.io/record'">
             記錄器
         </button>
 
-        
+
         <!-- <button class="fab-btn" onclick="window.location.href='https://christypy.github.io/roast'">
             烘豆
         </button> -->
@@ -719,7 +718,7 @@
                     <div class="price-item">熱美式<span class="p-value">70</span></div>
                     <div class="price-item">冰美式<span class="p-value">75</span></div>
                     <div class="price-item">大熱美<span class="p-value">80</span></div>
-                     <div class="price-item">淺焙美式<span class="p-value">130</span></div>
+                    <div class="price-item">淺焙美式<span class="p-value">130</span></div>
 
                 </div>
 
@@ -875,9 +874,9 @@
                     ➔ <b>熱拿鐵：</b>牛奶用鋼杯打熱後加至九分滿
 
                 </div>
-                 <div>
+                <div>
                     <strong style="color: var(--color-primary);">淺培美式：</strong><br>
-                    靜 or 果 8.5 刻度 
+                    靜 or 果 8.5 刻度
                 </div>
                 <div>
                     <strong style="color: var(--color-primary);">🍵 抹茶歐蕾：</strong><br>
@@ -912,15 +911,15 @@
             { loc: "右邊鄰居", name: "怡香軒", item: "熱美式", type: "hot_am", days: [], count: 1, groupId: "neighbor_r_1" },
             { loc: "右邊鄰居", name: "油飯", item: "熱美式", tag: "當日問", type: "hot_am", days: [], count: 1, groupId: "neighbor_r_2" },
             { loc: "右邊鄰居", name: "山城米食", item: "熱拿鐵", type: "hot_latte", days: [], count: 1, note: "寄杯", groupId: "neighbor_r_3" },
-            { loc: "右邊鄰居", name: "橘子攤", item: "熱拿鐵", type: "hot_latte", days: [],note: "寄杯36杯", count: 1, groupId: "neighbor_r_4" },
+            { loc: "右邊鄰居", name: "橘子攤", item: "熱拿鐵", type: "hot_latte", days: [], note: "寄杯36杯", count: 1, groupId: "neighbor_r_4" },
             { loc: "右邊鄰居", name: "糖果", item: "熱拿鐵", type: "hot_latte", days: [6, 0], count: 1, note: "付兩天", groupId: "neighbor_r_5" },
             { loc: "左邊鄰居", name: "牛肉", item: "熱拿鐵", type: "hot_latte_sugar", days: [3, 5, 0], count: 1, note: "加3g糖", groupId: "neighbor_l_1" },
             { loc: "左邊鄰居", name: "布老闆", item: "熱美式", type: "hot_am", days: [5], count: 1, note: "寄杯", groupId: "neighbor_l_2" },
             {
                 loc: "左邊鄰居",
                 name: "甘蔗雞",
-                item: [10, 11, 0, 1, 2].includes(new Date().getMonth()) ? "熱美式" : "冰美式",
-                type: [10, 11, 0, 1, 2].includes(new Date().getMonth()) ? "hot_am" : "ice_am",
+                item: "冰美式", // 已移除月份判斷邏輯
+                type: "ice_am", // 固定為冰美式類型
                 days: [],
                 count: 1,
                 groupId: "neighbor_l_3"
@@ -1024,7 +1023,6 @@
                 staticList.classList.remove('has-dynamic');
             }
         }
-
         function renderOrders() {
             const day = parseInt(document.getElementById('daySelect').value);
             const sNDiv = document.getElementById('stats-neighbor');
@@ -1039,7 +1037,10 @@
             document.getElementById('clearAllBtn').disabled = false;
 
             let sNeigh = {}, sOther = {};
-            for (const k in typeNames) { sNeigh[k] = { total: 0, done: 0, orders: [] }; sOther[k] = { total: 0, done: 0, orders: [] }; }
+            for (const k in typeNames) {
+                sNeigh[k] = { total: 0, done: 0, orders: [] };
+                sOther[k] = { total: 0, done: 0, orders: [] };
+            }
 
             const todaysOrders = customers.filter(c => c.days.length === 0 || c.days.includes(day));
             renderMemos(todaysOrders);
@@ -1047,12 +1048,17 @@
             todaysOrders.forEach(c => {
                 let target = (c.loc.includes("鄰居")) ? sNeigh : sOther;
                 let isAbsent = isGroupAbsent(c.groupId);
+
                 if (typeNames[c.type]) {
-                    //if (!isAbsent) target[c.type].total += (c.count || 1);
+                    // 無論是否缺席，都計入總數，確保該品項資訊「不消失」
                     target[c.type].total += (c.count || 1);
+
                     for (let i = 0; i < (c.count || 1); i++) {
                         let done = isItemDone(c.name, c.item, c.loc, i);
+                        // 只有在「非缺席」且「已完成」的情況下才計入完成數
+                        // 如果缺席了，就不計入完成，剩餘數會維持原樣或標示為不用做
                         if (done && !isAbsent) target[c.type].done++;
+
                         target[c.type].orders.push({ ...c, isDone: done, isAbsent, index: i });
                     }
                 }
@@ -1062,23 +1068,70 @@
                 let html = '', totalN = 0, totalD = 0;
                 for (const k in typeNames) {
                     if (stats[k].total > 0) {
-                        let s = stats[k], rem = s.total - s.done, per = Math.round((s.done / s.total) * 100), id = `detail_${prefix}_${k}`;
+                        let s = stats[k];
+                        // 計算「扣除缺席後」真正要做的總數
+                        let activeTotal = s.orders.filter(o => !o.isAbsent).length;
+                        let rem = activeTotal - s.done;
+                        let per = activeTotal > 0 ? Math.round((s.done / activeTotal) * 100) : 100;
+                        let id = `detail_${prefix}_${k}`;
+
                         expandedStats.add(id);
-                        html += `<div class="stat-row" onclick="toggleStatDetail('${id}')"><span>${typeNames[k]}</span><div class="progress-counts"><span class="count-total">${s.total}</span><span class="count-remaining">剩: <b style="${rem === 0 ? 'color:var(--color-success)' : ''}">${rem}</b></span></div></div><div class="stat-row-progress"><div class="progress-fill" style="width:${per}%; background-color:${rem === 0 ? 'var(--color-success)' : 'var(--color-accent)'};"></div></div><div id="${id}" class="stat-detail-list" style="display:block;">${s.orders.map(o => {
+
+                        html += `
+                <div class="stat-row" onclick="toggleStatDetail('${id}')">
+                    <span>${typeNames[k]}</span>
+                    <div class="progress-counts">
+                        <span class="count-total">${activeTotal}</span>
+                        <span class="count-remaining">剩: <b style="${rem === 0 ? 'color:var(--color-success)' : ''}">${rem}</b></span>
+                    </div>
+                </div>
+                <div class="stat-row-progress">
+                    <div class="progress-fill" style="width:${per}%; background-color:${rem === 0 ? 'var(--color-success)' : 'var(--color-accent)'};"></div>
+                </div>
+                <div id="${id}" class="stat-detail-list" style="display:block;">
+                    ${s.orders.map(o => {
                             let safe = [escapeJsString(o.name), escapeJsString(o.item), escapeJsString(o.loc), o.index, o.groupId];
-                            return `<div class="stat-detail-item ${o.isAbsent ? 'absent' : (o.isDone ? 'done' : '')}"><span class="absence-toggle" onclick="event.stopPropagation(); toggleAbsence('${o.groupId}')">${o.isAbsent ? '恢復' : '缺席'}</span><div class="customer-info" onclick="toggleDone('${safe[0]}','${safe[1]}','${safe[2]}',${safe[3]},'${safe[4]}')"><span class="customer-name">${o.name}${o.count > 1 ? ` (${o.index + 1}/${o.count})` : ''} ${o.tag || o.note ? `<span class="customer-tag">${o.tag || o.note}</span>` : ''}</span><span class="customer-loc">${o.item}</span></div><input type="checkbox" ${o.isDone || o.isAbsent ? 'checked' : ''} onclick="${o.isAbsent ? 'event.preventDefault()' : `toggleDone('${safe[0]}','${safe[1]}','${safe[2]}',${safe[3]},'${safe[4]}')`}"></div>`
-                        }).join('')}</div>`;
-                        totalN += s.total; totalD += s.done;
+                            return `
+                        <div class="stat-detail-item ${o.isAbsent ? 'absent' : (o.isDone ? 'done' : '')}">
+                            <span class="absence-toggle" onclick="event.stopPropagation(); toggleAbsence('${o.groupId}')">${o.isAbsent ? '恢復' : '缺席'}</span>
+                            <div class="customer-info" onclick="toggleDone('${safe[0]}','${safe[1]}','${safe[2]}',${safe[3]},'${safe[4]}')">
+                                <span class="customer-name">${o.name}${o.count > 1 ? ` (${o.index + 1}/${o.count})` : ''} ${o.tag || o.note ? `<span class="customer-tag">${o.tag || o.note}</span>` : ''}</span>
+                                <span class="customer-loc">${o.item}</span>
+                            </div>
+                            <input type="checkbox" ${o.isDone || o.isAbsent ? 'checked' : ''} onclick="${o.isAbsent ? 'event.preventDefault()' : `toggleDone('${safe[0]}','${safe[1]}','${safe[2]}',${safe[3]},'${safe[4]}')`}">
+                        </div>`;
+                        }).join('')}
+                </div>`;
+
+                        totalN += activeTotal;
+                        totalD += s.done;
                     }
                 }
-                if (totalN > 0) {
-                    let rem = totalN - totalD, per = Math.round((totalD / totalN) * 100);
-                    html += `<div class="stat-row total"><span>🏆 總計</span><div class="progress-counts"><span class="count-total">${totalN}</span><span class="count-remaining">剩: <b style="${rem === 0 ? 'color:var(--color-success)' : ''}">${rem}</b></span></div></div><div class="stat-row-progress"><div class="progress-fill" style="width:${per}%; background-color:${rem === 0 ? 'var(--color-success)' : 'var(--color-total-progress)'};"></div></div>`;
-                } else html = '<div style="text-align:center;color:#999;padding:10px;">無訂單</div>';
+
+                // 總計區塊渲染
+                if (totalN >= 0) { // 改成 >= 0 確保就算全缺席也會顯示總計 0
+                    let rem = totalN - totalD;
+                    let per = totalN > 0 ? Math.round((totalD / totalN) * 100) : 100;
+                    html += `
+            <div class="stat-row total">
+                <span>🏆 總計 (扣除缺席)</span>
+                <div class="progress-counts">
+                    <span class="count-total">${totalN}</span>
+                    <span class="count-remaining">剩: <b style="${rem === 0 ? 'color:var(--color-success)' : ''}">${rem}</b></span>
+                </div>
+            </div>
+            <div class="stat-row-progress">
+                <div class="progress-fill" style="width:${per}%; background-color:${rem === 0 ? 'var(--color-success)' : 'var(--color-total-progress)'};"></div>
+            </div>`;
+                } else {
+                    html = '<div style="text-align:center;color:#999;padding:10px;">無訂單</div>';
+                }
                 return html;
             };
-            sNDiv.innerHTML = makeHtml(sNeigh, 'n'); sODiv.innerHTML = makeHtml(sOther, 'o');
+            sNDiv.innerHTML = makeHtml(sNeigh, 'n');
+            sODiv.innerHTML = makeHtml(sOther, 'o');
         }
+
 
         window.toggleStatDetail = function (id) {
             const el = document.getElementById(id);
