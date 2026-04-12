@@ -53,8 +53,11 @@
         }
 
         @media (min-width: 769px) {
-            #quickMenuBtn {
-                display: none;
+            .stats-container {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                /* 三欄佈局 */
+                gap: 15px;
             }
         }
 
@@ -224,11 +227,21 @@
             background: #888888;
         }
 
-        /* 統計區 */
+        /* 統計區 RWD 優化 */
         .stats-container {
             display: flex;
-            gap: 20px;
+            flex-direction: column;
+            /* 手機版垂直排列 */
+            gap: 15px;
             margin-bottom: 20px;
+        }
+
+        @media (min-width: 1024px) {
+            .stats-container {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                /* 電腦版三欄並排 */
+            }
         }
 
         .stat-box {
@@ -704,9 +717,14 @@
             <h3>🏠 左右鄰居 總計</h3>
             <div id="stats-neighbor"></div>
         </div>
+
         <div class="stat-box" style="border-top-color: var(--color-total-progress);">
             <h3>🛵 其他區域 總計</h3>
             <div id="stats-other"></div>
+        </div>
+        <div class="stat-box" style="border-top-color: var(--color-accent);">
+            <h3>❓ 當日需確認 總計</h3>
+            <div id="stats-ask"></div>
         </div>
     </div>
 
@@ -860,10 +878,10 @@
                 </tr>
                 <tr>
                     <td>實</td>
-                    <td><span class="menu-price"></span></td>
-                    <td><span class="menu-price"></span></td>
+                    <td><span class="menu-price">130</span></td>
+                    <td><span class="menu-price">180</span></td>
                     <td><span class="menu-price">550</span></td>
-                    <td><span class="menu-price"></span></td>
+                    <td><span class="menu-price">45</span></td>
                 </tr>
             </tbody>
         </table>
@@ -878,13 +896,17 @@
                     <strong style="color: var(--color-primary);">☕ 美式/拿鐵基底：</strong><br>
                     18/19/20g 粉 → 萃取 1:2-3g 時間大落在: 20-35秒<br>
                     ➔ <b>加糖版本：</b>加3g糖粉<br>
-                    ➔ <b>熱美式：</b>濃縮60g+加熱水至九分滿<br>
-                    ➔ <b>大熱美式：</b>濃縮80g加熱水至九分滿<br>
+                    <br>
+                    ➔ <b>熱美式：</b> 1.濃縮60g 2.熱水九分滿<br>
+                    ➔ <b>大熱美式：</b>1.濃縮80g 2.熱水九分滿<br>
 
-                    ➔ <b>冰美式：</b>冰塊180g+水130g+濃縮60g，最後冰塊補到九分滿<br>
-                    ➔ <b>氣泡冰美式：</b>基底加冰塊，用蒸氣打3-5秒，再倒入整杯冰塊<br>
-                    ➔ <b>冰拿鐵：</b>基底80g+牛奶230g+冰塊120g<br>
-                    ➔ <b>熱拿鐵：</b>基底60g+牛奶230g打熱
+                    ➔ <b>冰美式：</b>1.冰塊180g 2.水130g 3.基底60g 4.冰塊補滿<br>
+                    ➔ <b>氣泡冰美式：</b>1. 60g濃縮加冰塊 2.用蒸氣打5秒 3.倒入整杯冰塊 <br>
+                    <br>
+                    ➔ <b>外帶冰拿鐵：</b>1.冰塊120g 2.濃縮80g 3.牛奶230g<br>
+                    ➔ <b>內用冰拿鐵：</b>1.冰塊120g 2.濃縮60g 3.牛奶160g<br>
+
+                    ➔ <b>熱拿鐵：</b>1.濃縮60g 2.牛奶230g打熱 3.融合
 
                 </div>
                 <div>
@@ -924,50 +946,56 @@
 
     <script>
         const expandedStats = new Set();
-        const customers = [
-            { loc: "右邊鄰居", name: "怡香軒", item: "熱美式", type: "hot_am", days: [], count: 1, groupId: "neighbor_r_1" },
-            { loc: "右邊鄰居", name: "油飯", item: "熱美式", tag: "當日問", type: "hot_am", days: [], count: 1, groupId: "neighbor_r_2" },
-            { loc: "右邊鄰居", name: "山城米食", item: "熱拿鐵", type: "hot_latte", days: [], count: 1, note: "寄杯", groupId: "neighbor_r_3" },
-            { loc: "右邊鄰居", name: "橘子攤", item: "熱拿鐵", type: "hot_latte", days: [], note: "寄杯36杯", count: 1, groupId: "neighbor_r_4" },
-            { loc: "右邊鄰居", name: "糖果", item: "熱拿鐵", type: "hot_latte", days: [6, 0], count: 1, note: "付兩天", groupId: "neighbor_r_5" },
-            { loc: "左邊鄰居", name: "牛肉", item: "熱拿鐵", type: "hot_latte_sugar", days: [3, 5, 0], count: 1, note: "加3g糖", groupId: "neighbor_l_1" },
-            { loc: "左邊鄰居", name: "布老闆", item: "熱美式", type: "hot_am", days: [5], count: 1, note: "寄杯", groupId: "neighbor_l_2" },
-            {
-                loc: "左邊鄰居",
-                name: "甘蔗雞",
-                item: "冰美式", // 已移除月份判斷邏輯
-                type: "ice_am", // 固定為冰美式類型
-                days: [],
-                count: 1,
-                groupId: "neighbor_l_3"
-            },
-            { loc: "左邊鄰居", name: "國聯哥", item: "冰美式", type: "ice_am", days: [], count: 1, groupId: "neighbor_l_4" },
-            { loc: "左邊鄰居", name: "宜蘭魚攤", item: "冰美式", type: "ice_am", days: [6], tag: "當日問", count: 1, groupId: "neighbor_l_5" },
-            { loc: "左邊鄰居", name: "宜蘭魚攤", item: "冰拿鐵", type: "ice_latte_sugar", days: [6], tag: "當日問", count: 1, note: "加糖", groupId: "neighbor_l_5" },
-            { loc: "恐龍嫩仙草對面", name: "賣魚的員工", item: "大熱美", type: "large_hot_am", days: [6, 0], note: "六給兩天錢", groupId: "other_1" },
-            // 將原本的內容修改如下：
-            { loc: "近十字路口", name: "牛肉爸爸", item: "大拿鐵", count: 1, type: "large_hot_latte", days: [], groupId: "other_2_dad" },
-            { loc: "近十字路口", name: "牛肉兒子", item: "大拿鐵", count: 1, type: "large_hot_latte", days: [], note: "粉-1g", groupId: "other_2_son" },
-            { loc: "近十字路口", name: "韓國棉T", item: "大熱拿", count: 2, type: "large_hot_latte", days: [3], tag: "當日問", groupId: "other_19" },
+        let coffeeList = []; // 預留存放豆單的空間
+        // 使用 fetch 讀取外部 JSON
+        async function loadCoffeeData() {
+            try {
+                const response = await fetch('coffee_list.json');
+                if (!response.ok) throw new Error('無法取得豆單資料');
 
-            { loc: "過十字路口直行", name: "魚老闆", item: "大拿鐵", type: "large_hot_latte", days: [2, 3, 5], count: 1, note: "寄杯", groupId: "other_3" },
-            { loc: "過十字路口直行", name: "魚老闆鄰居(水果)", item: "熱拿鐵", type: "hot_latte", days: [2, 3, 6, 0], count: 1, groupId: "other_4" },
-            { loc: "過十字路口直行", name: "小辣椒", item: "熱美式", type: "hot_am", days: [], count: 1, groupId: "other_5" },
-            { loc: "過十字路口直行", name: "蝦老闆", item: "熱美式", type: "hot_am", days: [2, 4, 5, 6, 0], count: 1, groupId: "other_6" },
-            { loc: "過十字路口直行", name: "梨山蜜蘋果", item: "熱拿鐵", tag: "當日問", type: "hot_latte", days: [4, 5], count: 1, groupId: "other_7" },
-            { loc: "過十字路口直行", name: "城隍廟口鐵鍋行", item: "冰美式", count: 2, type: "ice_am", days: [5], tag: "當日問", groupId: "other_8" },
-            { loc: "過十字路口直行", name: "眼鏡白髮小菜老闆", item: "冰/熱手沖", type: "hand_drip", tag: "當日問老客戶手沖100", days: [4, 6], count: 1, groupId: "other_9" },
-            { loc: "過十字路口直行", name: "抓餅女老闆", item: "熱美式", tag: "當日問", type: "hot_am", days: [2, 4], count: 1, groupId: "other_10" },
-            { loc: "過十字路口直行", name: "豐原素食", item: "熱美式", type: "hot_am", days: [3], count: 1, groupId: "other_11" },
-            { loc: "過十字路口直行", name: "近中山路水果攤", item: "熱美式", type: "hot_am", days: [], count: 1, groupId: "other_12" },
-            { loc: "過十字路口右轉", name: "福記對面豬肉", item: "熱美式", type: "hot_am", days: [], count: 1, note: "寄杯", groupId: "other_13" },
-            { loc: "市場內", name: "國聯哥媽媽", item: "熱美式", type: "hot_am", days: [2, 5], tag: "當日問", count: 1, groupId: "other_14" },
-            { loc: "過十字路口直行", name: "城隍廟口貢丸 ", item: "熱拿鐵", type: "hot_latte", days: [2], count: 1, groupId: "other_15" },
-            { loc: "過十字路口直行", name: "貢丸老闆 (拿)", item: "熱拿鐵", type: "hot_latte", days: [3, 0], count: 1, groupId: "other_16" },
-            { loc: "過十字路口直行", name: "貢丸老闆 (手)", item: "熱手沖", type: "hand_drip", days: [3, 0], count: 1, note: "總計$185", groupId: "other_16" },
-            { loc: "過十字路口直行", name: "菜老闆", item: "熱拿鐵", type: "hot_latte", days: [], count: 1, groupId: "other_17" },
-            { loc: "過十字路口直行", name: "城隍廟口豆腐", item: "冰美式", type: "ice_am", days: [6], tag: "當日問", groupId: "other_18" },
-        ];
+                coffeeList = await response.json();
+
+                // 確保資料抓到後，才執行畫面的渲染
+                renderCoffeeMenu();
+            } catch (error) {
+                console.error('讀取失敗:', error);
+                // 這裡可以放一個備用的錯誤顯示
+            }
+        }
+
+        // 修改原本的初始化位置
+        window.onload = function () {
+            loadCoffeeData(); // 改成呼叫這個讀取函式
+        };
+
+
+        // 1. 先宣告空的變數
+        let customers = [];
+
+        // 2. 建立讀取 JSON 的非同步函式
+        async function initData() {
+            try {
+                const response = await fetch('customers.json'); // 讀取外部 JSON
+                if (!response.ok) throw new Error('讀取 JSON 失敗');
+
+                customers = await response.json(); // 將資料存入變數
+
+                // 3. 資料確認讀取後，再執行初始化渲染
+                initApp();
+            } catch (error) {
+                console.error('初始化失敗:', error);
+                alert('無法載入攤販資料，請檢查網路或檔案路徑');
+            }
+        }
+
+        // 4. 將原本放在最底部的初始化程式碼封裝起來
+        function initApp() {
+            document.getElementById('daySelect').value = new Date().getDay();
+            renderOrders();
+        }
+
+        // 5. 執行！
+        initData();
 
         const typeNames = {
             hot_am: '☕ 熱美式', ice_am: '🧊 冰美式', large_hot_am: "☕️ 大熱美",
@@ -1025,9 +1053,7 @@
         function renderMemos(todaysOrders) {
             const memoList = document.getElementById('dynamicMemoList');
             const staticList = document.getElementById('staticMemoList');
-            // const dynamicMemos = todaysOrders.filter(c => c.tag && !c.tag.includes('寄杯') && !isGroupAbsent(c.groupId));
-            const dynamicMemos = todaysOrders.filter(c => c.tag && !c.tag.includes('寄杯'));
-            const filterMemos = dynamicMemos.filter(c => {
+            const filterMemos = todaysOrders.filter(c => c.tag && !c.tag.includes('寄杯')).filter(c => {
                 for (let i = 0; i < (c.count || 1); i++) if (!isItemDone(c.name, c.item, c.loc, i)) return true;
                 return false;
             });
@@ -1041,96 +1067,53 @@
                 staticList.classList.remove('has-dynamic');
             }
         }
-        function renderOrders() {
-            const day = parseInt(document.getElementById('daySelect').value);
-            const sNDiv = document.getElementById('stats-neighbor');
-            const sODiv = document.getElementById('stats-other');
 
-            if (day === 1) {
-                sNDiv.innerHTML = sODiv.innerHTML = '<div style="text-align:center;color:#999;padding:10px;">本日休息</div>';
-                document.getElementById('clearAllBtn').disabled = true;
-                document.getElementById('dynamicMemoList').innerHTML = '';
-                return;
-            }
-            document.getElementById('clearAllBtn').disabled = false;
-
-            let sNeigh = {}, sOther = {};
+        // 輔助函式：產生各區塊的 HTML
+        function makeHtml(stats, prefix) {
+            let html = '', totalN = 0, totalD = 0;
+            let hasData = false;
             for (const k in typeNames) {
-                sNeigh[k] = { total: 0, done: 0, orders: [] };
-                sOther[k] = { total: 0, done: 0, orders: [] };
-            }
+                if (stats[k].total > 0) {
+                    hasData = true;
+                    let s = stats[k];
+                    let activeTotal = s.orders.filter(o => !o.isAbsent).length;
+                    let rem = activeTotal - s.done;
+                    let per = activeTotal > 0 ? Math.round((s.done / activeTotal) * 100) : 100;
+                    let id = `detail_${prefix}_${k}`;
 
-            const todaysOrders = customers.filter(c => c.days.length === 0 || c.days.includes(day));
-            renderMemos(todaysOrders);
-
-            todaysOrders.forEach(c => {
-                let target = (c.loc.includes("鄰居")) ? sNeigh : sOther;
-                let isAbsent = isGroupAbsent(c.groupId);
-
-                if (typeNames[c.type]) {
-                    // 無論是否缺席，都計入總數，確保該品項資訊「不消失」
-                    target[c.type].total += (c.count || 1);
-
-                    for (let i = 0; i < (c.count || 1); i++) {
-                        let done = isItemDone(c.name, c.item, c.loc, i);
-                        // 只有在「非缺席」且「已完成」的情況下才計入完成數
-                        // 如果缺席了，就不計入完成，剩餘數會維持原樣或標示為不用做
-                        if (done && !isAbsent) target[c.type].done++;
-
-                        target[c.type].orders.push({ ...c, isDone: done, isAbsent, index: i });
-                    }
-                }
-            });
-
-            const makeHtml = (stats, prefix) => {
-                let html = '', totalN = 0, totalD = 0;
-                for (const k in typeNames) {
-                    if (stats[k].total > 0) {
-                        let s = stats[k];
-                        // 計算「扣除缺席後」真正要做的總數
-                        let activeTotal = s.orders.filter(o => !o.isAbsent).length;
-                        let rem = activeTotal - s.done;
-                        let per = activeTotal > 0 ? Math.round((s.done / activeTotal) * 100) : 100;
-                        let id = `detail_${prefix}_${k}`;
-
-                        expandedStats.add(id);
-
-                        html += `
-                <div class="stat-row" onclick="toggleStatDetail('${id}')">
-                    <span>${typeNames[k]}</span>
-                    <div class="progress-counts">
-                        <span class="count-total">${activeTotal}</span>
-                        <span class="count-remaining">剩: <b style="${rem === 0 ? 'color:var(--color-success)' : ''}">${rem}</b></span>
-                    </div>
-                </div>
-                <div class="stat-row-progress">
-                    <div class="progress-fill" style="width:${per}%; background-color:${rem === 0 ? 'var(--color-success)' : 'var(--color-accent)'};"></div>
-                </div>
-                <div id="${id}" class="stat-detail-list" style="display:block;">
-                    ${s.orders.map(o => {
-                            let safe = [escapeJsString(o.name), escapeJsString(o.item), escapeJsString(o.loc), o.index, o.groupId];
-                            return `
-                        <div class="stat-detail-item ${o.isAbsent ? 'absent' : (o.isDone ? 'done' : '')}">
-                            <span class="absence-toggle" onclick="event.stopPropagation(); toggleAbsence('${o.groupId}')">${o.isAbsent ? '恢復' : '缺席'}</span>
-                            <div class="customer-info" onclick="toggleDone('${safe[0]}','${safe[1]}','${safe[2]}',${safe[3]},'${safe[4]}')">
-                                <span class="customer-name">${o.name}${o.count > 1 ? ` (${o.index + 1}/${o.count})` : ''} ${o.tag || o.note ? `<span class="customer-tag">${o.tag || o.note}</span>` : ''}</span>
-                                <span class="customer-loc">${o.item}</span>
-                            </div>
-                            <input type="checkbox" ${o.isDone || o.isAbsent ? 'checked' : ''} onclick="${o.isAbsent ? 'event.preventDefault()' : `toggleDone('${safe[0]}','${safe[1]}','${safe[2]}',${safe[3]},'${safe[4]}')`}">
-                        </div>`;
-                        }).join('')}
-                </div>`;
-
-                        totalN += activeTotal;
-                        totalD += s.done;
-                    }
-                }
-
-                // 總計區塊渲染
-                if (totalN >= 0) { // 改成 >= 0 確保就算全缺席也會顯示總計 0
-                    let rem = totalN - totalD;
-                    let per = totalN > 0 ? Math.round((totalD / totalN) * 100) : 100;
                     html += `
+                    <div class="stat-row" onclick="toggleStatDetail('${id}')">
+                        <span>${typeNames[k]}</span>
+                        <div class="progress-counts">
+                            <span class="count-total">${activeTotal}</span>
+                            <span class="count-remaining">剩: <b style="${rem === 0 ? 'color:var(--color-success)' : ''}">${rem}</b></span>
+                        </div>
+                    </div>
+                    <div class="stat-row-progress">
+                        <div class="progress-fill" style="width:${per}%; background-color:${rem === 0 ? 'var(--color-success)' : 'var(--color-accent)'};"></div>
+                    </div>
+                    <div id="${id}" class="stat-detail-list" style="display:block;">
+                        ${s.orders.map(o => {
+                        let safe = [escapeJsString(o.name), escapeJsString(o.item), escapeJsString(o.loc), o.index, o.groupId];
+                        return `
+                            <div class="stat-detail-item ${o.isAbsent ? 'absent' : (o.isDone ? 'done' : '')}">
+                                <span class="absence-toggle" onclick="event.stopPropagation(); toggleAbsence('${o.groupId}')">${o.isAbsent ? '恢復' : '缺席'}</span>
+                                <div class="customer-info" onclick="toggleDone('${safe[0]}','${safe[1]}','${safe[2]}',${safe[3]},'${safe[4]}')">
+                                    <span class="customer-name">${o.name}${o.count > 1 ? ` (${o.index + 1}/${o.count})` : ''} ${o.tag || o.note ? `<span class="customer-tag">${o.tag || o.note}</span>` : ''}</span>
+                                    <span class="customer-loc">${o.item}</span>
+                                </div>
+                                <input type="checkbox" ${o.isDone || o.isAbsent ? 'checked' : ''} onclick="${o.isAbsent ? 'event.preventDefault()' : `toggleDone('${safe[0]}','${safe[1]}','${safe[2]}',${safe[3]},'${safe[4]}')`}">
+                            </div>`;
+                    }).join('')}
+                    </div>`;
+                    totalN += activeTotal;
+                    totalD += s.done;
+                }
+            }
+            if (!hasData) return '<div style="text-align:center;color:#999;padding:10px;">無訂單</div>';
+            let rem = totalN - totalD;
+            let per = totalN > 0 ? Math.round((totalD / totalN) * 100) : 100;
+            html += `
             <div class="stat-row total">
                 <span>🏆 總計 (扣除缺席)</span>
                 <div class="progress-counts">
@@ -1141,15 +1124,54 @@
             <div class="stat-row-progress">
                 <div class="progress-fill" style="width:${per}%; background-color:${rem === 0 ? 'var(--color-success)' : 'var(--color-total-progress)'};"></div>
             </div>`;
-                } else {
-                    html = '<div style="text-align:center;color:#999;padding:10px;">無訂單</div>';
-                }
-                return html;
-            };
-            sNDiv.innerHTML = makeHtml(sNeigh, 'n');
-            sODiv.innerHTML = makeHtml(sOther, 'o');
+            return html;
         }
 
+        function renderOrders() {
+            const day = parseInt(document.getElementById('daySelect').value);
+            const sNDiv = document.getElementById('stats-neighbor');
+            const sADiv = document.getElementById('stats-ask');
+            const sODiv = document.getElementById('stats-other');
+
+            if (day === 1) {
+                sNDiv.innerHTML = sADiv.innerHTML = sODiv.innerHTML = '<div style="text-align:center;color:#999;padding:10px;">本日休息</div>';
+                document.getElementById('clearAllBtn').disabled = true;
+                document.getElementById('dynamicMemoList').innerHTML = '';
+                return;
+            }
+            document.getElementById('clearAllBtn').disabled = false;
+
+            const createStatsObj = () => {
+                let obj = {};
+                for (const k in typeNames) obj[k] = { total: 0, done: 0, orders: [] };
+                return obj;
+            };
+
+            let sNeigh = createStatsObj(), sOther = createStatsObj(), sAsk = createStatsObj();
+            const todaysOrders = customers.filter(c => c.days.length === 0 || c.days.includes(day));
+            renderMemos(todaysOrders);
+
+            todaysOrders.forEach(c => {
+                let target;
+                if (c.loc === "當日問") target = sAsk;
+                else if (c.loc.includes("鄰居")) target = sNeigh;
+                else target = sOther;
+
+                let isAbsent = isGroupAbsent(c.groupId);
+                if (typeNames[c.type]) {
+                    target[c.type].total += (c.count || 1);
+                    for (let i = 0; i < (c.count || 1); i++) {
+                        let done = isItemDone(c.name, c.item, c.loc, i);
+                        if (done && !isAbsent) target[c.type].done++;
+                        target[c.type].orders.push({ ...c, isDone: done, isAbsent, index: i });
+                    }
+                }
+            });
+
+            sNDiv.innerHTML = makeHtml(sNeigh, 'n');
+            sADiv.innerHTML = makeHtml(sAsk, 'a');
+            sODiv.innerHTML = makeHtml(sOther, 'o');
+        }
 
         window.toggleStatDetail = function (id) {
             const el = document.getElementById(id);
@@ -1159,10 +1181,9 @@
             }
         }
 
+        // 初始化頁面
         document.getElementById('daySelect').value = new Date().getDay();
         renderOrders();
-
-
     </script>
 </body>
 
