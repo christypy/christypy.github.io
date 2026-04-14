@@ -1,0 +1,13 @@
+const menuData = [
+  { name: "覺", takeout: 200, dinein: 250, halfPound: 950, drip: 60, pack10: "" },
+  { name: "花", takeout: 180, dinein: 230, halfPound: 850, drip: 55, pack10: "" },
+  { name: "寶", takeout: 180, dinein: 230, halfPound: 850, drip: 55, pack10: "" },
+  { name: "菩", takeout: 130, dinein: 180, halfPound: 700, drip: 45, pack10: "" },
+  { name: "雅", takeout: 130, dinein: 180, halfPound: 650, drip: 45, pack10: "" },
+  { name: "靜", takeout: 130, dinein: 180, halfPound: 650, drip: 45, pack10: "" },
+  { name: "果", takeout: 130, dinein: 180, halfPound: 600, drip: 45, pack10: 360 },
+  { name: "福", takeout: 130, dinein: 180, halfPound: 550, drip: 40, pack10: "" },
+  { name: "柔", takeout: 130, dinein: 180, halfPound: 450, drip: 35, pack10: "" },
+  { name: "定", takeout: 130, dinein: 180, halfPound: 650, drip: "-", pack10: "" },
+  { name: "幻", takeout: 130, dinein: 180, halfPound: 680, drip: 45, pack10: "" }
+];
