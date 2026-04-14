@@ -1,42 +1,24 @@
 /**
- * 一味淨生活咖啡系統 - 邏輯核心 (完整修正版)
+ * 一味淨生活咖啡系統 - 邏輯核心
  */
 
-// --- 1. 全域狀態與設定 ---
-let coffeeList = [];
+// --- 1. 全域狀態 ---
 let customers = [];
-
-const typeNames = {
-    hot_am: '☕ 熱美式', 
-    ice_am: '🧊 冰美式', 
-    large_hot_am: "☕️ 大熱美",
-    hot_latte: '🔥 熱拿鐵', 
-    hot_latte_sugar: '🍬 熱拿鐵 (加糖)',
-    ice_latte_sugar: '🍭 冰拿鐵 (加糖)', 
-    ice_latte: '❄️ 冰拿鐵',
-    large_hot_latte: '🥤 大熱拿', 
-    hand_drip: '💧 手沖', 
-    potential_item: '❓ 待確認'
-};
 
 // --- 2. 初始化與資料讀取 ---
 
 async function initData() {
     try {
-        const [coffeeRes, customerRes] = await Promise.all([
-            fetch('coffee_list.json'),
-            fetch('customers.json')
-        ]);
+        // 僅需讀取客戶資料，豆單與名稱對照直接引用 CONFIG
+        const customerRes = await fetch('customers.json');
 
-        if (!coffeeRes.ok || !customerRes.ok) throw new Error('資料讀取失敗');
+        if (!customerRes.ok) throw new Error('資料讀取失敗');
 
-        coffeeList = await coffeeRes.json();
         customers = await customerRes.json();
 
         initApp();
     } catch (error) {
         console.error('初始化失敗:', error);
-        alert('無法載入資料，請檢查網路或檔案路徑');
     }
 }
 
@@ -50,9 +32,13 @@ function initApp() {
     
     // 綁定統計區容器的事件委派
     const statsContainer = document.querySelector('.stats-container');
-    statsContainer.addEventListener('click', handleStatsClick);
+    if (statsContainer) {
+        statsContainer.addEventListener('click', handleStatsClick);
+    }
 
-    renderOrders();
+    // 執行初始渲染
+    renderOrders(); // 渲染攤販訂單清單
+    renderPrices(); // 渲染義式飲品、其他品項與單品豆單表格
 }
 
 // --- 3. 事件委派處理中心 ---
@@ -120,8 +106,9 @@ function makeHtml(stats, prefix) {
     let html = '', totalN = 0, totalD = 0;
     let hasData = false;
 
-    for (const k in typeNames) {
-        if (stats[k].total > 0) {
+    // 統一使用 CONFIG.TYPE_NAMES 作為來源
+    for (const k in CONFIG.TYPE_NAMES) {
+        if (stats[k] && stats[k].total > 0) {
             hasData = true;
             const s = stats[k];
             const activeTotal = s.orders.filter(o => !o.isAbsent).length;
@@ -129,10 +116,9 @@ function makeHtml(stats, prefix) {
             const per = activeTotal > 0 ? Math.round((s.done / activeTotal) * 100) : 100;
             const id = `detail_${prefix}_${k}`;
 
-            // 調整為預設展開且移除點擊提示
             html += `
                 <div class="stat-row">
-                    <span>${typeNames[k]}</span>
+                    <span>${CONFIG.TYPE_NAMES[k]}</span>
                     <div class="progress-counts">
                         <span class="count-total">${activeTotal}</span>
                         <span class="count-remaining">剩: <b style="${rem === 0 ? 'color:var(--color-success)' : ''}">${rem}</b></span>
@@ -181,8 +167,7 @@ function makeHtml(stats, prefix) {
 }
 
 function renderOrders() {
-    const daySelect = document.getElementById('daySelect');
-    const day = parseInt(daySelect.value);
+    const day = parseInt(document.getElementById('daySelect').value);
     const sNDiv = document.getElementById('stats-neighbor');
     const sADiv = document.getElementById('stats-ask');
     const sODiv = document.getElementById('stats-other');
@@ -197,7 +182,7 @@ function renderOrders() {
 
     const createStatsObj = () => {
         let obj = {};
-        for (const k in typeNames) obj[k] = { total: 0, done: 0, orders: [] };
+        for (const k in CONFIG.TYPE_NAMES) obj[k] = { total: 0, done: 0, orders: [] };
         return obj;
     };
 
@@ -210,7 +195,7 @@ function renderOrders() {
         let target = (c.loc === "當日問") ? sAsk : (c.loc.includes("鄰居") ? sNeigh : sOther);
         let isAbsent = isGroupAbsent(c.groupId);
 
-        if (typeNames[c.type]) {
+        if (CONFIG.TYPE_NAMES[c.type]) {
             const count = c.count || 1;
             target[c.type].total += count;
             for (let i = 0; i < count; i++) {
@@ -247,6 +232,37 @@ function renderMemos(todaysOrders) {
     }
 }
 
+function renderPrices() {
+    // 1. 渲染義式飲品 (BASE_DRINKS)
+    const baseContainer = document.getElementById('baseDrinksContainer');
+    if (baseContainer) {
+        baseContainer.innerHTML = CONFIG.BASE_DRINKS.map(item => `
+            <div class="price-item">${item.name}<span class="p-value">${item.price}</span></div>
+        `).join('');
+    }
+
+    // 2. 渲染其他品項 (OTHER_ITEMS)
+    const otherContainer = document.getElementById('otherItemsContainer');
+    if (otherContainer) {
+        otherContainer.innerHTML = CONFIG.OTHER_ITEMS.map(item => `
+            <div class="price-item">${item.name}<span class="p-value">${item.price}</span></div>
+        `).join('');
+    }
+
+    // 3. 渲染豆單表格 (MENU_DATA)
+    const menuTable = document.getElementById('menuTableBody');
+    if (menuTable) {
+        menuTable.innerHTML = CONFIG.MENU_DATA.map(item => `
+            <tr>
+                <td>${item.name}</td>
+                <td><span class="menu-price">${item.takeout || '-'}</span></td>
+                <td><span class="menu-price">${item.dinein || '-'}</span></td>
+                <td><span class="menu-price">${item.halfPound || '-'}</span></td>
+                <td><span class="menu-price">${item.drip || '-'}</span></td>
+            </tr>
+        `).join('');
+    }
+}
 // --- 6. 工具函式 ---
 
 function getTodayDateString() {

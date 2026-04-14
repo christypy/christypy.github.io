@@ -11,7 +11,8 @@
 <body>
 
     <h2>☕ 一味淨生活咖啡</h2>
-<script src="main.js"></script>
+    <script src="config.js"></script>
+    <script src="main.js"></script>
     <div class="fab-container">
         <button class="fab-btn fab-top" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
             回到最上
@@ -41,8 +42,7 @@
 
     <div class="controls">
         <select id="daySelect" onchange="renderOrders()">
-            <option value="1">星期一 (休)</op
-                git clean -fdtion>
+            <option value="1">星期一 (休)</op git clean -fdtion>
             <option value="2">星期二</option>
             <option value="3">星期三</option>
             <option value="4">星期四</option>
@@ -83,6 +83,16 @@
 
     <div class="price-card-container">
         <div class="price-card">
+            <div class="price-card-header">☕ 義式基礎飲品</div>
+            <div class="price-grid" id="baseDrinksContainer">
+            </div>
+        </div>
+        <div class="price-card">
+    <div class="price-card-header">📦 其他品項</div>
+    <div class="price-grid" id="otherItemsContainer">
+        </div>
+</div>
+        <!-- <div class="price-card">
             <div class="price-card-header">☕ 義式基礎飲品</div>
             <div class="price-grid">
                 <div class="col">
@@ -125,10 +135,20 @@
                 <div class="price-item"><span class="p-name">大濾紙</span><span class="p-value">130</span></div>
                 <div class="price-item"><span class="p-name">濾掛紙(50個)</span><span class="p-value">150</span></div>
             </div>
-        </div>
+        </div> -->
     </div>
 
-    <div class="info-section" id="menuReference" style="margin-top:20px;">
+    <table class="menu-group-full">
+    <thead>
+        <tr>
+            <th>品項</th><th>外帶</th><th>內用</th><th>半磅</th><th>濾掛</th>
+        </tr>
+    </thead>
+    <tbody id="menuTableBody">
+        </tbody>
+</table>
+
+    <!-- <div class="info-section" id="menuReference" style="margin-top:20px;">
         <h3>📋 單品豆單參考</h3>
         <table class="menu-group-full">
             <thead>
@@ -238,7 +258,7 @@
                 </tr>
             </tbody>
         </table>
-    </div>
+    </div> -->
 
     <div class="price-card-container" id="method" style="margin-top: 25px;">
         <div class="price-card">
