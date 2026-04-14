@@ -311,10 +311,10 @@
         }
 
         .stat-detail-list {
-            margin-top: 8px;
-            padding: 5px 0;
-            border-top: 1px dashed var(--color-light-gray);
-            display: none;
+            display: block; /* 或是直接刪除 display 這行，div 預設就是顯示的 */
+            padding: 5px 10px;
+            background-color: #fff;
+            border-top: 1px solid var(--color-light-gray);
         }
 
         .stat-detail-item {
@@ -646,5 +646,11 @@
                 flex-grow: 1;
             }
 
+            /* 讓統計行看起來不像按鈕 */
+.stat-row.no-click {
+    cursor: default; /* 改回一般箭頭 */
+}
+
+/* 如果你想保留點擊展開的「感覺」但預設全開，就維持 pointer，但通常建議改掉 */
             
         }
