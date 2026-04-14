@@ -1,0 +1,650 @@
+/* 全局變數與配色優化 */
+        :root {
+            --color-primary: #5c3a21;
+            /* 經典深咖啡 */
+            --color-secondary: #9a6e4e;
+            /* 溫暖中咖啡 */
+            --color-accent: #e2b34a;
+            /* 金黃色/強調色 */
+            --color-background: #fdf6e9;
+            /* 奶油淺黃背景 */
+            --color-light-gray: #e6e0d8;
+            /* 柔和邊界色 */
+            --color-done-bg: #f5f0e7;
+            /* 完成品的背景色 */
+            --color-success: #4a7d4a;
+            /* 完成/進度綠 (飽和度略降) */
+            --color-danger: #cf4a4a;
+            /* 剩餘數紅色 (更柔和的紅) */
+            --color-total-progress: #d68910;
+            /* 總計進度橘 */
+            --color-section-bg: #ffffff;
+            /* 區塊背景 (白) */
+            --color-text: #333333;
+            /* 主要文字色 */
+
+            --shadow-subtle: 0 1px 4px rgba(0, 0, 0, 0.08);
+            --shadow-medium: 0 3px 8px rgba(0, 0, 0, 0.1);
+            --border-radius-lg: 12px;
+            --border-radius-md: 8px;
+        }
+
+        #quickMenuBtn {
+            position: fixed;
+            right: 16px;
+            bottom: 20px;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 999px;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 999;
+        }
+
+        @media (min-width: 769px) {
+            .stats-container {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                /* 三欄佈局 */
+                gap: 15px;
+            }
+        }
+
+        /* 基礎排版與字體 */
+        body {
+            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif;
+            background: var(--color-background);
+            padding: 0 15px 30px 15px;
+            color: var(--color-text);
+            max-width: 960px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--color-primary);
+            margin: 20px 0 15px 0;
+            font-size: 30px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        /* 按鈕容器佈局 */
+        .top-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .top-nav .btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        /* 資訊區塊 (備忘/菜單) */
+        .info-section {
+            background: var(--color-section-bg);
+            padding: 15px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-medium);
+            margin-bottom: 20px;
+            border-left: 5px solid var(--color-secondary);
+        }
+
+        .info-section h3 {
+            color: var(--color-primary);
+            font-size: 18px;
+            margin: 0 0 10px 0;
+            border-bottom: 2px dashed var(--color-light-gray);
+            padding-bottom: 8px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .info-section li {
+            font-size: 14px;
+            padding: 4px 0;
+            color: #555;
+        }
+
+        .info-section li b {
+            color: var(--color-danger);
+            font-weight: 700;
+        }
+
+        #dynamicMemoList {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding-top: 5px;
+        }
+
+        .dynamic-memo-title {
+            width: 100%;
+            margin-top: 10px;
+            padding-bottom: 5px;
+            color: var(--color-danger);
+            font-weight: bold;
+            border-top: 2px dashed var(--color-danger);
+        }
+
+        .dynamic-memo-item {
+            color: var(--color-primary);
+            font-weight: 600;
+            padding: 2px 0;
+            border: none;
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        .dynamic-memo-item .memo-tag {
+            font-style: normal;
+            color: white;
+            background-color: var(--color-total-progress);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-left: 5px;
+            font-size: 12px;
+        }
+
+        #staticMemoList.has-dynamic {
+            margin-bottom: 10px;
+        }
+
+        /* 控制區 */
+        .controls {
+            background: var(--color-section-bg);
+            padding: 15px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-subtle);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        select {
+            padding: 12px;
+            font-size: 16px;
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--color-light-gray);
+            width: 40%;
+            appearance: none;
+            background-color: #fcfcfc;
+            flex-grow: 2;
+            cursor: pointer;
+        }
+
+        .btn {
+            background: var(--color-accent);
+            color: var(--color-primary);
+            border: none;
+            padding: 12px 15px;
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+            transition: background 0.2s, transform 0.1s;
+            flex-grow: 1;
+        }
+
+        .btn:hover {
+            background: #f0c35f;
+            transform: translateY(-1px);
+        }
+
+        #clearAllBtn {
+            background: #aaaaaa;
+            color: white;
+        }
+
+        #clearAllBtn:hover {
+            background: #888888;
+        }
+
+        /* 統計區 RWD 優化 */
+        .stats-container {
+            display: flex;
+            flex-direction: column;
+            /* 手機版垂直排列 */
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        @media (min-width: 1024px) {
+            .stats-container {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                /* 電腦版三欄並排 */
+            }
+        }
+
+        .stat-box {
+            flex: 1;
+            background: var(--color-section-bg);
+            border-radius: var(--border-radius-lg);
+            padding: 15px;
+            box-shadow: var(--shadow-medium);
+            border-top: 6px solid var(--color-primary);
+        }
+
+        .stat-box h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            color: var(--color-primary);
+            font-weight: 700;
+            text-align: center;
+            border-bottom: 1px solid var(--color-light-gray);
+            padding-bottom: 8px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 15px;
+            margin: 6px 0;
+            padding: 8px 10px;
+            cursor: pointer;
+            transition: background-color 0.15s;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .stat-row:hover {
+            background-color: var(--color-done-bg);
+        }
+
+        .stat-row.total {
+            font-size: 16px;
+            font-weight: 700;
+            border-top: 2px solid var(--color-light-gray);
+            margin-top: 15px;
+            padding-top: 12px;
+            color: var(--color-primary);
+        }
+
+        .stat-row-progress {
+            height: 5px;
+            background-color: var(--color-light-gray);
+            border-radius: 2px;
+            margin: 0 10px 8px 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--color-accent);
+            transition: width 0.3s ease;
+        }
+
+        .progress-counts .count-total {
+            color: var(--color-danger);
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .progress-counts .count-remaining b {
+            color: var(--color-danger);
+            font-weight: bold;
+        }
+
+        .progress-counts .count-remaining b[style*="color: var(--color-success);"] {
+            color: var(--color-success) !important;
+        }
+
+        .stat-detail-list {
+            margin-top: 8px;
+            padding: 5px 0;
+            border-top: 1px dashed var(--color-light-gray);
+            display: none;
+        }
+
+        .stat-detail-item {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            font-size: 14px;
+            padding: 8px 10px;
+            border-bottom: 1px dotted #e0e0e0;
+            cursor: pointer;
+            transition: background-color 0.1s;
+            border-radius: 4px;
+        }
+
+        .stat-detail-item:hover:not(.done):not(.absent) {
+            background-color: var(--color-done-bg);
+        }
+
+        .stat-detail-item.done {
+            background-color: var(--color-done-bg);
+            color: #888;
+            text-decoration: line-through;
+        }
+
+        .customer-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            flex-grow: 1;
+            margin-right: auto;
+        }
+
+        .customer-name {
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+
+        .stat-detail-item.done .customer-name {
+            color: #aaa;
+        }
+
+        .customer-loc {
+            font-size: 12px;
+            color: #777;
+            margin-top: 2px;
+        }
+
+        .customer-tag {
+            font-size: 11px;
+            background-color: var(--color-accent);
+            color: var(--color-primary);
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+            margin-left: 8px;
+            flex-shrink: 0;
+            line-height: 1.4;
+        }
+
+        .stat-detail-item.done .customer-tag {
+            background-color: #d8d8d8;
+            color: #999;
+        }
+
+        /* Checkbox */
+        .stat-detail-item input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--color-secondary);
+            border-radius: 4px;
+            cursor: pointer;
+            outline: none;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .stat-detail-item input[type="checkbox"]:checked {
+            border-color: var(--color-success);
+            background-color: var(--color-success);
+        }
+
+        .stat-detail-item input[type="checkbox"]:checked::after {
+            content: '✓';
+            color: white;
+            position: absolute;
+            top: -1px;
+            left: 4px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .stat-detail-item .absence-toggle {
+            background: #f4f4f4;
+            color: var(--color-danger);
+            border: 1px solid var(--color-light-gray);
+            border-radius: 4px;
+            font-weight: bold;
+            padding: 4px 8px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background 0.1s;
+            line-height: 1;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .stat-detail-item .absence-toggle:hover {
+            background: #ffe6e6;
+            border-color: var(--color-danger);
+        }
+
+        .stat-detail-item.absent {
+            background-color: #f7f7f7;
+            color: #999;
+            opacity: 0.6;
+        }
+
+        .stat-detail-item.absent .customer-name {
+            color: #999;
+        }
+
+        .stat-detail-item.absent .customer-tag {
+            display: none;
+        }
+
+        .stat-detail-item.absent input[type="checkbox"] {
+            border-color: #ccc;
+            background-color: #e8e8e8;
+            cursor: default;
+        }
+
+        .stat-detail-item.absent input[type="checkbox"]:checked::after {
+            content: '－';
+            color: #999;
+            top: -3px;
+            left: 4px;
+        }
+
+        .stat-detail-item.absent .customer-info {
+            cursor: default;
+            pointer-events: none;
+        }
+
+        /* --- 優化後的價格顯示區塊樣式 --- */
+        .price-card-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .price-card {
+            background: #fff;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-medium);
+            overflow: hidden;
+            border: 1px solid var(--color-light-gray);
+        }
+
+        .price-card-header {
+            background: var(--color-primary);
+            color: #fff;
+            padding: 10px 15px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .price-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0 24px;
+        }
+
+        .price-item {
+            padding: 8px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .price-item.milk {
+            grid-column: 2;
+        }
+
+        .price-item:nth-child(odd) {
+            border-right: 1px solid #f0f0f0;
+        }
+
+        .price-item .p-name {
+            color: #555;
+        }
+
+        .price-item .p-value {
+            color: var(--color-danger);
+            font-weight: bold;
+        }
+
+        .price-item .p-value::before {
+            content: '$';
+            font-size: 12px;
+            margin-right: 2px;
+        }
+
+        /* 單品豆單表格優化 */
+        .menu-group-full {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .menu-group-full thead th {
+            background-color: var(--color-secondary);
+            color: white;
+            padding: 12px 8px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .menu-group-full tbody tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        .menu-group-full tbody td {
+            padding: 10px 8px;
+            text-align: center;
+            font-size: 13px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .menu-group-full td:first-child {
+            font-weight: bold;
+            color: var(--color-primary);
+        }
+
+        .menu-price {
+            color: var(--color-danger);
+            font-weight: bold;
+        }
+
+        .menu-price::before {
+            content: '$';
+            font-size: 11px;
+        }
+
+        .menu-price:empty::before {
+            content: '';
+        }
+
+
+
+        .fab-container {
+            position: fixed;
+            right: 16px;
+            bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 999;
+        }
+
+        .fab-btn {
+            min-width: 88px;
+            height: 40px;
+            padding: 0 14px;
+            border-radius: 999px;
+            border: none;
+            background: var(--color-primary);
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+            cursor: pointer;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .fab-btn:hover {
+            background: var(--color-secondary);
+        }
+
+        .fab-top {
+            background: var(--color-accent);
+            color: var(--color-primary);
+        }
+
+
+        /* RWD 優化 */
+        @media (max-width: 768px) {
+            .price-card-container {
+                grid-template-columns: 1fr;
+            }
+
+            .price-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .price-item:nth-child(odd) {
+                border-right: none;
+            }
+
+            .stats-container {
+                flex-direction: column;
+            }
+
+            .btn {
+                font-size: 13px;
+                padding: 12px 5px;
+            }
+
+            .controls {
+                flex-wrap: wrap;
+            }
+
+            .controls select {
+                width: 100%;
+                margin-bottom: 0px;
+            }
+
+            .controls .btn {
+                width: 48%;
+                flex-grow: 1;
+            }
+
+            
+        }
