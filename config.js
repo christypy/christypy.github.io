@@ -51,8 +51,11 @@ const CONFIG = {
   { name: "雅(4/14:200度)", takeout: 130, dinein: 180, halfPound: 700, drip: 45, pack10: "" },
   { name: "靜", takeout: 130, dinein: 180, halfPound: 650, drip: 45, pack10: "" },
   { name: "果", takeout: 130, dinein: 180, halfPound: 600, drip: 45, pack10: 360 },
-  { name: "福", takeout: 130, dinein: 180, halfPound: 550, drip: 40, pack10: "" },
-  { name: "柔", takeout: 130, dinein: 180, halfPound: 450, drip: 35, pack10: "" },
-  { name: "定", takeout: 130, dinein: 180, halfPound: 650, drip: "-", pack10: "" },
-  { name: "幻", takeout: 130, dinein: 180, halfPound: 680, drip: 45, pack10: "" }
+  { name: "定", takeout: 130, dinein: 180, halfPound: 650, drip: 45, pack10: "" },
+  { name: "幻", takeout: 130, dinein: 180, halfPound: 680, drip: 45, pack10: "" },
+    { name: "福", takeout: 130, dinein: 180, halfPound: 550, drip: 40, pack10: "" },
+
+   { name: "實", takeout: 130, dinein: 180, halfPound: 550, drip: 40, pack10: "" },
+     { name: "柔", takeout: 130, dinein: 180, halfPound: 450, drip: 35, pack10: "" }
+
 ]};
