@@ -25,7 +25,9 @@ const CONFIG = {
         { name: "即溶(袋100條)", price: 1450 },
         { name: "小濾紙", price: 120 },
         { name: "大濾紙", price: 130 },
-        { name: "濾掛紙(50個)", price: 150 }
+        { name: "濾掛紙(50個)", price: 150 },
+        {name:"玻璃壺",price:400},
+        {name:"玻璃壺(大)",price:500}
     ],
     // 飲品代碼對應名稱
     TYPE_NAMES: {
@@ -46,7 +48,7 @@ const CONFIG = {
   { name: "花", takeout: 180, dinein: 230, halfPound: 850, drip: 55, pack10: "" },
   { name: "寶", takeout: 180, dinein: 230, halfPound: 850, drip: 55, pack10: "" },
   { name: "菩", takeout: 130, dinein: 180, halfPound: 700, drip: 45, pack10: "" },
-  { name: "雅", takeout: 130, dinein: 180, halfPound: 650, drip: 45, pack10: "" },
+  { name: "雅(4/14:200度)", takeout: 130, dinein: 180, halfPound: 700, drip: 45, pack10: "" },
   { name: "靜", takeout: 130, dinein: 180, halfPound: 650, drip: 45, pack10: "" },
   { name: "果", takeout: 130, dinein: 180, halfPound: 600, drip: 45, pack10: 360 },
   { name: "福", takeout: 130, dinein: 180, halfPound: 550, drip: 40, pack10: "" },
