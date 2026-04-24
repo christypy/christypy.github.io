@@ -379,7 +379,7 @@
         "name": "水果攤大叔",
         "item": "冰美式",
         "type": "ice_am",
-        "days": [],
+        "days": [1],
         "tag": "當日問",
         "groupId": "other_20"
     },
