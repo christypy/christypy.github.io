@@ -56,6 +56,6 @@ const CONFIG = {
     { name: "福", takeout: 130, dinein: 180, halfPound: 550, drip: 40, pack10: "" },
 
    { name: "實", takeout: 130, dinein: 180, halfPound: 550, drip: 40, pack10: "" },
-     { name: "柔", takeout: 130, dinein: 180, halfPound: 450, drip: 35, pack10: "" }
+     { name: "柔", takeout: 130, dinein: 180, halfPound: 480, drip: 35, pack10: "" }
 
 ]};

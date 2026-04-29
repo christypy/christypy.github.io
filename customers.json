@@ -138,13 +138,13 @@
         "item": "大拿鐵",
         "count": 1,
         "type": "large_hot_latte",
-        "days": [],
+        "days": [1],
         "groupId": "other_2_dad"
     },
     {
         "loc": "近十字路口",
         "name": "牛肉兒子",
-        "item": "大拿鐵",
+        "item": "冰拿鐵",
         "count": 1,
         "type": "large_hot_latte",
         "days": [],
