@@ -299,12 +299,9 @@
     {
         "loc": "當日問",
         "name": "國聯哥媽媽",
-        "item": "熱美式",
-        "type": "hot_am",
-        "days": [
-            2,
-            5
-        ],
+        "item": "冰拿鐵",
+        "type": "ice_latte",
+        "days": [],
         "tag": "當日問",
         "count": 1,
         "groupId": "other_14"
