@@ -5,7 +5,7 @@
 // ⚠️ 請在此處填入你的 Google 試算表 ID
 const SPREADSHEET_ID = '1aH2ap9QeqhpKI34-K9SsyiHnTpXPM1ud2rpOmAQtSIA'; 
 // ⚠️ 如果你有設定 Google Apps Script 網頁部署，請填在這邊（若尚未設定，可先保持空字串，系統會改用本地儲存備份）
-const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxkSZ6hm9NlknXcrzgSNPW1ISwX_HR3K2soj094K2y_tgsnrurtPLJIVclTBfZ7Syo/exec'; 
+const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbz0Ex6MfHhOg5OR-0v_YFZ_d036IE_JNT8ZONwY94Pz_LWCVsC9JXW7QG6gyZVuBA-Jeg/exec'; 
 
 
 // --- 1. 全域狀態 ---
@@ -15,100 +15,195 @@ let customers = [];
 
 async function initData() {
     try {
-        // 僅需讀取客戶資料，豆單與名稱對照直接引用 CONFIG
-        const customerRes = await fetch('customers.json');
+        // 使用時間戳記破解快取，強迫每次抓取都是雲端最新狀態（含試算表記錄的已完成、缺席狀態）
+        const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&v=${new Date().getTime()}`;
+        
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('無法連線至 Google 試算表');
+        
+        const text = await res.text();
+        const jsonString = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
+        const data = JSON.parse(jsonString);
+        
+        const rows = data.table.rows;
+        customers = rows.map(row => {
+            const cells = row.c;
+            
+            // 讀取雲端第 10 欄與第 11 欄存下來的狀態字串 (如 "true,false")
+            const cloudDoneStr = cells[9] ? String(cells[9].v) : "";
+            const cloudAbsentStr = cells[10] ? String(cells[10].v) : "";
+            
+            return {
+                loc: cells[0] ? String(cells[0].v) : "",
+                name: cells[1] ? String(cells[1].v) : "",
+                item: cells[2] ? String(cells[2].v) : "",
+                type: cells[3] ? String(cells[3].v) : "",
+                days: (cells[4] && cells[4].v) ? String(cells[4].v).split(',').map(Number) : [],
+                count: cells[5] ? Number(cells[5].v) : 1,
+                note: (cells[6] && cells[6].v) ? String(cells[6].v) : "",
+                tag: (cells[7] && cells[7].v) ? String(cells[7].v) : "",
+                groupId: cells[8] ? String(cells[8].v) : "",
+                // 解析每杯的狀態陣列
+                cloudDoneArr: cloudDoneStr ? cloudDoneStr.split(',') : [],
+                cloudAbsentArr: cloudAbsentStr ? cloudAbsentStr.split(',') : []
+            };
+        });
 
-        if (!customerRes.ok) throw new Error('資料讀取失敗');
-
-        customers = await customerRes.json();
+        // 同步覆蓋更新本地記憶體快取狀態
+        syncCloudToLocal();
 
         initApp();
     } catch (error) {
-        console.error('初始化失敗:', error);
+        console.error('雲端讀取失敗，採用本地既有暫存狀態:', error);
+        try {
+            const customerRes = await fetch('customers.json');
+            if (customerRes.ok) {
+                customers = await customerRes.json();
+                initApp();
+            }
+        } catch (e) {
+            console.error('備用資料載入失敗', e);
+        }
     }
 }
 
-function initApp() {
-    // 設定今日星期
-    document.getElementById('daySelect').value = new Date().getDay();
+// 將 Google 試算表上記錄的狀態，轉存寫入網頁 LocalStorage，保持完全一致
+function syncCloudToLocal() {
+    customers.forEach(c => {
+        const count = c.count || 1;
+        for (let i = 0; i < count; i++) {
+            const doneKey = getStorageKey(c.name, c.item, c.loc, i);
+            const absentKey = getAbsenceKey(c.name, c.item, c.loc, i);
+            
+            // 同步完成狀態
+            if (c.cloudDoneArr[i] === 'true') {
+                localStorage.setItem(doneKey, 'true');
+            } else {
+                localStorage.removeItem(doneKey);
+            }
+            
+            // 同步缺席狀態
+            if (c.cloudAbsentArr[i] === 'true') {
+                localStorage.setItem(absentKey, 'true');
+            } else {
+                localStorage.removeItem(absentKey);
+            }
+        }
+    });
+}
 
-    // 綁定「非動態」按鈕的事件
+function initApp() {
+    document.getElementById('daySelect').value = new Date().getDay();
     document.getElementById('clearAllBtn').addEventListener('click', clearAllDone);
     document.getElementById('daySelect').addEventListener('change', renderOrders);
     
-    // 綁定統計區容器的事件委派
     const statsContainer = document.querySelector('.stats-container');
     if (statsContainer) {
         statsContainer.addEventListener('click', handleStatsClick);
     }
 
-    // 執行初始渲染
-    renderOrders(); // 渲染攤販訂單清單
-    renderPrices(); // 渲染義式飲品、其他品項與單品豆單表格
+    renderOrders(); 
+    renderPrices(); 
 }
 
-// --- 3. 事件委派處理中心（✨ 已修正：徹底分流「缺席按鈕」與「整列點擊」） ---
+// --- 3. 事件委派處理中心 ---
 
 function handleStatsClick(e) {
-    // 1. 優先處理「缺席/恢復」按鈕點擊
     if (e.target.classList.contains('absence-toggle')) {
-        e.stopPropagation(); // 阻止事件冒泡
+        e.stopPropagation();
         const parent = e.target.closest('.stat-detail-item');
         if (parent) {
             const d = parent.dataset;
-            // 傳入精確的單杯資料進行 切換
-            toggleAbsence(d.name, d.item, d.loc, parseInt(d.index));
+            toggleAbsence(d.name, d.item, d.loc, parseInt(d.index), d.groupid);
         }
-        return; // 執行完立刻離開，不讓下方的訂單完成邏輯干擾
+        return;
     }
 
-    // 2. 處理「整列點擊」（點擊勾選框或文字判定為完成訂單）
     const item = e.target.closest('.stat-detail-item');
-    // 只有在非缺席狀態下，點擊整列才能切換完成狀態
     if (item && !item.classList.contains('absent')) {
         const d = item.dataset;
         toggleDone(d.name, d.item, d.loc, parseInt(d.index), d.groupid);
     }
 }
 
-// --- 4. 業務邏輯 ---
+// --- 4. 業務邏輯與雲端即時同步 ---
+
+async function sendStatusToCloud(action, groupId, index, value) {
+    if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL.includes('XXXXX')) return;
+    try {
+        // 使用 fetch 發送背景請求更新 Google 試算表，網頁無需重整等待
+        fetch(GAS_WEB_APP_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: action, groupId: groupId, index: index, value: value })
+        });
+    } catch (err) {
+        console.error('即時同步至雲端失敗:', err);
+    }
+}
 
 function toggleDone(name, item, loc, index, groupId) {
-    // 改為判斷這「那一杯」有沒有缺席，缺席就不能點完成
     if (isItemAbsent(name, item, loc, index)) return; 
     
     const key = getStorageKey(name, item, loc, index);
-    localStorage.getItem(key) === 'true' 
-        ? localStorage.removeItem(key) 
-        : localStorage.setItem(key, 'true');
-    renderOrders();
-}
-
-// 傳入更多參數，讓按鈕知道是哪一家的哪一杯要缺席
-function toggleAbsence(name, item, loc, index) {
-    const key = getAbsenceKey(name, item, loc, index);
+    let newValue = false;
     
     if (localStorage.getItem(key) === 'true') {
-        // 如果原本是缺席，按第二次就是「恢復」，清除缺席註記
         localStorage.removeItem(key);
+        newValue = false;
     } else {
-        // 如果原本不是缺席，設定為缺席，並移除「這特定一杯」的已完成標記
         localStorage.setItem(key, 'true');
-        localStorage.removeItem(getStorageKey(name, item, loc, index));
+        newValue = true;
     }
+    
     renderOrders();
+    // 即時傳送給 Google 試算表記錄
+    if (groupId) sendStatusToCloud('toggleDone', groupId, index, newValue);
+}
+
+function toggleAbsence(name, item, loc, index, groupId) {
+    const key = getAbsenceKey(name, item, loc, index);
+    let newAbsentValue = false;
+    
+    if (localStorage.getItem(key) === 'true') {
+        localStorage.removeItem(key);
+        newAbsentValue = false;
+    } else {
+        localStorage.setItem(key, 'true');
+        newAbsentValue = true;
+        // 缺席時，移除完成標記，並同步通知雲端
+        localStorage.removeItem(getStorageKey(name, item, loc, index));
+        if (groupId) sendStatusToCloud('toggleDone', groupId, index, false);
+    }
+    
+    renderOrders();
+    // 即時將缺席狀態傳送給 Google 試算表
+    if (groupId) sendStatusToCloud('toggleAbsence', groupId, index, newAbsentValue);
 }
 
 function clearAllDone() {
     if (!confirm("確定要重置今日所有狀態嗎？")) return;
     const day = parseInt(document.getElementById('daySelect').value);
+    
     customers.filter(c => c.days.length === 0 || c.days.includes(day)).forEach(c => {
         for (let i = 0; i < (c.count || 1); i++) {
             localStorage.removeItem(getStorageKey(c.name, c.item, c.loc, i));
-            localStorage.removeItem(getAbsenceKey(c.name, c.item, c.loc, i)); // 同步清除單杯缺席
+            localStorage.removeItem(getAbsenceKey(c.name, c.item, c.loc, i)); 
         }
     });
+    
     renderOrders();
+    
+    // 通知雲端重置今日有開市攤販的所有勾選狀態
+    if (GAS_WEB_APP_URL && !GAS_WEB_APP_URL.includes('XXXXX')) {
+        fetch(GAS_WEB_APP_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'clearAll', day: day })
+        });
+    }
 }
 
 // --- 5. 渲染引擎 ---
@@ -117,7 +212,6 @@ function makeHtml(stats, prefix) {
     let html = '', totalN = 0, totalD = 0;
     let hasData = false;
 
-    // 統一使用 CONFIG.TYPE_NAMES 作為來源
     for (const k in CONFIG.TYPE_NAMES) {
         if (stats[k] && stats[k].total > 0) {
             hasData = true;
@@ -139,20 +233,27 @@ function makeHtml(stats, prefix) {
                     <div class="progress-fill" style="width:${per}%; background-color:${rem === 0 ? 'var(--color-success)' : 'var(--color-accent)'};"></div>
                 </div>
                 <div id="${id}" class="stat-detail-list" style="display: block;">
-                    ${s.orders.map(o => `
+                    ${s.orders.map(o => {
+                        let displayTag = o.tag || o.note || '';
+                        if (displayTag.includes('neighbor') || displayTag.includes('other') || displayTag.includes('_')) {
+                            displayTag = ''; 
+                        }
+
+                        return `
                         <div class="stat-detail-item ${o.isAbsent ? 'absent' : (o.isDone ? 'done' : '')}"
                              data-name="${o.name}" data-item="${o.item}" data-loc="${o.loc}" 
                              data-index="${o.index}" data-groupid="${o.groupId}">
                             <span class="absence-toggle">${o.isAbsent ? '恢復' : '缺席'}</span>
                             <div class="customer-info">
                                 <span class="customer-name">${o.name}${o.count > 1 ? ` (${o.index + 1}/${o.count})` : ''} 
-                                    ${o.tag || o.note ? `<span class="customer-tag">${o.tag || o.note}</span>` : ''}
+                                    ${displayTag ? `<span class="customer-tag">${displayTag}</span>` : ''}
                                 </span>
                                 <span class="customer-loc">${o.item}</span>
                             </div>
                             <input type="checkbox" ${o.isDone || o.isAbsent ? 'checked' : ''} ${o.isAbsent ? 'disabled' : ''}>
                         </div>
-                    `).join('')}
+                        `;
+                    }).join('')}
                 </div>`;
             totalN += activeTotal;
             totalD += s.done;
@@ -289,10 +390,6 @@ function getAbsenceKey(n, i, l, idx = 0) {
 
 function isItemAbsent(n, i, l, idx = 0) { 
     return localStorage.getItem(getAbsenceKey(n, i, l, idx)) === 'true'; 
-}
-
-function isGroupAbsent(gid) { 
-    return gid ? localStorage.getItem(`${getTodayDateString()}_absent_group_${gid}`) === 'true' : false; 
 }
 
 // 啟動系統

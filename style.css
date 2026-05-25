@@ -654,3 +654,25 @@
 /* 如果你想保留點擊展開的「感覺」但預設全開，就維持 pointer，但通常建議改掉 */
             
         }
+
+
+        /* 修改品項按鈕樣式 */
+.edit-item-btn {
+    padding: 6px 10px;
+    margin-left: 8px;
+    margin-right: 4px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: transform 0.1s ease;
+    user-select: none;
+}
+
+/* 點擊時的小動畫回饋 */
+.edit-item-btn:active {
+    transform: scale(1.2);
+}
+
+/* 當該列處於缺席狀態時，隱藏修改按鈕不給操作 */
+.stat-detail-item.absent .edit-item-btn {
+    display: none;
+}
