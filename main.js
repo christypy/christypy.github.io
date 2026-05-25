@@ -1,6 +1,12 @@
 /**
- * 一味淨生活咖啡系統 - 邏輯核心
+ * 一味淨生活咖啡系統 - 徹底修復標籤大小寫問題版
  */
+
+// ⚠️ 請在此處填入你的 Google 試算表 ID
+const SPREADSHEET_ID = '1aH2ap9QeqhpKI34-K9SsyiHnTpXPM1ud2rpOmAQtSIA'; 
+// ⚠️ 如果你有設定 Google Apps Script 網頁部署，請填在這邊（若尚未設定，可先保持空字串，系統會改用本地儲存備份）
+const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxkSZ6hm9NlknXcrzgSNPW1ISwX_HR3K2soj094K2y_tgsnrurtPLJIVclTBfZ7Syo/exec'; 
+
 
 // --- 1. 全域狀態 ---
 let customers = [];
@@ -41,19 +47,24 @@ function initApp() {
     renderPrices(); // 渲染義式飲品、其他品項與單品豆單表格
 }
 
-// --- 3. 事件委派處理中心 ---
+// --- 3. 事件委派處理中心（✨ 已修正：徹底分流「缺席按鈕」與「整列點擊」） ---
 
 function handleStatsClick(e) {
-    // 1. 處理「缺席」按鈕點擊
+    // 1. 優先處理「缺席/恢復」按鈕點擊
     if (e.target.classList.contains('absence-toggle')) {
-        e.stopPropagation();
+        e.stopPropagation(); // 阻止事件冒泡
         const parent = e.target.closest('.stat-detail-item');
-        toggleAbsence(parent.dataset.groupid);
-        return;
+        if (parent) {
+            const d = parent.dataset;
+            // 傳入精確的單杯資料進行 切換
+            toggleAbsence(d.name, d.item, d.loc, parseInt(d.index));
+        }
+        return; // 執行完立刻離開，不讓下方的訂單完成邏輯干擾
     }
 
-    // 2. 處理「訂單完成」點擊 (點擊背景或 Checkbox)
+    // 2. 處理「整列點擊」（點擊勾選框或文字判定為完成訂單）
     const item = e.target.closest('.stat-detail-item');
+    // 只有在非缺席狀態下，點擊整列才能切換完成狀態
     if (item && !item.classList.contains('absent')) {
         const d = item.dataset;
         toggleDone(d.name, d.item, d.loc, parseInt(d.index), d.groupid);
@@ -63,7 +74,9 @@ function handleStatsClick(e) {
 // --- 4. 業務邏輯 ---
 
 function toggleDone(name, item, loc, index, groupId) {
-    if (isGroupAbsent(groupId)) return;
+    // 改為判斷這「那一杯」有沒有缺席，缺席就不能點完成
+    if (isItemAbsent(name, item, loc, index)) return; 
+    
     const key = getStorageKey(name, item, loc, index);
     localStorage.getItem(key) === 'true' 
         ? localStorage.removeItem(key) 
@@ -71,19 +84,17 @@ function toggleDone(name, item, loc, index, groupId) {
     renderOrders();
 }
 
-function toggleAbsence(groupId) {
-    const key = getAbsenceKey(groupId);
+// 傳入更多參數，讓按鈕知道是哪一家的哪一杯要缺席
+function toggleAbsence(name, item, loc, index) {
+    const key = getAbsenceKey(name, item, loc, index);
+    
     if (localStorage.getItem(key) === 'true') {
+        // 如果原本是缺席，按第二次就是「恢復」，清除缺席註記
         localStorage.removeItem(key);
     } else {
+        // 如果原本不是缺席，設定為缺席，並移除「這特定一杯」的已完成標記
         localStorage.setItem(key, 'true');
-        // 缺席時，移除該組所有已完成標記
-        const day = parseInt(document.getElementById('daySelect').value);
-        customers.filter(c => c.groupId === groupId && (c.days.length === 0 || c.days.includes(day))).forEach(c => {
-            for (let i = 0; i < (c.count || 1); i++) {
-                localStorage.removeItem(getStorageKey(c.name, c.item, c.loc, i));
-            }
-        });
+        localStorage.removeItem(getStorageKey(name, item, loc, index));
     }
     renderOrders();
 }
@@ -94,8 +105,8 @@ function clearAllDone() {
     customers.filter(c => c.days.length === 0 || c.days.includes(day)).forEach(c => {
         for (let i = 0; i < (c.count || 1); i++) {
             localStorage.removeItem(getStorageKey(c.name, c.item, c.loc, i));
+            localStorage.removeItem(getAbsenceKey(c.name, c.item, c.loc, i)); // 同步清除單杯缺席
         }
-        if (c.groupId) localStorage.removeItem(getAbsenceKey(c.groupId));
     });
     renderOrders();
 }
@@ -193,19 +204,19 @@ function renderOrders() {
 
     todaysOrders.forEach(c => {
         let target = (c.loc === "當日問") ? sAsk : (c.loc.includes("鄰居") ? sNeigh : sOther);
-        let isAbsent = isGroupAbsent(c.groupId);
 
         if (CONFIG.TYPE_NAMES[c.type]) {
             const count = c.count || 1;
             target[c.type].total += count;
             for (let i = 0; i < count; i++) {
+                let isAbsent = isItemAbsent(c.name, c.item, c.loc, i); 
                 let done = isItemDone(c.name, c.item, c.loc, i);
+                
                 if (done && !isAbsent) target[c.type].done++;
                 target[c.type].orders.push({ ...c, isDone: done, isAbsent, index: i });
             }
         }
     });
-
     sNDiv.innerHTML = makeHtml(sNeigh, 'n');
     sADiv.innerHTML = makeHtml(sAsk, 'a');
     sODiv.innerHTML = makeHtml(sOther, 'o');
@@ -233,7 +244,6 @@ function renderMemos(todaysOrders) {
 }
 
 function renderPrices() {
-    // 1. 渲染義式飲品 (BASE_DRINKS)
     const baseContainer = document.getElementById('baseDrinksContainer');
     if (baseContainer) {
         baseContainer.innerHTML = CONFIG.BASE_DRINKS.map(item => `
@@ -241,7 +251,6 @@ function renderPrices() {
         `).join('');
     }
 
-    // 2. 渲染其他品項 (OTHER_ITEMS)
     const otherContainer = document.getElementById('otherItemsContainer');
     if (otherContainer) {
         otherContainer.innerHTML = CONFIG.OTHER_ITEMS.map(item => `
@@ -249,7 +258,6 @@ function renderPrices() {
         `).join('');
     }
 
-    // 3. 渲染豆單表格 (MENU_DATA)
     const menuTable = document.getElementById('menuTableBody');
     if (menuTable) {
         menuTable.innerHTML = CONFIG.MENU_DATA.map(item => `
@@ -263,6 +271,7 @@ function renderPrices() {
         `).join('');
     }
 }
+
 // --- 6. 工具函式 ---
 
 function getTodayDateString() {
@@ -272,9 +281,19 @@ function getTodayDateString() {
 
 function sanitize(s) { return s ? s.replace(/ /g, '_').replace(/[^a-zA-Z0-9\u4e00-\u9fa5_]/g, '') : ''; }
 function getStorageKey(n, i, l, idx = 0) { return `${getTodayDateString()}_${sanitize(n)}_${sanitize(i)}_${sanitize(l)}_${idx}`; }
-function getAbsenceKey(gid) { return `${getTodayDateString()}_absent_${gid}`; }
 function isItemDone(n, i, l, idx = 0) { return localStorage.getItem(getStorageKey(n, i, l, idx)) === 'true'; }
-function isGroupAbsent(gid) { return gid ? localStorage.getItem(getAbsenceKey(gid)) === 'true' : false; }
+
+function getAbsenceKey(n, i, l, idx = 0) { 
+    return `${getTodayDateString()}_absent_${sanitize(n)}_${sanitize(i)}_${sanitize(l)}_${idx}`; 
+}
+
+function isItemAbsent(n, i, l, idx = 0) { 
+    return localStorage.getItem(getAbsenceKey(n, i, l, idx)) === 'true'; 
+}
+
+function isGroupAbsent(gid) { 
+    return gid ? localStorage.getItem(`${getTodayDateString()}_absent_group_${gid}`) === 'true' : false; 
+}
 
 // 啟動系統
 initData();
