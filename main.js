@@ -59,11 +59,16 @@ function syncCloudToLocal() {
             const doneKey = getStorageKey(c.name, c.item, c.loc, i);
             const absentKey = getAbsenceKey(c.name, c.item, c.loc, i);
             
-            if (c.cloudDoneArr[i] === 'true') localStorage.setItem(doneKey, 'true');
-            else localStorage.removeItem(doneKey);
+            // 只有當雲端「確實有紀錄」時，才強制同步到本地
+            if (c.cloudDoneArr && c.cloudDoneArr.length > 0 && c.cloudDoneArr.includes('true')) {
+                if (c.cloudDoneArr[i] === 'true') localStorage.setItem(doneKey, 'true');
+                else localStorage.removeItem(doneKey);
+            }
             
-            if (c.cloudAbsentArr[i] === 'true') localStorage.setItem(absentKey, 'true');
-            else localStorage.removeItem(absentKey);
+            if (c.cloudAbsentArr && c.cloudAbsentArr.length > 0 && c.cloudAbsentArr.includes('true')) {
+                if (c.cloudAbsentArr[i] === 'true') localStorage.setItem(absentKey, 'true');
+                else localStorage.removeItem(absentKey);
+            }
         }
     });
 }
