@@ -8,11 +8,12 @@ const SPREADSHEET_ID = '1aH2ap9QeqhpKI34-K9SsyiHnTpXPM1ud2rpOmAQtSIA';
 const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbz0Ex6MfHhOg5OR-0v_YFZ_d036IE_JNT8ZONwY94Pz_LWCVsC9JXW7QG6gyZVuBA-Jeg/exec'; 
 
 let customers = [];
+let syncInterval = null; // 用來記錄定時器的變數
 
 // --- 初始化與資料讀取 ---
-async function initData() {
+async function initData(isBackgroundSync = false) {
     try {
-        // 使用時間戳記強迫每次重整都抓到雲端最新狀態（包含勾選、缺席紀錄）
+        // 使用時間戳記強迫每次抓取都是雲端最新狀態
         const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&v=${new Date().getTime()}`;
         
         const res = await fetch(url);
@@ -25,7 +26,6 @@ async function initData() {
         const rows = data.table.rows;
         customers = rows.map(row => {
             const cells = row.c;
-            // 讀取試算表第 10 欄與第 11 欄的勾選狀態 (例如 "true,false")
             const cloudDoneStr = cells[9] ? String(cells[9].v) : "";
             const cloudAbsentStr = cells[10] ? String(cells[10].v) : "";
             
@@ -44,12 +44,31 @@ async function initData() {
             };
         });
 
-        // 將雲端狀態寫入本地快取，確保兩邊一致
+        // 將雲端狀態同步至本地 LocalStorage
         syncCloudToLocal();
-        initApp();
+
+        // 如果是第一次初始化，才執行 initApp；如果是背景自動同步，直接重新渲染畫面即可
+        if (!isBackgroundSync) {
+            initApp();
+            startAutoSync(); // 🚀 啟動自動即時同步監聽
+        } else {
+            renderOrders(); // 背景同步完畢，悄悄更新畫面
+        }
     } catch (error) {
-        console.error('雲端讀取失敗，採用本地既有暫存狀態:', error);
+        console.error('雲端同步失敗:', error);
     }
+}
+
+// 🚀 建立自動同步機制（每 5 秒鐘自動檢查一次雲端變更）
+function startAutoSync() {
+    // 先清除可能重複建立的計時器
+    if (syncInterval) clearInterval(syncInterval);
+    
+    // 每 5000 毫秒 (5秒) 執行一次背景更新
+    syncInterval = setInterval(() => {
+        // 傳入 true 告知系統這是背景同步，不需要重跑 initApp 綁定事件
+        initData(true);
+    }, 5000); 
 }
 
 function syncCloudToLocal() {
@@ -59,16 +78,12 @@ function syncCloudToLocal() {
             const doneKey = getStorageKey(c.name, c.item, c.loc, i);
             const absentKey = getAbsenceKey(c.name, c.item, c.loc, i);
             
-            // 只有當雲端「確實有紀錄」時，才強制同步到本地
-            if (c.cloudDoneArr && c.cloudDoneArr.length > 0 && c.cloudDoneArr.includes('true')) {
-                if (c.cloudDoneArr[i] === 'true') localStorage.setItem(doneKey, 'true');
-                else localStorage.removeItem(doneKey);
-            }
+            // 雲端有打勾，本地就打勾；雲端取消，本地就跟著取消
+            if (c.cloudDoneArr[i] === 'true') localStorage.setItem(doneKey, 'true');
+            else localStorage.removeItem(doneKey);
             
-            if (c.cloudAbsentArr && c.cloudAbsentArr.length > 0 && c.cloudAbsentArr.includes('true')) {
-                if (c.cloudAbsentArr[i] === 'true') localStorage.setItem(absentKey, 'true');
-                else localStorage.removeItem(absentKey);
-            }
+            if (c.cloudAbsentArr[i] === 'true') localStorage.setItem(absentKey, 'true');
+            else localStorage.removeItem(absentKey);
         }
     });
 }
@@ -76,7 +91,11 @@ function syncCloudToLocal() {
 function initApp() {
     document.getElementById('daySelect').value = new Date().getDay();
     document.getElementById('clearAllBtn').addEventListener('click', clearAllDone);
-    document.getElementById('daySelect').addEventListener('change', renderOrders);
+    
+    // 當手動切換星期時，立刻強制刷一次雲端
+    document.getElementById('daySelect').addEventListener('change', () => {
+        initData(true);
+    });
     
     const statsContainer = document.querySelector('.stats-container');
     if (statsContainer) statsContainer.addEventListener('click', handleStatsClick);
@@ -102,18 +121,24 @@ function handleStatsClick(e) {
     }
 }
 
-// ✨ 背景發送非同步請求更新 Google 試算表，不影響網頁流暢度
 async function sendStatusToCloud(action, groupId, index, value) {
     if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL.includes('XXXXX')) return;
     try {
-        fetch(GAS_WEB_APP_URL, {
+        // 暫時停止自動計時器，避免自己點擊的同時跟舊的雲端資料衝突
+        clearInterval(syncInterval);
+
+        await fetch(GAS_WEB_APP_URL, {
             method: 'POST',
             mode: 'no-cors',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: action, groupId: groupId, index: index, value: value })
         });
+
+        // 點擊送出後，隔 2 秒重新啟動輪詢，給雲端一點時間反應
+        setTimeout(startAutoSync, 2000);
     } catch (err) {
         console.error('即時同步至雲端失敗:', err);
+        startAutoSync();
     }
 }
 
@@ -154,6 +179,7 @@ function clearAllDone() {
     if (!confirm("確定要重置今日所有狀態嗎？")) return;
     const day = parseInt(document.getElementById('daySelect').value);
     
+    clearInterval(syncInterval);
     customers.filter(c => c.days.length === 0 || c.days.includes(day)).forEach(c => {
         for (let i = 0; i < (c.count || 1); i++) {
             localStorage.removeItem(getStorageKey(c.name, c.item, c.loc, i));
@@ -167,7 +193,11 @@ function clearAllDone() {
             method: 'POST',
             mode: 'no-cors',
             body: JSON.stringify({ action: 'clearAll', day: day })
+        }).then(() => {
+            setTimeout(startAutoSync, 3000);
         });
+    } else {
+        startAutoSync();
     }
 }
 
