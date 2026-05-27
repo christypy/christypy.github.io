@@ -6,7 +6,138 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>一味淨生活咖啡系統</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* ==========================================================================
+           ⚡ 價目表空間極致壓縮與多欄化排版
+           ========================================================================== */
+        
+        /* 1. 義式飲品與周邊：打破卡片制，改為緊湊多欄 Grid */
+        .compact-menu-section {
+            background: var(--color-section-bg);
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-subtle);
+            border: 1px solid rgba(92, 58, 33, 0.08);
+            padding: 10px 12px;
+            margin-bottom: 12px;
+        }
 
+        .compact-grid-title {
+            font-size: 13px !important;
+            font-weight: 700;
+            color: var(--color-primary);
+            border-left: 3px solid var(--color-secondary);
+            padding-left: 6px;
+            margin: 4px 0 10px 0;
+            letter-spacing: 0.5px;
+        }
+
+        .multi-column-wrapper {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 📱 手機版直接並排雙欄 */
+            gap: 6px 12px;
+        }
+
+        @media (min-width: 768px) {
+            .multi-column-wrapper {
+                grid-template-columns: repeat(4, 1fr); /* 💻 電腦與平板直接展開成四欄 */
+            }
+        }
+
+        .mini-price-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 6px;
+            background: #faf8f5;
+            border-radius: 4px;
+            font-size: 12.5px;
+            border: 1px solid rgba(0, 0, 0, 0.02);
+        }
+        .mini-price-item .p-name {
+            color: #444;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .mini-price-item .p-cost {
+            font-weight: 700;
+            color: var(--color-secondary);
+            flex-shrink: 0;
+        }
+
+        /* 2. 單品咖啡豆：全面改為直覺好讀的「四宮格規格字卡」 */
+        .single-beans-grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* 自動塞滿橫向空間 */
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .bean-compact-card {
+            background: var(--color-section-bg);
+            border-radius: 6px;
+            border: 1px solid rgba(92, 58, 33, 0.08);
+            box-shadow: var(--shadow-subtle);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .bean-title-line {
+            font-size: 13.5px !important;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: 6px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* 規格方塊按鈕組（超直覺橫排） */
+        .bean-specs-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 四個規格平分寬度 */
+            gap: 4px;
+        }
+
+        .square-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #fdfaf5;
+            border: 1px solid #f0e9dd;
+            border-radius: 4px;
+            padding: 4px 2px;
+            font-size: 11px;
+        }
+        .square-badge .sq-lbl {
+            font-size: 10px;
+            color: #888;
+            font-weight: 500;
+            margin-bottom: 1px;
+        }
+        .square-badge .sq-prc {
+            font-weight: 700;
+            color: var(--color-danger);
+        }
+        
+        /* 沒填價格的規格直接隱藏，維持視覺平衡 */
+        .square-badge.is-empty {
+            visibility: hidden; /* 保留骨架位置讓排版不歪掉，但看不到內容 */
+        }
+
+        /* 讀取狀態 */
+        .cloud-loading-mini {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 15px;
+            color: #999;
+            font-size: 12px;
+            font-style: italic;
+        }
+    </style>
 </head>
 
 <body>
@@ -75,32 +206,32 @@
         </div>
     </div>
 
-    <div class="price-section-wrapper" id="menuReference" style="display: flex; gap: 15px; flex-wrap: wrap;">
-        <div class="price-card" style="flex: 1; min-width: 300px; margin-bottom: 0;">
-            <div class="price-card-header">☕ 義式基礎飲品</div>
-            <div class="price-grid" id="baseDrinksContainer"></div>
+    <!-- 🌟 新優化：多欄位合流的基本飲品與周邊區塊 -->
+    <div id="menuReference">
+        <div class="compact-menu-section">
+            <div class="compact-grid-title">☕ 義式基礎飲品</div>
+            <div class="multi-column-wrapper" id="baseDrinksContainer">
+                <div class="cloud-loading-mini">同步雲端飲品中...</div>
+            </div>
         </div>
-        <div class="price-card" style="flex: 1; min-width: 300px; margin-bottom: 0;">
-            <div class="price-card-header" style="background: #7d5a50;">📦 其他品項</div>
-            <div class="price-grid" id="otherItemsContainer"></div>
+
+        <div class="compact-menu-section">
+            <div class="compact-grid-title">📦 其他品項</div>
+            <div class="multi-column-wrapper" id="otherItemsContainer">
+                <div class="cloud-loading-mini">同步雲端品項中...</div>
+            </div>
         </div>
     </div>
 
-    <table class="menu-group-full">
-        <thead>
-            <tr>
-                <th>品項</th>
-                <th>外帶</th>
-                <th>內用</th>
-                <th>半磅</th>
-                <th>濾掛</th>
-            </tr>
-        </thead>
-        <tbody id="menuTableBody"></tbody>
-    </table>
+    <!-- 🌟 新優化：單品咖啡豆（徹底拋棄大表格，改為超直覺網格字卡） -->
+    <div class="single-beans-grid-container" id="singleBeansGrid">
+        <div class="cloud-loading-mini">☕ 正在讀取雲端單品豆目...</div>
+    </div>
 
-    <div class="price-card-container" id="method" style="margin-top: 25px;">
-        </div>
+    <!-- 隱藏舊版大表格占位符，確保原程式不報錯 -->
+    <table id="menuTableBody" style="display: none;"></table>
+
+    <div class="price-card-container" id="method" style="margin-top: 25px;"></div>
 
     <div id="vendorEditModal" class="modal">
         <div class="modal-content">
@@ -108,8 +239,7 @@
             
             <div class="modal-group">
                 <label for="modalVendorSelect">選擇攤販 / 姓名：</label>
-                <select id="modalVendorSelect" onchange="onModalVendorChange()">
-                    </select>
+                <select id="modalVendorSelect" onchange="onModalVendorChange()"></select>
             </div>
             
             <div class="modal-group">
@@ -136,5 +266,80 @@
         </div>
     </div>
 
+    <!-- ==========================================================================
+       📊 雲端多欄位快讀資料解析腳本
+       ========================================================================== */ -->
+    <script>
+        const CLOUD_MENU_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSEiSHdIF1FlVgrSp5r8DhCDnTKAVhfRjXPIizNQ_d5kK_FFUQJfQKhQG1YXe3ViIdExAiUnAPlKCO-/pub?gid=250388087&single=true&output=csv";
+
+        async function fetchCloudMenu() {
+            try {
+                const response = await fetch(CLOUD_MENU_URL);
+                if (!response.ok) throw new Error("價目表連線失敗");
+                const csvText = await response.text();
+                
+                const lines = csvText.split(/\r?\n/).map(line => line.split(','));
+                
+                let classicHTML = "";
+                let otherHTML = "";
+                let singleHTML = "";
+
+                for (let i = 1; i < lines.length; i++) {
+                    const row = lines[i];
+                    if (!row || row.length < 3 || !row[0]) continue;
+
+                    const type = row[0].trim();     
+                    const name = row[2].trim();     
+                    const takePrice = row[8] ? row[8].trim() : ""; 
+
+                    if (type === 'classic') {
+                        classicHTML += `
+                            <div class="mini-price-item">
+                                <span class="p-name">${name}</span>
+                                <span class="p-cost">$${takePrice || '0'}</span>
+                            </div>
+                        `;
+                    } else if (type === 'other') {
+                        otherHTML += `
+                            <div class="mini-price-item">
+                                <span class="p-name">${name}</span>
+                                <span class="p-cost">$${takePrice || '0'}</span>
+                            </div>
+                        `;
+                    } else if (type === 'single') {
+                        const stayPrice = row[9] ? row[9].trim() : "";   
+                        const poundPrice = row[10] ? row[10].trim() : ""; 
+                        const dripPrice = row[11] ? row[11].trim() : "";   
+                        
+                        // 轉換為直覺的四宮格卡片排版
+                        singleHTML += `
+                            <div class="bean-compact-card">
+                                <div class="bean-title-line">☕ ${name}</div>
+                                <div class="bean-specs-row">
+                                    <div class="square-badge ${!takePrice ? 'is-empty' : ''}"><span class="sq-lbl">外</span><span class="sq-prc">$${takePrice}</span></div>
+                                    <div class="square-badge ${!stayPrice ? 'is-empty' : ''}"><span class="sq-lbl">內</span><span class="sq-prc">$${stayPrice}</span></div>
+                                    <div class="square-badge ${!poundPrice ? 'is-empty' : ''}"><span class="sq-lbl">磅</span><span class="sq-prc">$${poundPrice}</span></div>
+                                    <div class="square-badge ${!dripPrice ? 'is-empty' : ''}"><span class="sq-lbl">掛</span><span class="sq-prc">$${dripPrice}</span></div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
+                document.getElementById('baseDrinksContainer').innerHTML = classicHTML || '<div class="cloud-loading-mini">暫無品項</div>';
+                document.getElementById('otherItemsContainer').innerHTML = otherHTML || '<div class="cloud-loading-mini">暫無品項</div>';
+                document.getElementById('singleBeansGrid').innerHTML = singleHTML || '<div class="cloud-loading-mini">暫無單品供應</div>';
+
+            } catch (error) {
+                console.error("雲端選單同步錯誤:", error);
+                document.getElementById('baseDrinksContainer').innerHTML = '<div class="cloud-loading-mini" style="color:red;">連線失敗</div>';
+                document.getElementById('otherItemsContainer').innerHTML = '<div class="cloud-loading-mini" style="color:red;">連線失敗</div>';
+                document.getElementById('singleBeansGrid').innerHTML = '<div class="cloud-loading-mini" style="color:red;">單品豆載入失敗</div>';
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', fetchCloudMenu);
+    </script>
 </body>
+
 </html>
