@@ -449,78 +449,99 @@
         .fab:hover { background: #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
         .fab.admin-active { background: var(--dark-roast); color: #fff; border-color: transparent; }
 
-        /* ═══════════════════════════
-           📱 手機版 (≤ 768px)
+/* ═══════════════════════════
+           📱 手機版 (≤ 768px) 修正：維持左右佈局
         ═══════════════════════════ */
         @media (max-width: 768px) {
-            body { flex-direction: column; }
-
-            .layout {
-                flex-direction: column;
-                height: auto;
-                overflow: visible;
-                /* 留空間給下面的收銀台 */
-                flex: 1;
-                min-height: 0;
+            body { 
+                flex-direction: row; /* 確保主體是左右 */
+                height: 100dvh;
+                overflow: hidden;
             }
 
-            /* 手機：左欄 + 豆子區變成上下排列 */
+            /* 重新調配手機版的欄位寬度比例 */
+            :root {
+                --menu-col-w: 110px;  /* 左欄經典選單縮窄，剛好放得下品名 */
+                --cashier-w: 130px;   /* 右欄收銀台縮窄，手機端精簡顯示 */
+            }
+
+            .layout {
+                flex: 1;
+                flex-direction: row; /* 強制左右並排 */
+                height: 100dvh;
+                overflow: hidden;
+            }
+
+            /* 左欄：經典 + 其他 */
             .col-menu {
-                width: 100%;
-                min-width: unset;
-                height: auto;
-                max-height: none;
-                border-right: none;
-                border-bottom: 2px solid var(--border);
-                flex-direction: row;
-                flex-wrap: wrap;
-                overflow: visible;
+                width: var(--menu-col-w);
+                min-width: var(--menu-col-w);
+                height: 100dvh;
+                overflow-y: auto;
+                border-right: 1px solid var(--border);
+                border-bottom: none;
+                flex-direction: column; /* 恢復上下滾動 */
+                flex-wrap: nowrap;
                 padding: 0;
             }
             .col-section {
-                flex: 1;
-                min-width: 140px;
-                border-bottom: none;
-                border-right: 1px solid var(--border);
-            }
-            .col-section:last-child { border-right: none; }
-
-            .col-beans {
-                height: auto;
-                overflow: visible;
-                padding: 14px 12px 20px;
-            }
-
-            #singleGrid {
-                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-                gap: 10px;
-            }
-
-            /* 收銀台：固定在底部 */
-            .col-cashier {
-                width: 100%;
+                padding: 12px 8px;
                 min-width: unset;
-                height: auto;
-                max-height: 55vh;
-                border-left: none;
-                border-top: 2px solid var(--border);
-                flex-shrink: 0;
-                position: sticky;
-                bottom: 0;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
             }
+            .menu-item {
+                padding: 8px 4px;
+                flex-direction: column; /* 手機版品名與價格上下排，省空間 */
+                align-items: flex-start;
+                gap: 2px;
+            }
+            .item-name { font-size: 0.78em; }
+            .item-price { font-size: 0.8em; }
 
-            body {
+            /* 中間：單品豆區（給予最大彈性空間） */
+            .col-beans {
+                flex: 1;
                 height: 100dvh;
-                overflow: hidden;
-                display: flex;
-                flex-direction: column;
-            }
-            .layout {
                 overflow-y: auto;
-                -webkit-overflow-scrolling: touch;
+                padding: 12px 8px 4px;
             }
+            #singleGrid {
+                /* 手機版單品豆改為一列一個，或寬度足夠時自動填滿 */
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+                gap: 8px;
+            }
+            .card {
+                padding: 10px 8px 8px;
+                border-radius: 10px;
+            }
+            .theme-word { font-size: 1.3em; }
+            .price-box { grid-template-columns: 1fr; gap: 4px; } /* 四宮格按鈕改為上下依序排，避免按鈕擠壓 */
+            .price-btn { padding: 4px 6px; }
 
-            .theme-word { font-size: 1.6em; }
+            /* 右欄：收銀台 */
+            .col-cashier {
+                width: var(--cashier-w);
+                min-width: var(--cashier-w);
+                height: 100dvh;
+                max-height: none;
+                border-left: 1px solid var(--border);
+                border-top: none;
+                position: relative;
+                bottom: unset;
+            }
+            .cashier-header { padding: 10px 6px; font-size: 0.85em; }
+            .cart-item-row { 
+                flex-direction: column; /* 購物車項目改垂直排列，防擠壓 */
+                align-items: flex-start; 
+                padding: 6px;
+            }
+            .qty-controls { width: 100%; justify-content: space-between; margin-top: 4px; }
+            .cash-input { width: 70px; font-size: 0.9em; }
+            .fast-cash-tags { display: none; } /* 手機版隱藏快選快捷鍵，節省空間 */
+            .cashier-bill { padding: 8px; gap: 6px; }
+            .calc-value.total { font-size: 1.1em; }
+            .calc-value.change { font-size: 1.1em; }
         }
 
         /* ═══════════════════════════
