@@ -1,410 +1,260 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>一味淨生活咖啡系統</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* ==========================================================================
-           ⚡ 價目表與作法空間極致壓縮排版
-           ========================================================================== */
-        
-        /* 1. 義式飲品與周邊：打破大卡片，改為緊湊多欄 Grid */
-        .compact-menu-section {
-            background: var(--color-section-bg);
-            border-radius: var(--border-radius-md);
-            box-shadow: var(--shadow-subtle);
-            border: 1px solid rgba(92, 58, 33, 0.08);
-            padding: 10px 12px;
-            margin-bottom: 12px;
-        }
-
-        .compact-grid-title {
-            font-size: 13px !important;
-            font-weight: 700;
-            color: var(--color-primary);
-            border-left: 3px solid var(--color-secondary);
-            padding-left: 6px;
-            margin: 4px 0 10px 0;
-            letter-spacing: 0.5px;
-        }
-
-        .multi-column-wrapper {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr); /* 📱 手機版並排雙欄 */
-            gap: 6px 12px;
-        }
-
-        @media (min-width: 768px) {
-            .multi-column-wrapper {
-                grid-template-columns: repeat(4, 1fr); /* 💻 電腦版四欄 */
-            }
-        }
-
-        .mini-price-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 4px 6px;
-            background: #faf8f5;
-            border-radius: 4px;
-            font-size: 12.5px;
-            border: 1px solid rgba(0, 0, 0, 0.02);
-        }
-        .mini-price-item .p-name {
-            color: #444;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .mini-price-item .p-cost {
-            font-weight: 700;
-            color: var(--color-secondary);
-            flex-shrink: 0;
-        }
-
-        /* 2. 單品咖啡豆：全面改為直覺好讀的「四宮格規格字卡」 */
-        .single-beans-grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 8px;
-            margin-top: 10px;
-            margin-bottom: 16px;
-        }
-
-        .bean-compact-card {
-            background: var(--color-section-bg);
-            border-radius: 6px;
-            border: 1px solid rgba(92, 58, 33, 0.08);
-            box-shadow: var(--shadow-subtle);
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .bean-title-line {
-            font-size: 13.5px !important;
-            font-weight: 700;
-            color: var(--color-primary);
-            margin-bottom: 6px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .bean-specs-row {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 4px;
-        }
-
-        .square-badge {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: #fdfaf5;
-            border: 1px solid #f0e9dd;
-            border-radius: 4px;
-            padding: 4px 2px;
-            font-size: 11px;
-        }
-        .square-badge .sq-lbl {
-            font-size: 10px;
-            color: #888;
-            font-weight: 500;
-            margin-bottom: 1px;
-        }
-        .square-badge .sq-prc {
-            font-weight: 700;
-            color: var(--color-danger);
-        }
-        
-        .square-badge.is-empty {
-            visibility: hidden; 
-        }
-
-        /* 3. 調製做法與洗機流程雙欄美化（手機版直排，大螢幕自動並排） */
-        .method-flex-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        @media (min-width: 768px) {
-            .method-flex-container {
-                flex-direction: row;
-            }
-            .method-flex-container .price-card {
-                flex: 1;
-                margin-bottom: 0 !important;
-            }
-        }
-
-        .method-item-block {
-            margin-bottom: 12px;
-            border-bottom: 1px dashed rgba(0,0,0,0.06);
-            padding-bottom: 10px;
-        }
-        .method-item-block:last-child {
-            margin-bottom: 0;
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-
-        /* 讀取狀態 */
-        .cloud-loading-mini {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 15px;
-            color: #999;
-            font-size: 12px;
-            font-style: italic;
-        }
-    </style>
 </head>
-
 <body>
 
-    <h2>☕ 一味淨生活咖啡</h2>
-    <script src="config.js"></script>
-    <script src="main.js"></script>
-    
-    <div class="fab-container">
-        <button class="fab-btn fab-top" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
-            回到最上
-        </button>
+<h2>☕ 一味淨生活咖啡</h2>
+<script src="config.js"></script>
+<script src="main.js"></script>
 
-        <button class="fab-btn" style="background-color: #e91e63; color: white;" onclick="openEditModal()">
-            修改攤販
-        </button>
+<div class="fab-container">
+    <button class="fab-btn fab-top" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">回到最上</button>
+    <button class="fab-btn" style="background-color: #e91e63; color: white;" onclick="openEditModal()">修改攤販</button>
+    <button class="fab-btn" onclick="document.getElementById('menuReference').scrollIntoView({ behavior: 'smooth' })">價格</button>
+    <button class="fab-btn" onclick="window.location.href='https://christypy.github.io/been.html?mode=admin'">結帳</button>
+    <button class="fab-btn" onclick="document.getElementById('method').scrollIntoView({ behavior: 'smooth' })">作法</button>
+</div>
 
-        <button class="fab-btn" onclick="document.getElementById('menuReference').scrollIntoView({ behavior: 'smooth' })">
-            價格
-        </button>
-        <button class="fab-btn" onclick="window.location.href='https://christypy.github.io/been.html?mode=admin'">
-            結帳
-        </button>
-        <button class="fab-btn" onclick="document.getElementById('method').scrollIntoView({ behavior: 'smooth' })">
-            作法
-        </button>
+<div class="controls">
+    <select id="daySelect">
+        <option value="1">星期一 (休)</option>
+        <option value="2">星期二</option>
+        <option value="3">星期三</option>
+        <option value="4">星期四</option>
+        <option value="5">星期五</option>
+        <option value="6">星期六</option>
+        <option value="0">星期日</option>
+    </select>
+    <button id="refreshBtn" class="btn" onclick="initData(true)">刷新列表</button>
+    <button class="btn" id="clearAllBtn" onclick="manualClearAll()">全部重置</button>
+</div>
+
+<div class="info-section">
+    <h3>📝 常駐備忘</h3>
+    <ul id="staticMemoList">
+        <li><b>恐龍嫩仙草：</b>環保杯熱美式</li>
+        <li><b>內衣店老闆：</b>熱拿鐵</li>
+        <li><b>芭樂：</b>熱拿鐵 + 糖(3g)</li>
+    </ul>
+    <ul id="dynamicMemoList"></ul>
+</div>
+
+<div class="stats-container">
+    <div class="stat-box" style="border-top-color: var(--color-success);">
+        <h3>🏠 左右鄰居 總計</h3>
+        <div id="stats-neighbor"></div>
     </div>
-
-    <div class="controls">
-        <select id="daySelect">
-            <option value="1">星期一 (休)</option>
-            <option value="2">星期二</option>
-            <option value="3">星期三</option>
-            <option value="4">星期4</option>
-            <option value="5">星期五</option>
-            <option value="6">星期六</option>
-            <option value="0">星期日</option>
-        </select>
-        <button id="refreshBtn" class="btn" onclick="initData(true)">刷新列表</button>
-        <button class="btn" id="clearAllBtn" onclick="manualClearAll()">全部重置</button>
+    <div class="stat-box" style="border-top-color: var(--color-total-progress);">
+        <h3>🛵 其他區域 總計</h3>
+        <div id="stats-other"></div>
     </div>
-
-    <div class="info-section">
-        <h3>📝 常駐備忘</h3>
-        <ul id="staticMemoList">
-            <li><b>恐龍嫩仙草：</b>環保杯熱美式</li>
-            <li><b>內衣店老闆：</b>熱拿鐵</li>
-            <li><b>芭樂：</b>熱拿鐵 + 糖(3g)</li>
-        </ul>
-        <ul id="dynamicMemoList"></ul>
+    <div class="stat-box" style="border-top-color: var(--color-accent);">
+        <h3>❓ 當日需確認 總計</h3>
+        <div id="stats-ask"></div>
     </div>
+</div>
 
-    <div class="stats-container">
-        <div class="stat-box" style="border-top-color: var(--color-success);">
-            <h3>🏠 左右鄰居 總計</h3>
-            <div id="stats-neighbor"></div>
-        </div>
-
-        <div class="stat-box" style="border-top-color: var(--color-total-progress);">
-            <h3>🛵 其他區域 總計</h3>
-            <div id="stats-other"></div>
-        </div>
-        <div class="stat-box" style="border-top-color: var(--color-accent);">
-            <h3>❓ 當日需確認 總計</h3>
-            <div id="stats-ask"></div>
+<!-- 價目表 -->
+<div id="menuReference">
+    <div class="compact-menu-section">
+        <div class="compact-grid-title">☕ 義式基礎飲品</div>
+        <div class="multi-column-wrapper" id="baseDrinksContainer">
+            <div class="cloud-loading-mini">同步雲端飲品中...</div>
         </div>
     </div>
+    <div class="compact-menu-section">
+        <div class="compact-grid-title">📦 其他品項 / 周邊</div>
+        <div class="multi-column-wrapper" id="otherItemsContainer">
+            <div class="cloud-loading-mini">同步雲端品項中...</div>
+        </div>
+    </div>
 
-    <div id="menuReference">
-        <div class="compact-menu-section">
-            <div class="compact-grid-title">☕ 義式基礎飲品</div>
-            <div class="multi-column-wrapper" id="baseDrinksContainer">
-                <div class="cloud-loading-mini">同步雲端飲品中...</div>
+    <!-- 單品咖啡豆 -->
+    <div class="compact-menu-section single-beans-section">
+        <div class="compact-grid-title">🫘 單品咖啡豆</div>
+        <div class="single-beans-grid-container" id="singleBeansGrid">
+            <div class="cloud-loading-mini">☕ 正在讀取雲端單品豆目錄...</div>
+        </div>
+    </div>
+</div>
+
+<!-- 作法 + 洗機流程 -->
+<div class="method-flex-container" id="method">
+    <div class="price-card">
+        <div class="price-card-header" style="background: var(--color-secondary);">📖 咖啡調製做法</div>
+        <div style="padding: 14px; font-size: 13.5px; line-height: 1.8;">
+            <div class="method-item-block">
+                <strong style="color: var(--color-primary);">☕ 美式/拿鐵基底：</strong><br>
+                18/19/20g 粉 → 萃取 1:2-3g 時間大落在: 20-35秒<br>
+                ➔ <b>加糖版本：</b>加3g糖粉<br>
+                ➔ <b>熱美式：</b>加熱水至九分滿<br>
+                ➔ <b>冰美式：</b>冰塊跟水九分滿+基底<br>
+                ➔ <b>氣泡冰美式：</b>濃縮加冰塊用蒸氣打3-5秒，再倒入整杯冰塊<br>
+                ➔ <b>冰拿鐵：</b>基底80+牛奶230+冰塊120<br>
+                ➔ <b>熱拿鐵：</b>牛奶用鋼杯打熱後加至九分滿
             </div>
-        </div>
-
-        <div class="compact-menu-section">
-            <div class="compact-grid-title">📦 其他品項 / 周邊</div>
-            <div class="multi-column-wrapper" id="otherItemsContainer">
-                <div class="cloud-loading-mini">同步雲端品項中...</div>
+            <div class="method-item-block">
+                <strong style="color: var(--color-primary);">淺焙美式：</strong><br>
+                靜 or 果 8.5 刻度
             </div>
-        </div>
-    </div>
-
-    <div class="single-beans-grid-container" id="singleBeansGrid">
-        <div class="cloud-loading-mini">☕ 正在讀取雲端單品豆目...</div>
-    </div>
-
-    <div class="price-card-container method-flex-container" id="method">
-        
-        <div class="price-card" style="margin-bottom: 0;">
-            <div class="price-card-header" style="background: var(--color-secondary);">📖 咖啡調製做法</div>
-            <div style="padding: 15px; font-size: 13.5px; line-height: 1.8;">
-                <div class="method-item-block">
-                    <strong style="color: var(--color-primary);">☕ 美式/拿鐵基底：</strong><br>
-                    18/19/20g 粉 → 萃取 1:2-3g 時間大落在: 20-35秒<br>
-                    ➔ <b>加糖版本：</b>加3g糖粉<br>
-                    ➔ <b>熱美式：</b>加熱水至九分滿<br>
-                    ➔ <b>冰美式：</b>冰塊跟水九分滿+基底<br>
-                    ➔ <b>氣泡冰美式：</b>濃縮加冰塊用蒸氣打3-5秒，再倒入整杯冰塊<br>
-                    ➔ <b>冰拿鐵：</b>基底80+牛奶230+冰塊120<br>
-                    ➔ <b>熱拿鐵：</b>牛奶用鋼杯打熱後加至九分滿
-                </div>
-                <div class="method-item-block">
-                    <strong style="color: var(--color-primary);">淺焙美式：</strong><br>
-                    靜 or 果 8.5 刻度
-                </div>
-                <div class="method-item-block">
-                    <strong style="color: var(--color-primary);">🍵 抹茶歐蕾：</strong><br>
-                    粉 7g + 糖粉 6g + 熱水 60g 攪拌均勻，剩下用熱牛奶補滿。
-                </div>
-                <div class="method-item-block">
-                    <strong style="color: var(--color-primary);">🍫 可可歐蕾：</strong><br>
-                    粉 7g + 糖粉 6g + 熱牛奶一些攪拌均勻，剩下用熱牛奶補滿。
-                </div>
+            <div class="method-item-block">
+                <strong style="color: var(--color-primary);">🍵 抹茶歐蕾：</strong><br>
+                粉 7g + 糖粉 6g + 熱水 60g 攪拌均勻，剩下用熱牛奶補滿。
             </div>
-        </div>
-
-        <div class="price-card" style="margin-bottom: 0;">
-            <div class="price-card-header" style="background: #666;">🔧 每日洗咖啡機流程</div>
-            <div style="padding: 15px; font-size: 13.5px; line-height: 1.7;">
-                <ul style="padding-left: 18px; margin: 0;">
-                    <li style="margin-bottom: 6px;">卸下把手，將粉杯替換為<b>無孔逆洗杯</b>。</li>
-                    <li style="margin-bottom: 6px;">用<b>一字起子</b>轉開濾網螺絲，取下濾網清洗（小心燙，保管好螺絲）。</li>
-                    <li style="margin-bottom: 6px;">把手加入<b>一湯匙清潔粉</b>並扣回。</li>
-                    <li style="margin-bottom: 6px;">長按<b>「1 + 5」</b>按鈕啟動自動清洗。</li>
-                    <li style="margin-bottom: 6px;">洗完將水倒掉，重複<b>「1 + 5」</b>清洗至無泡泡。</li>
-                    <li style="margin-bottom: 6px;">卸下把手，鎖回螺絲與濾網，換回原本有孔粉杯。</li>
-                    <li style="margin-bottom: 0;">清水跑幾次觀察是否無泡沫。</li>
-                </ul>
-            </div>
-        </div>
-
-    </div>
-
-    <table id="menuTableBody" style="display: none;"></table>
-
-    <div id="vendorEditModal" class="modal">
-        <div class="modal-content">
-            <h3>✏️ 線上修改攤販品項</h3>
-            
-            <div class="modal-group">
-                <label for="modalVendorSelect">選擇攤販 / 姓名：</label>
-                <select id="modalVendorSelect" onchange="onModalVendorChange()"></select>
-            </div>
-            
-            <div class="modal-group">
-                <label for="modalItemSelect">更換品項：</label>
-                <select id="modalItemSelect">
-                    <option value="大拿鐵">大拿鐵</option>
-                    <option value="大熱美">大熱美</option>
-                    <option value="大熱拿">大熱拿</option>
-                    <option value="冰手沖">冰手沖</option>
-                    <option value="冰美式">冰美式</option>
-                    <option value="冰拿鐵">冰拿鐵</option>
-                    <option value="冰拿鐵加糖">冰拿鐵加糖</option>
-                    <option value="熱手沖">熱手沖</option>
-                    <option value="熱美式">熱美式</option>
-                    <option value="熱拿鐵">熱拿鐵</option>
-                    <option value="熱拿鐵加糖">熱拿鐵加糖</option>
-                </select>
-            </div>
-            
-            <div class="modal-actions">
-                <button class="modal-btn cancel" onclick="closeEditModal()">取消</button>
-                <button class="modal-btn confirm" onclick="submitVendorEdit()">確認修改</button>
+            <div class="method-item-block">
+                <strong style="color: var(--color-primary);">🍫 可可歐蕾：</strong><br>
+                粉 7g + 糖粉 6g + 熱牛奶一些攪拌均勻，剩下用熱牛奶補滿。
             </div>
         </div>
     </div>
 
-    <script>
-        const CLOUD_MENU_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSEiSHdIF1FlVgrSp5r8DhCDnTKAVhfRjXPIizNQ_d5kK_FFUQJfQKhQG1YXe3ViIdExAiUnAPlKCO-/pub?gid=250388087&single=true&output=csv";
+    <div class="price-card">
+        <div class="price-card-header" style="background: #666;">🔧 每日洗咖啡機流程</div>
+        <div style="padding: 14px; font-size: 13.5px; line-height: 1.7;">
+            <ul style="padding-left: 18px; margin: 0;">
+                <li style="margin-bottom: 6px;">卸下把手，將粉杯替換為<b>無孔逆洗杯</b>。</li>
+                <li style="margin-bottom: 6px;">用<b>一字起子</b>轉開濾網螺絲，取下濾網清洗（小心燙，保管好螺絲）。</li>
+                <li style="margin-bottom: 6px;">把手加入<b>一湯匙清潔粉</b>並扣回。</li>
+                <li style="margin-bottom: 6px;">長按<b>「1 + 5」</b>按鈕啟動自動清洗。</li>
+                <li style="margin-bottom: 6px;">洗完將水倒掉，重複<b>「1 + 5」</b>清洗至無泡泡。</li>
+                <li style="margin-bottom: 6px;">卸下把手，鎖回螺絲與濾網，換回原本有孔粉杯。</li>
+                <li style="margin-bottom: 0;">清水跑幾次觀察是否無泡沫。</li>
+            </ul>
+        </div>
+    </div>
+</div>
 
-        async function fetchCloudMenu() {
-            try {
-                const response = await fetch(CLOUD_MENU_URL);
-                if (!response.ok) throw new Error("價目表連線失敗");
-                const csvText = await response.text();
-                
-                const lines = csvText.split(/\r?\n/).map(line => line.split(','));
-                
-                let classicHTML = "";
-                let otherHTML = "";
-                let singleHTML = "";
+<table id="menuTableBody" style="display: none;"></table>
 
-                for (let i = 1; i < lines.length; i++) {
-                    const row = lines[i];
-                    if (!row || row.length < 3 || !row[0]) continue;
+<!-- 修改攤販 Modal -->
+<div id="vendorEditModal" class="modal">
+    <div class="modal-content">
+        <h3>✏️ 線上修改攤販品項</h3>
+        <div class="modal-group">
+            <label for="modalVendorSelect">選擇攤販 / 姓名：</label>
+            <select id="modalVendorSelect" onchange="onModalVendorChange()"></select>
+        </div>
+        <div class="modal-group">
+            <label for="modalItemSelect">更換品項：</label>
+            <select id="modalItemSelect">
+                <option value="大拿鐵">大拿鐵</option>
+                <option value="大熱美">大熱美</option>
+                <option value="大熱拿">大熱拿</option>
+                <option value="冰手沖">冰手沖</option>
+                <option value="冰美式">冰美式</option>
+                <option value="冰拿鐵">冰拿鐵</option>
+                <option value="冰拿鐵加糖">冰拿鐵加糖</option>
+                <option value="熱手沖">熱手沖</option>
+                <option value="熱美式">熱美式</option>
+                <option value="熱拿鐵">熱拿鐵</option>
+                <option value="熱拿鐵加糖">熱拿鐵加糖</option>
+            </select>
+        </div>
+        <div class="modal-actions">
+            <button class="modal-btn cancel" onclick="closeEditModal()">取消</button>
+            <button class="modal-btn confirm" onclick="submitVendorEdit()">確認修改</button>
+        </div>
+    </div>
+</div>
 
-                    const type = row[0].trim();     
-                    const name = row[2].trim();     
-                    const takePrice = row[8] ? row[8].trim() : ""; 
+<script>
+// ── 雲端 CSV 價目表 URL ───────────────────────────────────────
+const CLOUD_MENU_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSEiSHdIF1FlVgrSp5r8DhCDnTKAVhfRjXPIizNQ_d5kK_FFUQJfQKhQG1YXe3ViIdExAiUnAPlKCO-/pub?gid=250388087&single=true&output=csv";
 
-                    if (type === 'classic') {
-                        classicHTML += `
-                            <div class="mini-price-item">
-                                <span class="p-name">${name}</span>
-                                <span class="p-cost">$${takePrice || '0'}</span>
-                            </div>
-                        `;
-                    } else if (type === 'other') {
-                        otherHTML += `
-                            <div class="mini-price-item">
-                                <span class="p-name">${name}</span>
-                                <span class="p-cost">$${takePrice || '0'}</span>
-                            </div>
-                        `;
-                    } else if (type === 'single') {
-                        const stayPrice = row[9] ? row[9].trim() : "";   
-                        const poundPrice = row[10] ? row[10].trim() : ""; 
-                        const dripPrice = row[11] ? row[11].trim() : "";   
-                        
-                        singleHTML += `
-                            <div class="bean-compact-card">
-                                <div class="bean-title-line">☕ ${name}</div>
-                                <div class="bean-specs-row">
-                                    <div class="square-badge ${!takePrice ? 'is-empty' : ''}"><span class="sq-lbl">外</span><span class="sq-prc">$${takePrice}</span></div>
-                                    <div class="square-badge ${!stayPrice ? 'is-empty' : ''}"><span class="sq-lbl">內</span><span class="sq-prc">$${stayPrice}</span></div>
-                                    <div class="square-badge ${!poundPrice ? 'is-empty' : ''}"><span class="sq-lbl">磅</span><span class="sq-prc">$${poundPrice}</span></div>
-                                    <div class="square-badge ${!dripPrice ? 'is-empty' : ''}"><span class="sq-lbl">掛</span><span class="sq-prc">$${dripPrice}</span></div>
-                                </div>
-                            </div>
-                        `;
-                    }
-                }
+// 焙度文字 → CSS class / 顯示文字對照
+function getRoastInfo(raw) {
+    if (!raw) return null;
+    const r = raw.trim();
+    if (!r) return null;
+    const lower = r.toLowerCase();
+    if (lower.includes('light') || lower.includes('淺')) return { label: '淺焙', cls: 'roast-light' };
+    if (lower.includes('dark') || lower.includes('深')) return { label: '深焙', cls: 'roast-dark' };
+    if (lower.includes('medium') || lower.includes('中')) return { label: '中焙', cls: 'roast-medium' };
+    // 有值但不在已知分類 → 直接顯示原文
+    return { label: r, cls: 'roast-default' };
+}
 
-                document.getElementById('baseDrinksContainer').innerHTML = classicHTML || '<div class="cloud-loading-mini">暫無品項</div>';
-                document.getElementById('otherItemsContainer').innerHTML = otherHTML || '<div class="cloud-loading-mini">暫無品項</div>';
-                document.getElementById('singleBeansGrid').innerHTML = singleHTML || '<div class="cloud-loading-mini">暫無單品供應</div>';
+async function fetchCloudMenu() {
+    try {
+        const response = await fetch(CLOUD_MENU_URL);
+        if (!response.ok) throw new Error("價目表連線失敗");
+        const csvText = await response.text();
 
-            } catch (error) {
-                console.error("雲端選單同步錯誤:", error);
-                document.getElementById('baseDrinksContainer').innerHTML = '<div class="cloud-loading-mini" style="color:red;">連線失敗</div>';
-                document.getElementById('otherItemsContainer').innerHTML = '<div class="cloud-loading-mini" style="color:red;">連線失敗</div>';
-                document.getElementById('singleBeansGrid').innerHTML = '<div class="cloud-loading-mini" style="color:red;">單品豆載入失敗</div>';
+        // 解析 CSV（簡易版，處理欄位中含逗號需引號的情形請視資料決定）
+        const lines = csvText.split(/\r?\n/).map(line => {
+            // 簡易 CSV split，不含引號跳脫
+            return line.split(',');
+        });
+
+        let classicHTML = "";
+        let otherHTML = "";
+        let singleHTML = "";
+
+        for (let i = 1; i < lines.length; i++) {
+            const row = lines[i];
+            if (!row || row.length < 3 || !row[0]) continue;
+
+            const type       = row[0]  ? row[0].trim()  : "";
+            const name       = row[2]  ? row[2].trim()  : "";
+            const takePrice  = row[8]  ? row[8].trim()  : "";
+            const roastRaw   = row[12] ? row[12].trim() : ""; // ← 第13欄為焙度
+
+            if (type === 'classic') {
+                classicHTML += `
+                    <div class="mini-price-item">
+                        <span class="p-name">${name}</span>
+                        <span class="p-cost">$${takePrice || '0'}</span>
+                    </div>`;
+            } else if (type === 'other') {
+                otherHTML += `
+                    <div class="mini-price-item">
+                        <span class="p-name">${name}</span>
+                        <span class="p-cost">$${takePrice || '0'}</span>
+                    </div>`;
+            } else if (type === 'single') {
+                const stayPrice  = row[9]  ? row[9].trim()  : "";
+                const poundPrice = row[10] ? row[10].trim() : "";
+                const dripPrice  = row[11] ? row[11].trim() : "";
+
+                const roastInfo  = getRoastInfo(roastRaw);
+                const roastBadge = roastInfo
+                    ? `<span class="roast-badge ${roastInfo.cls}">${roastInfo.label}</span>`
+                    : '';
+
+                singleHTML += `
+                    <div class="bean-compact-card">
+                        <div class="bean-title-row">
+                            <span class="bean-title-line">🫘 ${name}</span>
+                            ${roastBadge}
+                        </div>
+                        <div class="bean-specs-row">
+                            <div class="square-badge ${!takePrice  ? 'is-empty' : ''}"><span class="sq-lbl">外帶</span><span class="sq-prc">$${takePrice}</span></div>
+                            <div class="square-badge ${!stayPrice  ? 'is-empty' : ''}"><span class="sq-lbl">內用</span><span class="sq-prc">$${stayPrice}</span></div>
+                            <div class="square-badge ${!poundPrice ? 'is-empty' : ''}"><span class="sq-lbl">半磅</span><span class="sq-prc">$${poundPrice}</span></div>
+                            <div class="square-badge ${!dripPrice  ? 'is-empty' : ''}"><span class="sq-lbl">掛耳</span><span class="sq-prc">$${dripPrice}</span></div>
+                        </div>
+                    </div>`;
             }
         }
 
-        window.addEventListener('DOMContentLoaded', fetchCloudMenu);
-    </script>
-</body>
+        document.getElementById('baseDrinksContainer').innerHTML  = classicHTML || '<div class="cloud-loading-mini">暫無品項</div>';
+        document.getElementById('otherItemsContainer').innerHTML  = otherHTML   || '<div class="cloud-loading-mini">暫無品項</div>';
+        document.getElementById('singleBeansGrid').innerHTML      = singleHTML  || '<div class="cloud-loading-mini">暫無單品供應</div>';
 
+    } catch (error) {
+        console.error("雲端選單同步錯誤:", error);
+        document.getElementById('baseDrinksContainer').innerHTML = '<div class="cloud-loading-mini" style="color:red;">連線失敗，請重新整理</div>';
+        document.getElementById('otherItemsContainer').innerHTML = '<div class="cloud-loading-mini" style="color:red;">連線失敗</div>';
+        document.getElementById('singleBeansGrid').innerHTML     = '<div class="cloud-loading-mini" style="color:red;">單品豆載入失敗</div>';
+    }
+}
+
+window.addEventListener('DOMContentLoaded', fetchCloudMenu);
+</script>
+</body>
 </html>

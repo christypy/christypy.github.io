@@ -531,11 +531,11 @@ function renderMemos(todaysOrders) {
 function renderPrices() {
     const baseContainer = document.getElementById('baseDrinksContainer'); 
     if (baseContainer && CONFIG.BASE_DRINKS) { 
-        baseContainer.innerHTML = CONFIG.BASE_DRINKS.map(item => `<div class="price-item">${item.name}<span class="p-value">${item.price}</span></div>`).join(''); 
+        baseContainer.innerHTML = CONFIG.BASE_DRINKS.map(item => `<div class="mini-price-item">${item.name}<span class="p-cost">${item.price}</span></div>`).join(''); 
     }
     const otherContainer = document.getElementById('otherItemsContainer'); 
     if (otherContainer && CONFIG.OTHER_ITEMS) { 
-        otherContainer.innerHTML = CONFIG.OTHER_ITEMS.map(item => `<div class="price-item">${item.name}<span class="p-value">${item.price}</span></div>`).join(''); 
+        otherContainer.innerHTML = CONFIG.OTHER_ITEMS.map(item => `<div class="mini-price-item">${item.name}<span class="p-cost">${item.price}</span></div>`).join(''); 
     }
     const menuTable = document.getElementById('menuTableBody'); 
     if (menuTable && CONFIG.MENU_DATA) { 
