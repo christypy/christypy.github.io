@@ -676,3 +676,15 @@
 .stat-detail-item.absent .edit-item-btn {
     display: none;
 }
+
+
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+.modal-content { background: #fff; padding: 20px; border-radius: 8px; width: 90%; max-width: 400px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); color: #333; }
+.modal-content h3 { margin-top: 0; color: var(--color-primary); }
+.modal-group { margin-bottom: 15px; }
+.modal-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
+.modal-group select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+.modal-btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+.modal-btn.cancel { background: #eee; color: #333; }
+.modal-btn.confirm { background: var(--color-success, #28a745); color: #fff; }

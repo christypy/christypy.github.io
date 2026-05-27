@@ -329,4 +329,119 @@ function isItemDone(n, i, l, idx = 0) { return localStorage.getItem(getStorageKe
 function getAbsenceKey(n, i, l, idx = 0) { return `${getTodayDateString()}_absent_${sanitize(n)}_${sanitize(i)}_${sanitize(l)}_${idx}`; }
 function isItemAbsent(n, i, l, idx = 0) { return localStorage.getItem(getAbsenceKey(n, i, l, idx)) === 'true'; }
 
+
+// 🚀 新增功能：彈窗互動與修改品項對應邏輯
+
+// 前端品項文字與 type 代碼的快速轉換字典
+const ITEM_TYPE_MAP = {
+    "大拿鐵": "large_hot_latte",
+    "大熱美": "large_hot_am",
+    "大熱拿": "large_hot_latte",
+    "冰手沖": "hand_drip",
+    "冰美式": "ice_am",
+    "冰拿鐵": "ice_latte",
+    "冰拿鐵加糖": "ice_latte_sugar",
+    "熱手沖": "hand_drip",
+    "熱美式": "hot_am",
+    "熱拿鐵": "hot_latte",
+    "熱拿鐵加糖": "hot_latte_sugar"
+};
+
+// 打開修改彈窗
+function openEditModal() {
+    const day = parseInt(document.getElementById('daySelect').value);
+    const vendorSelect = document.getElementById('modalVendorSelect');
+    if (!vendorSelect) return;
+    
+    // 篩選出今天有開市、且具有有效 groupId 的攤販名單
+    const todaysVendors = customers.filter(c => (c.days.length === 0 || c.days.includes(day)) && c.groupId);
+    
+    if (todaysVendors.length === 0) {
+        vendorSelect.innerHTML = '<option value="">今日無營業攤販資料</option>';
+    } else {
+        // 渲染下拉選單：顯示 區域 - 姓名 (現有品項)
+        vendorSelect.innerHTML = todaysVendors.map(c => `
+            <option value="${c.groupId}" data-item="${c.item}">
+                [${c.loc}] ${c.name} (目前: ${c.item})
+            </option>
+        `).join('');
+    }
+    
+    // 初始化第一個被選中店家的品項下拉選單預設值
+    onModalVendorChange();
+    
+    // 顯示彈窗
+    document.getElementById('vendorEditModal').style.display = 'flex';
+}
+
+// 當彈窗中切換不同店家時，自動把「品項選單」定位到該店家目前的品項
+function onModalVendorChange() {
+    const vendorSelect = document.getElementById('modalVendorSelect');
+    const itemSelect = document.getElementById('modalItemSelect');
+    if (!vendorSelect || !itemSelect || vendorSelect.value === "") return;
+    
+    const selectedOption = vendorSelect.options[vendorSelect.selectedIndex];
+    const currentItem = selectedOption.dataset.item;
+    
+    if (currentItem && ITEM_TYPE_MAP[currentItem]) {
+        itemSelect.value = currentItem;
+    }
+}
+
+// 關閉彈窗
+function closeEditModal() {
+    document.getElementById('vendorEditModal').style.display = 'none';
+}
+
+// 確認送出修改
+async function submitVendorEdit() {
+    const vendorSelect = document.getElementById('modalVendorSelect');
+    const itemSelect = document.getElementById('modalItemSelect');
+    
+    if (!vendorSelect || !itemSelect || vendorSelect.value === "") {
+        alert("無有效店家可修改");
+        return;
+    }
+    
+    const groupId = vendorSelect.value;
+    const newItem = itemSelect.value;
+    const newType = ITEM_TYPE_MAP[newItem] || "hot_am"; // 防呆預設值
+    
+    // 暫時停止輪詢定時器，避免畫面閃爍
+    if (syncInterval) clearInterval(syncInterval);
+    
+    // 畫面上先做「本地立即無感更新」提高流暢度
+    customers.forEach(c => {
+        if (c.groupId === groupId) {
+            c.item = newItem;
+            c.type = newType;
+        }
+    });
+    renderOrders();
+    closeEditModal();
+    
+    // 發送 POST 請求至雲端 GAS 即時修改 Google 試算表中的資料
+    if (GAS_WEB_APP_URL && !GAS_WEB_APP_URL.includes('XXXXX')) {
+        try {
+            await fetch(GAS_WEB_APP_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    action: 'updateItem', 
+                    groupId: groupId, 
+                    newItem: newItem, 
+                    newType: newType 
+                })
+            });
+            console.log(`[系統通知] 雲端品項更新成功: ${groupId} -> ${newItem}`);
+        } catch (err) {
+            console.error('更新雲端品項失敗:', err);
+        }
+    }
+    
+    // 兩秒後重啟自動即時同步
+    setTimeout(startAutoSync, 2000);
+}
+
 initData();

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>一味淨生活咖啡系統</title>
     <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
@@ -13,13 +14,17 @@
     <h2>☕ 一味淨生活咖啡</h2>
     <script src="config.js"></script>
     <script src="main.js"></script>
+    
     <div class="fab-container">
         <button class="fab-btn fab-top" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
             回到最上
         </button>
 
-        <button class="fab-btn"
-            onclick="document.getElementById('menuReference').scrollIntoView({ behavior: 'smooth' })">
+        <button class="fab-btn" style="background-color: #e91e63; color: white;" onclick="openEditModal()">
+            修改攤販
+        </button>
+
+        <button class="fab-btn" onclick="document.getElementById('menuReference').scrollIntoView({ behavior: 'smooth' })">
             價格
         </button>
         <button class="fab-btn" onclick="window.location.href='https://christypy.github.io/been.html?mode=admin'">
@@ -28,17 +33,7 @@
         <button class="fab-btn" onclick="document.getElementById('method').scrollIntoView({ behavior: 'smooth' })">
             作法
         </button>
-        <!-- <button class="fab-btn" onclick="window.location.href='https://christypy.github.io/record'">
-            記錄器
-        </button> -->
-
-
-        <!-- <button class="fab-btn" onclick="window.location.href='https://christypy.github.io/roast'">
-            烘豆
-        </button> -->
     </div>
-
-
 
     <div class="controls">
         <select id="daySelect">
@@ -50,9 +45,8 @@
             <option value="6">星期六</option>
             <option value="0">星期日</option>
         </select>
-        <!-- <button class="btn" onclick="renderOrders()">刷新列表</button> -->
-        <button id="refreshBtn" class="btn">刷新列表</button>
-        <button class="btn" id="clearAllBtn" onclick="clearAllDone()">全部重置</button>
+        <button id="refreshBtn" class="btn" onclick="initData(true)">刷新列表</button>
+        <button class="btn" id="clearAllBtn" onclick="manualClearAll()">全部重置</button>
     </div>
 
     <div class="info-section">
@@ -82,19 +76,14 @@
     </div>
 
     <div class="price-section-wrapper" id="menuReference" style="display: flex; gap: 15px; flex-wrap: wrap;">
-
         <div class="price-card" style="flex: 1; min-width: 300px; margin-bottom: 0;">
             <div class="price-card-header">☕ 義式基礎飲品</div>
-            <div class="price-grid" id="baseDrinksContainer">
-            </div>
+            <div class="price-grid" id="baseDrinksContainer"></div>
         </div>
-
         <div class="price-card" style="flex: 1; min-width: 300px; margin-bottom: 0;">
             <div class="price-card-header" style="background: #7d5a50;">📦 其他品項</div>
-            <div class="price-grid" id="otherItemsContainer">
-            </div>
+            <div class="price-grid" id="otherItemsContainer"></div>
         </div>
-
     </div>
 
     <table class="menu-group-full">
@@ -110,182 +99,42 @@
         <tbody id="menuTableBody"></tbody>
     </table>
 
-
-
-
-    </div>
-
-
-
-    <!-- <div class="info-section" id="menuReference" style="margin-top:20px;">
-        <h3>📋 單品豆單參考</h3>
-        <table class="menu-group-full">
-            <thead>
-                <tr>
-                    <th>品項</th>
-                    <th>外帶</th>
-                    <th>內用</th>
-                    <th>半磅</th>
-                    <th>濾掛</th>
-                    <th>10入組
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>覺</td>
-                    <td><span class="menu-price">200</span></td>
-                    <td><span class="menu-price">250</span></td>
-                    <td><span class="menu-price">950</span></td>
-                    <td><span class="menu-price">60</span></td>
-                </tr>
-                <tr>
-                    <td>花</td>
-                    <td><span class="menu-price">180</span></td>
-                    <td><span class="menu-price">230</span></td>
-                    <td><span class="menu-price">850</span></td>
-                    <td><span class="menu-price">55</span></td>
-                </tr>
-                <tr>
-                    <td>寶</td>
-                    <td><span class="menu-price">180</span></td>
-                    <td><span class="menu-price">230</span></td>
-                    <td><span class="menu-price">850</span></td>
-                    <td><span class="menu-price">55</span></td>
-                </tr>
-                <tr>
-                    <td>菩</td>
-                    <td><span class="menu-price">130</span></td>
-                    <td><span class="menu-price">180</span></td>
-                    <td><span class="menu-price">700</span></td>
-                    <td><span class="menu-price">45</span></td>
-                </tr>
-                <tr>
-                    <td>雅</td>
-                    <td><span class="menu-price">130</span></td>
-                    <td><span class="menu-price">180</span></td>
-                    <td><span class="menu-price">650</span></td>
-                    <td><span class="menu-price">45</span></td>
-                </tr>
-                <tr>
-                    <td>靜</td>
-                    <td><span class="menu-price">130</span></td>
-                    <td><span class="menu-price">180</span></td>
-                    <td><span class="menu-price">650</span></td>
-                    <td><span class="menu-price">45</span></td>
-                </tr>
-                <tr>
-                    <td>果</td>
-                    <td><span class="menu-price">130</span></td>
-                    <td><span class="menu-price">180</span></td>
-                    <td><span class="menu-price">600</span></td>
-                    <td><span class="menu-price">45</span></td>
-                    <td><span class="menu-price">360</span></td>
-
-                </tr>
-                <tr>
-                    <td>福</td>
-                    <td><span class="menu-price">130</span></td>
-                    <td><span class="menu-price">180</span></td>
-                    <td><span class="menu-price">550</span></td>
-                    <td><span class="menu-price">40</span></td>
-                </tr>
-                <tr>
-                    <td>柔</td>
-                    <td><span class="menu-price">130</span></td>
-                    <td><span class="menu-price">180</span></td>
-                    <td><span class="menu-price">450</span></td>
-                    <td><span class="menu-price">35</span></td>
-                </tr>
-                <tr>
-                    <td>定</td>
-                    <td><span class="menu-price">130</span></td>
-                    <td><span class="menu-price">180</span></td>
-                    <td><span class="menu-price">650</span></td>
-                    <td>-</td>
-                </tr>
-                <tr>
-                    <td>幻</td>
-                    <td><span class="menu-price">130</span></td>
-                    <td><span class="menu-price">180</span></td>
-                    <td><span class="menu-price">680</span></td>
-                    <td><span class="menu-price">45</span></td>
-                </tr>
-                <tr>
-                    <td>潤</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td></td>
-                    <td>-</td>
-                </tr>
-                <tr>
-                    <td>實</td>
-                    <td><span class="menu-price">130</span></td>
-                    <td><span class="menu-price">180</span></td>
-                    <td><span class="menu-price">550</span></td>
-                    <td><span class="menu-price">45</span></td>
-                </tr>
-            </tbody>
-        </table>
-    </div> -->
-
     <div class="price-card-container" id="method" style="margin-top: 25px;">
-        <div class="price-card">
-            <div class="price-card-header" style="background: var(--color-secondary);">📖 咖啡調製做法</div>
-            <div style="padding: 15px; font-size: 14px; line-height: 1.8;">
-                <div
-                    style="margin-bottom: 12px; border-bottom: 1px dashed var(--color-light-gray); padding-bottom: 8px;">
-                    <strong style="color: var(--color-primary);">☕ 美式/拿鐵基底：</strong><br>
-                    18/19/20g 粉 → 萃取 1:2-3g 時間大落在: 20-35秒<br>
-                    ➔ <b>加糖版本：</b>加3g糖粉<br>
-                    <br>
-                    ➔ <b>熱美式：</b> 1.濃縮60g 2.熱水九分滿<br>
-                    ➔ <b>大熱美式：</b>1.濃縮80g 2.熱水九分滿<br>
-
-                    ➔ <b>冰美式：</b>1.冰塊全滿 2.水八分 3.基底80g 4.冰塊補滿<br>
-                    ➔ <b>氣泡冰美式：</b>1. 60g濃縮加冰塊 2.用蒸氣打5秒 3.倒入整杯冰塊 <br>
-                    <br>
-                    ➔ <b>外帶冰拿鐵：</b>1.冰塊120g 2.濃縮80g 3.牛奶230g<br>
-                    ➔ <b>內用冰拿鐵：</b>1.冰塊120g 2.濃縮60g 3.牛奶160g<br>
-
-                    ➔ <b>熱拿鐵：</b>1.濃縮60g 2.牛奶230g打熱 3.融合
-
-                </div>
-                <div>
-                    <strong style="color: var(--color-primary);">淺培美式：</strong><br>
-                    靜 or 果 8.5 刻度
-                </div>
-                <div>
-                    <strong style="color: var(--color-primary);">🍵 抹茶歐蕾：</strong><br>
-                    粉 7g + 糖粉 6g + 熱水 60g 攪拌均勻，剩下用熱牛奶補滿。
-                </div>
-                <div>
-                    <strong style="color: var(--color-primary);">🍫 可可歐蕾：</strong><br>
-                    粉 7g + 糖粉 6g + 熱牛奶一些攪拌均勻，剩下用熱牛奶補滿。
-                </div>
-                <div>
-                    <strong style="color: var(--color-primary);">🍫 冰可可歐蕾：</strong><br>
-                    粉 10g + 糖粉 10g + 40度溫水50g攪拌均勻後，+冰牛奶250g<br>冰塊補到9分滿。
-                </div>
-            </div>
         </div>
 
-        <div class="price-card">
-            <div class="price-card-header" style="background: #666;">🔧 每日洗咖啡機流程</div>
-            <div style="padding: 15px; font-size: 14px; line-height: 1.6;">
-                <ul style="padding-left: 20px; margin: 0;">
-                    <li>卸下把手，將粉杯替換為<b>無孔逆洗杯 </b>。</li>
-                    <li>用<b>一字起子</b>轉開濾網螺絲，取下濾網清洗（小心燙，保管好螺絲）。</li>
-                    <li>把手加入<b>一湯匙清潔粉</b>並扣回。</li>
-                    <li>長按<b>「1 + 5」</b>按鈕啟動自動清洗。</li>
-                    <li>洗完將水倒掉，重複<b>「1 + 5」</b>清洗至無泡泡。</li>
-                    <li>卸下把手，鎖回螺絲與濾網，換回原本有孔粉杯。</li>
-                    <li>清水跑幾次觀察是否無泡沫</li>
-                </ul>
+    <div id="vendorEditModal" class="modal">
+        <div class="modal-content">
+            <h3>✏️ 線上修改攤販品項</h3>
+            
+            <div class="modal-group">
+                <label for="modalVendorSelect">選擇攤販 / 姓名：</label>
+                <select id="modalVendorSelect" onchange="onModalVendorChange()">
+                    </select>
+            </div>
+            
+            <div class="modal-group">
+                <label for="modalItemSelect">更換品項：</label>
+                <select id="modalItemSelect">
+                    <option value="大拿鐵">大拿鐵</option>
+                    <option value="大熱美">大熱美</option>
+                    <option value="大熱拿">大熱拿</option>
+                    <option value="冰手沖">冰手沖</option>
+                    <option value="冰美式">冰美式</option>
+                    <option value="冰拿鐵">冰拿鐵</option>
+                    <option value="冰拿鐵加糖">冰拿鐵加糖</option>
+                    <option value="熱手沖">熱手沖</option>
+                    <option value="熱美式">熱美式</option>
+                    <option value="熱拿鐵">熱拿鐵</option>
+                    <option value="熱拿鐵加糖">熱拿鐵加糖</option>
+                </select>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeEditModal()">取消</button>
+                <button class="modal-btn confirm" onclick="submitVendorEdit()">確認修改</button>
             </div>
         </div>
     </div>
 
 </body>
-
 </html>
