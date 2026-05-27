@@ -8,10 +8,10 @@
     <link rel="stylesheet" href="style.css">
     <style>
         /* ==========================================================================
-           ⚡ 價目表空間極致壓縮與多欄化排版
+           ⚡ 價目表與作法空間極致壓縮排版
            ========================================================================== */
         
-        /* 1. 義式飲品與周邊：打破卡片制，改為緊湊多欄 Grid */
+        /* 1. 義式飲品與周邊：打破大卡片，改為緊湊多欄 Grid */
         .compact-menu-section {
             background: var(--color-section-bg);
             border-radius: var(--border-radius-md);
@@ -33,13 +33,13 @@
 
         .multi-column-wrapper {
             display: grid;
-            grid-template-columns: repeat(2, 1fr); /* 📱 手機版直接並排雙欄 */
+            grid-template-columns: repeat(2, 1fr); /* 📱 手機版並排雙欄 */
             gap: 6px 12px;
         }
 
         @media (min-width: 768px) {
             .multi-column-wrapper {
-                grid-template-columns: repeat(4, 1fr); /* 💻 電腦與平板直接展開成四欄 */
+                grid-template-columns: repeat(4, 1fr); /* 💻 電腦版四欄 */
             }
         }
 
@@ -68,9 +68,10 @@
         /* 2. 單品咖啡豆：全面改為直覺好讀的「四宮格規格字卡」 */
         .single-beans-grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* 自動塞滿橫向空間 */
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 8px;
             margin-top: 10px;
+            margin-bottom: 16px;
         }
 
         .bean-compact-card {
@@ -94,10 +95,9 @@
             white-space: nowrap;
         }
 
-        /* 規格方塊按鈕組（超直覺橫排） */
         .bean-specs-row {
             display: grid;
-            grid-template-columns: repeat(4, 1fr); /* 四個規格平分寬度 */
+            grid-template-columns: repeat(4, 1fr);
             gap: 4px;
         }
 
@@ -123,9 +123,36 @@
             color: var(--color-danger);
         }
         
-        /* 沒填價格的規格直接隱藏，維持視覺平衡 */
         .square-badge.is-empty {
-            visibility: hidden; /* 保留骨架位置讓排版不歪掉，但看不到內容 */
+            visibility: hidden; 
+        }
+
+        /* 3. 調製做法與洗機流程雙欄美化（手機版直排，大螢幕自動並排） */
+        .method-flex-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        @media (min-width: 768px) {
+            .method-flex-container {
+                flex-direction: row;
+            }
+            .method-flex-container .price-card {
+                flex: 1;
+                margin-bottom: 0 !important;
+            }
+        }
+
+        .method-item-block {
+            margin-bottom: 12px;
+            border-bottom: 1px dashed rgba(0,0,0,0.06);
+            padding-bottom: 10px;
+        }
+        .method-item-block:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+            padding-bottom: 0;
         }
 
         /* 讀取狀態 */
@@ -171,7 +198,7 @@
             <option value="1">星期一 (休)</option>
             <option value="2">星期二</option>
             <option value="3">星期三</option>
-            <option value="4">星期四</option>
+            <option value="4">星期4</option>
             <option value="5">星期五</option>
             <option value="6">星期六</option>
             <option value="0">星期日</option>
@@ -206,7 +233,6 @@
         </div>
     </div>
 
-    <!-- 🌟 新優化：多欄位合流的基本飲品與周邊區塊 -->
     <div id="menuReference">
         <div class="compact-menu-section">
             <div class="compact-grid-title">☕ 義式基礎飲品</div>
@@ -216,22 +242,65 @@
         </div>
 
         <div class="compact-menu-section">
-            <div class="compact-grid-title">📦 其他品項</div>
+            <div class="compact-grid-title">📦 其他品項 / 周邊</div>
             <div class="multi-column-wrapper" id="otherItemsContainer">
                 <div class="cloud-loading-mini">同步雲端品項中...</div>
             </div>
         </div>
     </div>
 
-    <!-- 🌟 新優化：單品咖啡豆（徹底拋棄大表格，改為超直覺網格字卡） -->
     <div class="single-beans-grid-container" id="singleBeansGrid">
         <div class="cloud-loading-mini">☕ 正在讀取雲端單品豆目...</div>
     </div>
 
-    <!-- 隱藏舊版大表格占位符，確保原程式不報錯 -->
-    <table id="menuTableBody" style="display: none;"></table>
+    <div class="price-card-container method-flex-container" id="method">
+        
+        <div class="price-card" style="margin-bottom: 0;">
+            <div class="price-card-header" style="background: var(--color-secondary);">📖 咖啡調製做法</div>
+            <div style="padding: 15px; font-size: 13.5px; line-height: 1.8;">
+                <div class="method-item-block">
+                    <strong style="color: var(--color-primary);">☕ 美式/拿鐵基底：</strong><br>
+                    18/19/20g 粉 → 萃取 1:2-3g 時間大落在: 20-35秒<br>
+                    ➔ <b>加糖版本：</b>加3g糖粉<br>
+                    ➔ <b>熱美式：</b>加熱水至九分滿<br>
+                    ➔ <b>冰美式：</b>冰塊跟水九分滿+基底<br>
+                    ➔ <b>氣泡冰美式：</b>濃縮加冰塊用蒸氣打3-5秒，再倒入整杯冰塊<br>
+                    ➔ <b>冰拿鐵：</b>基底80+牛奶230+冰塊120<br>
+                    ➔ <b>熱拿鐵：</b>牛奶用鋼杯打熱後加至九分滿
+                </div>
+                <div class="method-item-block">
+                    <strong style="color: var(--color-primary);">淺焙美式：</strong><br>
+                    靜 or 果 8.5 刻度
+                </div>
+                <div class="method-item-block">
+                    <strong style="color: var(--color-primary);">🍵 抹茶歐蕾：</strong><br>
+                    粉 7g + 糖粉 6g + 熱水 60g 攪拌均勻，剩下用熱牛奶補滿。
+                </div>
+                <div class="method-item-block">
+                    <strong style="color: var(--color-primary);">🍫 可可歐蕾：</strong><br>
+                    粉 7g + 糖粉 6g + 熱牛奶一些攪拌均勻，剩下用熱牛奶補滿。
+                </div>
+            </div>
+        </div>
 
-    <div class="price-card-container" id="method" style="margin-top: 25px;"></div>
+        <div class="price-card" style="margin-bottom: 0;">
+            <div class="price-card-header" style="background: #666;">🔧 每日洗咖啡機流程</div>
+            <div style="padding: 15px; font-size: 13.5px; line-height: 1.7;">
+                <ul style="padding-left: 18px; margin: 0;">
+                    <li style="margin-bottom: 6px;">卸下把手，將粉杯替換為<b>無孔逆洗杯</b>。</li>
+                    <li style="margin-bottom: 6px;">用<b>一字起子</b>轉開濾網螺絲，取下濾網清洗（小心燙，保管好螺絲）。</li>
+                    <li style="margin-bottom: 6px;">把手加入<b>一湯匙清潔粉</b>並扣回。</li>
+                    <li style="margin-bottom: 6px;">長按<b>「1 + 5」</b>按鈕啟動自動清洗。</li>
+                    <li style="margin-bottom: 6px;">洗完將水倒掉，重複<b>「1 + 5」</b>清洗至無泡泡。</li>
+                    <li style="margin-bottom: 6px;">卸下把手，鎖回螺絲與濾網，換回原本有孔粉杯。</li>
+                    <li style="margin-bottom: 0;">清水跑幾次觀察是否無泡沫。</li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+    <table id="menuTableBody" style="display: none;"></table>
 
     <div id="vendorEditModal" class="modal">
         <div class="modal-content">
@@ -266,9 +335,6 @@
         </div>
     </div>
 
-    <!-- ==========================================================================
-       📊 雲端多欄位快讀資料解析腳本
-       ========================================================================== */ -->
     <script>
         const CLOUD_MENU_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSEiSHdIF1FlVgrSp5r8DhCDnTKAVhfRjXPIizNQ_d5kK_FFUQJfQKhQG1YXe3ViIdExAiUnAPlKCO-/pub?gid=250388087&single=true&output=csv";
 
@@ -311,7 +377,6 @@
                         const poundPrice = row[10] ? row[10].trim() : ""; 
                         const dripPrice = row[11] ? row[11].trim() : "";   
                         
-                        // 轉換為直覺的四宮格卡片排版
                         singleHTML += `
                             <div class="bean-compact-card">
                                 <div class="bean-title-line">☕ ${name}</div>
