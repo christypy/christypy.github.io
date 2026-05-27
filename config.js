@@ -31,16 +31,17 @@ const CONFIG = {
     ],
     // 飲品代碼對應名稱
     TYPE_NAMES: {
-        hot_am: '☕ 熱美式', 
-        ice_am: '🧊 冰美式', 
-        large_hot_am: "☕️ 大熱美",
-        hot_latte: '🔥 熱拿鐵', 
-        hot_latte_sugar: '🍬 熱拿鐵 (加糖)',
-        ice_latte_sugar: '🍭 冰拿鐵 (加糖)', 
-        ice_latte: '❄️ 冰拿鐵',
-        large_hot_latte: '🥤 大熱拿', 
-        hand_drip: '💧 手沖', 
-        potential_item: '❓ 待確認'
+        hot_am: '熱美式', 
+        ice_am: '冰美式', 
+        large_hot_am: "大熱美",
+        large_hot_latte: '大熱拿', 
+        hot_latte: '熱拿鐵', 
+        hot_latte_sugar: '熱拿鐵 (加糖)',
+        ice_latte_sugar: '冰拿鐵 (加糖)', 
+        ice_latte: '冰拿鐵',
+        hot_hand: '熱手沖', 
+        ice_hand: ' 冰手沖', 
+        potential_item: '待確認'
     },
 
     MENU_DATA: [
