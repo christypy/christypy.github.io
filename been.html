@@ -622,7 +622,7 @@
     <script>
         const SPREADSHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSEiSHdIF1FlVgrSp5r8DhCDnTKAVhfRjXPIizNQ_d5kK_FFUQJfQKhQG1YXe3ViIdExAiUnAPlKCO-/pub?gid=250388087&single=true&output=csv";
 
-        let coffeeData = [];
+let coffeeData = [];
         let isAdminActive = false;
         let cart = {};
 
@@ -675,7 +675,7 @@
                 render();
             } catch (error) {
                 console.error(error);
-                document.getElementById('singleGrid').innerHTML = `<div style="text-align:center;padding:40px;color:#a44a3f;width:100%;">⚠️ 讀取雲端選單失敗，請確認網路或發布網址。</div>`;
+                document.getElementById('singleGrid').innerHTML = `<div style="text-align:center;padding:40px;color:#a44a3f;width:100%;">⚠️ 讀取雲端選單失敗。</div>`;
             }
         }
 
@@ -694,14 +694,18 @@
             render();
         }
 
+        // 修改：加入購物車時初始化 temp
         function addToCart(name, price, subText = '') {
             if (isAdminActive) return;
-            const cartKey = `${name} (${subText})`;
-            if (cart[cartKey]) {
-                cart[cartKey].qty += 1;
-            } else {
-                cart[cartKey] = { name: name, subText: subText, price: price, qty: 1 };
-            }
+            const cartKey = `${name}-${subText}-${Date.now()}`; // 使用唯一 Key 防止同名不同項被合併
+            cart[cartKey] = { name: name, subText: subText, price: price, qty: 1, temp: '冰' };
+            updateCartUI();
+        }
+
+        // 修改：切換冰熱
+        function toggleTemp(cartKey) {
+            if (!cart[cartKey]) return;
+            cart[cartKey].temp = (cart[cartKey].temp === '冰') ? '熱' : '冰';
             updateCartUI();
         }
 
@@ -732,25 +736,35 @@
         function updateCartUI() {
             const container = document.getElementById('cartItemsContainer');
             const items = Object.values(cart);
+            // 獲取所有鍵值，確保能對應到正確的 cart 物件
+            const keys = Object.keys(cart);
 
-            document.getElementById('headerCount').textContent = items.reduce((sum, i) => sum + i.qty, 0);
-            document.getElementById('calcTotal').textContent = items.reduce((sum, i) => sum + (i.price * i.qty), 0);
+            // 更新總件數與總金額
+            const totalCount = items.reduce((sum, i) => sum + i.qty, 0);
+            const totalPrice = items.reduce((sum, i) => sum + (i.price * i.qty), 0);
+            
+            document.getElementById('headerCount').textContent = totalCount;
+            document.getElementById('calcTotal').textContent = totalPrice;
 
             if (items.length === 0) {
                 container.innerHTML = `<div class="cart-empty">🛒<br>收銀台空空如也</div>`;
             } else {
-                container.innerHTML = items.map(item => {
-                    const key = `${item.name} (${item.subText})`;
+                // 使用 map 結合 index 來對應正確的 key
+                container.innerHTML = items.map((item, index) => {
+                    const currentKey = keys[index];
+                    const showTempBtn = (item.subText === '內用' || item.subText === '外帶');
+                    
                     return `
                         <div class="cart-item-row">
                             <div class="cart-item-info">
                                 <span class="cart-item-name">${item.name}</span>
-                                <span class="cart-item-meta">${item.subText} · $${item.price}</span>
+                                <span class="cart-item-meta">${item.subText} ${showTempBtn ? '· ' + item.temp : ''} · $${item.price}</span>
                             </div>
                             <div class="qty-controls">
-                                <button class="qty-btn" onclick="changeQty('${key}', -1)">−</button>
+                                ${showTempBtn ? `<button class="qty-btn" style="width:38px; border-radius:6px; margin-right:4px; font-size:0.75em;" onclick="toggleTemp('${currentKey}')">${item.temp}</button>` : ''}
+                                <button class="qty-btn" onclick="changeQty('${currentKey}', -1)">−</button>
                                 <span class="qty-val">${item.qty}</span>
-                                <button class="qty-btn" onclick="changeQty('${key}', 1)">+</button>
+                                <button class="qty-btn" onclick="changeQty('${currentKey}', 1)">+</button>
                             </div>
                         </div>
                     `;
@@ -775,7 +789,7 @@
             document.getElementById('otherListContainer').innerHTML = coffeeData
                 .filter(item => item.type === 'other')
                 .map((item, idx, arr) => `
-                    <li class="menu-item" onclick="addToCart('${item.name}', ${item.price}, '周邊')">
+                    <li class="menu-item" onclick="addToCart('${item.name}', ${item.price}, '其他')">
                         <span class="item-name">${item.name}</span>
                         <span class="item-price">${item.price}</span>
                     </li>
