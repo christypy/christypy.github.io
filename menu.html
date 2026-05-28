@@ -160,6 +160,9 @@
             } else if (r[0].trim() === 'other') {
                 otherHTML += `<div class="menu-item"><span class="item-name">${r[2]}</span><span class="item-price">${r[8]}</span></div>`;
             } else if (r[0].trim() === 'single') {
+                // 讀第 13 欄（index 12）status：1 或「上架」才顯示
+                const status = r[12] ? r[12].trim() : '';
+                if (status !== '1' && status !== '上架') continue;
                 singleHTML += `
                     <div class="card">
                         <span class="roast-badge ${r[5]}">${r[6]}</span>

@@ -932,11 +932,9 @@ let coffeeData = [];
             } else {
                 body.innerHTML = `
                     <div class="form-note" style="margin-bottom:12px;">
-                        ✏️ 填寫後請同步更新 Google 試算表「點單品項」sheet，<br>
-                        在對應列的第 13 欄（status）填入 <strong>1</strong> 代表上架，<strong>0</strong> 代表下架。<br>
-                        下方新增為本機暫存，重新整理後以試算表為準。
+                        ✏️ 填寫後點「新增」，資料會直接寫入 Google 試算表「點單品項」sheet，status 自動設為 <strong>1（上架）</strong>。
                     </div>
-                    <div class="add-success-msg" id="addSuccessMsg">✅ 已暫存新增！請記得同步更新試算表。</div>
+                    <div class="add-success-msg" id="addSuccessMsg">✅ 已寫入試算表！</div>
                     <div class="add-form">
                         <div class="form-row">
                             <div class="form-group full">
@@ -987,32 +985,61 @@ let coffeeData = [];
                                 <input class="form-input" id="f_drip" type="number" placeholder="80" inputmode="numeric">
                             </div>
                         </div>
-                        <button class="submit-btn" onclick="submitNewBean()">＋ 新增單品豆（暫存）</button>
+                        <button class="submit-btn" onclick="submitNewBean()">＋ 新增單品豆</button>
                     </div>
                 `;
             }
         }
 
-        function toggleStatus(id, checked) {
-            const item = coffeeData.find(c => c.id === id);
-            if (!item) return;
-            item.available = checked;
-            // 儲存本機覆蓋
-            const localOverride = JSON.parse(localStorage.getItem('statusOverride') || '{}');
-            localOverride[id] = checked;
-            localStorage.setItem('statusOverride', JSON.stringify(localOverride));
-            render();
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyAXTwhXOZfmICm1QjOd0tq5qJKYH0rMql4dWc_1SxlCkBmF8nD-1NEDrHLKzzLo481lQ/exec";
+
+        async function callGAS(payload) {
+            const res = await fetch(GAS_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+            return res.json();
         }
 
-        function submitNewBean() {
+        async function toggleStatus(id, checked) {
+            console.log('toggleStatus called:', id, checked); // 加這行
+
+            const item = coffeeData.find(c => c.id === id);
+            if (!item) return;
+
+            // 立即更新 UI，不等待網路
+            item.available = checked;
+            render();
+
+            // 找到 toggle 元素，顯示 loading 狀態
+            const checkbox = document.querySelector(`input[onchange="toggleStatus(${id}, this.checked)"]`);
+            if (checkbox) checkbox.disabled = true;
+
+            try {
+                const result = await callGAS({ action: 'updateStatus', id: id, status: checked });
+                if (!result.ok) throw new Error('GAS 回傳失敗');
+                // 清除 localStorage 覆蓋（試算表已是真實來源）
+                const localOverride = JSON.parse(localStorage.getItem('statusOverride') || '{}');
+                delete localOverride[id];
+                localStorage.setItem('statusOverride', JSON.stringify(localOverride));
+            } catch (err) {
+                console.error('寫入試算表失敗，改存本機備援', err);
+                // 寫入失敗時降級為 localStorage
+                const localOverride = JSON.parse(localStorage.getItem('statusOverride') || '{}');
+                localOverride[id] = checked;
+                localStorage.setItem('statusOverride', JSON.stringify(localOverride));
+            } finally {
+                if (checkbox) checkbox.disabled = false;
+            }
+        }
+
+        async function submitNewBean() {
             const name = document.getElementById('f_name').value.trim();
             if (!name) { alert('請填寫豆子名稱'); return; }
             const roastVal = document.getElementById('f_roast').value;
             const roastNameMap = { lr: '淺焙', mr: '中焙', dr: '深焙' };
-            const newId = Date.now();
-            const newItem = {
-                id: newId,
-                type: 'single',
+
+            const bean = {
                 name: name,
                 origin: document.getElementById('f_origin').value.trim(),
                 process: document.getElementById('f_process').value.trim(),
@@ -1023,20 +1050,39 @@ let coffeeData = [];
                 stay: parseInt(document.getElementById('f_stay').value) || 0,
                 pound: parseInt(document.getElementById('f_pound').value) || 0,
                 drip: parseInt(document.getElementById('f_drip').value) || 0,
-                available: true
             };
-            coffeeData.push(newItem);
-            render();
-            // 顯示成功訊息
-            const msg = document.getElementById('addSuccessMsg');
-            msg.style.display = 'block';
-            setTimeout(() => { msg.style.display = 'none'; }, 3000);
-            // 清空表單
-            ['f_name','f_origin','f_process','f_flavor','f_take','f_stay','f_pound','f_drip'].forEach(id => {
-                document.getElementById(id).value = '';
-            });
-            // 切換到狀態頁顯示新增結果
-            setTimeout(() => switchTab('status'), 1200);
+
+            // 按鈕 loading 狀態
+            const btn = document.querySelector('.submit-btn');
+            btn.textContent = '⏳ 寫入試算表中…';
+            btn.disabled = true;
+
+            try {
+                const result = await callGAS({ action: 'addBean', bean: bean });
+                // if (!result.ok) throw new Error('GAS 回傳失敗');
+
+                // 用試算表回傳的真實 id 加入本機資料
+                const newItem = { ...bean, id: result.newId, type: 'single', available: true };
+                coffeeData.push(newItem);
+                render();
+
+                const msg = document.getElementById('addSuccessMsg');
+                msg.textContent = '✅ 已寫入試算表！';
+                msg.style.display = 'block';
+                setTimeout(() => { msg.style.display = 'none'; }, 3000);
+
+                // 清空表單
+                ['f_name','f_origin','f_process','f_flavor','f_take','f_stay','f_pound','f_drip'].forEach(fid => {
+                    document.getElementById(fid).value = '';
+                });
+                setTimeout(() => switchTab('status'), 1200);
+
+            } catch (err) {
+                alert('⚠️ 寫入試算表失敗，請確認網路或 Apps Script 設定。\n' + err.message);
+            } finally {
+                btn.textContent = '＋ 新增單品豆';
+                btn.disabled = false;
+            }
         }
 
         // 修改：加入購物車時初始化 temp
