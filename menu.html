@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>咖啡選單</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3d2b1f;
+            --secondary: #8d6e63;
+            --bg: #f5f2ec;
+            --card-bg: #ffffff;
+            --light-roast: #e6b37e;
+            --med-roast: #bc6c25;
+            --dark-roast: #4a3728;
+            --price: #a44a3f;
+            --border: rgba(61, 43, 31, 0.1);
+            --font-main: "Noto Serif TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            background-image: radial-gradient(#ddd9d3 0.5px, transparent 0.5px);
+            background-size: 18px 18px;
+            color: #444;
+            margin: 0;
+            font-family: var(--font-main);
+            min-height: 100vh;
+            padding: 15px; /* 稍微縮小手機邊距 */
+        }
+
+        .container { max-width: 1000px; margin: 0 auto; }
+        
+        /* === 新增：手機版分頁導覽列 === */
+        .tab-container {
+            display: flex;
+            position: sticky;
+            top: 0;
+            background: var(--bg);
+            padding: 10px 0;
+            z-index: 100;
+            gap: 8px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 15px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px 5px;
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.95em;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .tab-btn.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+
+        /* 控制內容顯示/隱藏 */
+        .menu-section { display: none; }
+        .menu-section.active { display: block; }
+
+        /* 經典與其他列表 */
+        .simple-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+        .menu-item { background: rgba(255,255,255,0.6); padding: 14px 16px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); }
+        .item-name { font-weight: 600; color: var(--primary); }
+        .item-price { font-weight: 800; color: var(--price); }
+        .item-price::before { content: '$'; font-size: 0.8em; }
+
+        /* 單品豆區 */
+        #singleGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+        .card { background: var(--card-bg); border-radius: 14px; border: 1px solid var(--border); padding: 16px; display: flex; flex-direction: column; box-shadow: 0 2px 10px rgba(61,43,31,0.04); }
+        .roast-badge { align-self: flex-end; font-size: 0.65em; padding: 2px 7px; color: #fff; font-weight: bold; border-radius: 6px; }
+        .lr { background: var(--light-roast); } .mr { background: var(--med-roast); } .dr { background: var(--dark-roast); }
+        .theme-word { font-family: "DM Serif Display", serif; font-size: 1.8em; color: var(--primary); text-align: center; margin: 5px 0; }
+        .origin { font-size: 0.85em; font-weight: 700; color: var(--secondary); text-align: center; }
+        .process { background: #fdf1e6; color: #9d6b42; font-size: 0.7em; padding: 2px 8px; border-radius: 4px; width: fit-content; margin: 5px auto; }
+        .flavor { font-size: 0.85em; color: #666; text-align: center; margin: 8px 0 15px; flex-grow: 1; line-height: 1.4; }
+        
+        /* 優化單品價格為 2x2 網格排版，更適合手機 */
+        .price-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border-top: 1px solid #eee; padding-top: 10px; text-align: center; }
+        .price-item { background: #faf8f5; padding: 6px; border-radius: 6px; }
+        .p-unit { font-size: 0.75em; color: #888; margin-bottom: 2px; }
+        .p-val { font-weight: 800; color: var(--price); font-size: 0.95em; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 style="text-align: center; color: var(--primary); margin: 15px 0 10px; font-size: 1.8em;">☕ 咖啡選單</h1>
+    
+    <!-- 新增：分頁按鈕 -->
+    <div class="tab-container">
+        <button class="tab-btn active" onclick="switchTab('classic')">經典飲品</button>
+        <button class="tab-btn" onclick="switchTab('other')">其他品項</button>
+        <button class="tab-btn" onclick="switchTab('single')">單品咖啡豆</button>
+    </div>
+
+    <!-- 區塊改為由 Tab 控制顯示 -->
+    <div id="classic-section" class="menu-section active">
+        <div class="simple-list" id="classicList"></div>
+    </div>
+
+    <div id="other-section" class="menu-section">
+        <div class="simple-list" id="otherList"></div>
+    </div>
+
+    <div id="single-section" class="menu-section">
+        <div id="singleGrid"></div>
+    </div>
+</div>
+
+<script>
+    const SPREADSHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSEiSHdIF1FlVgrSp5r8DhCDnTKAVhfRjXPIizNQ_d5kK_FFUQJfQKhQG1YXe3ViIdExAiUnAPlKCO-/pub?gid=250388087&single=true&output=csv";
+
+    // 切換分頁的邏輯
+    function switchTab(tabName) {
+        // 切換按鈕狀態
+        document.querySelectorAll('.tab-btn').forEach((btn, index) => {
+            if((tabName === 'classic' && index === 0) || (tabName === 'other' && index === 1) || (tabName === 'single' && index === 2)) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+
+        // 切換內容顯示
+        document.querySelectorAll('.menu-section').forEach(section => {
+            section.classList.remove('active');
+        });
+        document.getElementById(`${tabName}-section`).classList.add('active');
+        
+        // 切換時自動滾動回頂部，體驗更好
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function fetchMenu() {
+        const response = await fetch(SPREADSHEET_CSV_URL);
+        const data = await response.text();
+        const rows = data.split('\n').map(r => r.split(','));
+        
+        let classicHTML = '', otherHTML = '', singleHTML = '';
+
+        for (let i = 1; i < rows.length; i++) {
+            const r = rows[i];
+            if (!r[0]) continue;
+            
+            if (r[0].trim() === 'classic') {
+                classicHTML += `<div class="menu-item"><span class="item-name">${r[2]}</span><span class="item-price">${r[8]}</span></div>`;
+            } else if (r[0].trim() === 'other') {
+                otherHTML += `<div class="menu-item"><span class="item-name">${r[2]}</span><span class="item-price">${r[8]}</span></div>`;
+            } else if (r[0].trim() === 'single') {
+                singleHTML += `
+                    <div class="card">
+                        <span class="roast-badge ${r[5]}">${r[6]}</span>
+                        <div class="theme-word">${r[2]}</div>
+                        <div class="origin">${r[3]}</div>
+                        <div class="process">${r[4]}</div>
+                        <div class="flavor">${r[7]}</div>
+                        <div class="price-row">
+                            <div class="price-item"><div class="p-unit">外帶</div><div class="p-val">$${r[8]}</div></div>
+                            <div class="price-item"><div class="p-unit">內用</div><div class="p-val">$${r[9]}</div></div>
+                            <div class="price-item"><div class="p-unit">濾掛</div><div class="p-val">$${r[11]}</div></div>
+                            <div class="price-item"><div class="p-unit">半磅</div><div class="p-val">$${r[10]}</div></div>
+                        </div>
+                    </div>`;
+            }
+        }
+        document.getElementById('classicList').innerHTML = classicHTML;
+        document.getElementById('otherList').innerHTML = otherHTML;
+        document.getElementById('singleGrid').innerHTML = singleHTML;
+    }
+    fetchMenu();
+</script>
+</body>
+</html>
