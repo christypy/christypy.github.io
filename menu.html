@@ -28,12 +28,16 @@
             margin: 0;
             font-family: var(--font-main);
             min-height: 100vh;
-            padding: 15px; /* 稍微縮小手機邊距 */
+            padding: 15px;
         }
 
         .container { max-width: 1000px; margin: 0 auto; }
         
-        /* === 新增：手機版分頁導覽列 === */
+        /* 區塊標題（在同網頁內區隔經典與其他） */
+        .section-title { font-size: 1.1em; font-weight: 700; color: var(--secondary); margin: 20px 0 12px; display: flex; align-items: center; gap: 10px; }
+        .section-title::before { content: ''; width: 4px; height: 16px; background: var(--secondary); border-radius: 2px; }
+
+        /* 置頂分頁導覽列 */
         .tab-container {
             display: flex;
             position: sticky;
@@ -41,19 +45,19 @@
             background: var(--bg);
             padding: 10px 0;
             z-index: 100;
-            gap: 8px;
+            gap: 10px;
             border-bottom: 1px solid var(--border);
             margin-bottom: 15px;
         }
         .tab-btn {
             flex: 1;
-            padding: 10px 5px;
+            padding: 12px 5px;
             background: rgba(255, 255, 255, 0.6);
             border: 1px solid var(--border);
-            border-radius: 20px;
+            border-radius: 25px;
             color: var(--primary);
             font-weight: 700;
-            font-size: 0.95em;
+            font-size: 1em;
             cursor: pointer;
             text-align: center;
             transition: all 0.3s;
@@ -85,7 +89,7 @@
         .process { background: #fdf1e6; color: #9d6b42; font-size: 0.7em; padding: 2px 8px; border-radius: 4px; width: fit-content; margin: 5px auto; }
         .flavor { font-size: 0.85em; color: #666; text-align: center; margin: 8px 0 15px; flex-grow: 1; line-height: 1.4; }
         
-        /* 優化單品價格為 2x2 網格排版，更適合手機 */
+        /* 2x2 價格網格 */
         .price-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border-top: 1px solid #eee; padding-top: 10px; text-align: center; }
         .price-item { background: #faf8f5; padding: 6px; border-radius: 6px; }
         .p-unit { font-size: 0.75em; color: #888; margin-bottom: 2px; }
@@ -97,22 +101,22 @@
 <div class="container">
     <h1 style="text-align: center; color: var(--primary); margin: 15px 0 10px; font-size: 1.8em;">☕ 咖啡選單</h1>
     
-    <!-- 新增：分頁按鈕 -->
+    <!-- 分頁按鈕調整為兩個 -->
     <div class="tab-container">
-        <button class="tab-btn active" onclick="switchTab('classic')">經典飲品</button>
-        <button class="tab-btn" onclick="switchTab('other')">其他品項</button>
+        <button class="tab-btn active" onclick="switchTab('drinks')">經典與飲品</button>
         <button class="tab-btn" onclick="switchTab('single')">單品咖啡豆</button>
     </div>
 
-    <!-- 區塊改為由 Tab 控制顯示 -->
-    <div id="classic-section" class="menu-section active">
+    <!-- 第一頁：經典飲品 + 其他品項 -->
+    <div id="drinks-section" class="menu-section active">
+        <div class="section-title">經典飲品</div>
         <div class="simple-list" id="classicList"></div>
-    </div>
 
-    <div id="other-section" class="menu-section">
+        <div class="section-title">其他品項</div>
         <div class="simple-list" id="otherList"></div>
     </div>
 
+    <!-- 第二頁：單品豆 -->
     <div id="single-section" class="menu-section">
         <div id="singleGrid"></div>
     </div>
@@ -121,11 +125,10 @@
 <script>
     const SPREADSHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSEiSHdIF1FlVgrSp5r8DhCDnTKAVhfRjXPIizNQ_d5kK_FFUQJfQKhQG1YXe3ViIdExAiUnAPlKCO-/pub?gid=250388087&single=true&output=csv";
 
-    // 切換分頁的邏輯
     function switchTab(tabName) {
         // 切換按鈕狀態
         document.querySelectorAll('.tab-btn').forEach((btn, index) => {
-            if((tabName === 'classic' && index === 0) || (tabName === 'other' && index === 1) || (tabName === 'single' && index === 2)) {
+            if((tabName === 'drinks' && index === 0) || (tabName === 'single' && index === 1)) {
                 btn.classList.add('active');
             } else {
                 btn.classList.remove('active');
@@ -138,7 +141,6 @@
         });
         document.getElementById(`${tabName}-section`).classList.add('active');
         
-        // 切換時自動滾動回頂部，體驗更好
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
