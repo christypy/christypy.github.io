@@ -557,6 +557,25 @@ function renderPrices() {
     }
 }
 
+function toggleSection(id, btn) {
+    const sections = ['menuReference', 'method', 'memoSection'];
+    const el = document.getElementById(id);
+    const isVisible = el.classList.contains('visible');
+
+    // 全部收起（包含 nav 高亮）
+    sections.forEach(s => {
+        document.getElementById(s).classList.remove('visible');
+    });
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
+
+    // 如果原本是收起的就展開，否則就維持收起（toggle 效果）
+    if (!isVisible) {
+        el.classList.add('visible');
+        if (btn) btn.classList.add('nav-active');
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
 // --- 🛠️ 輔助工具函式區 ---
 function getTodayDateString() {
     const t = new Date(); return t.getFullYear() + (t.getMonth() + 1).toString().padStart(2, '0') + t.getDate().toString().padStart(2, '0');

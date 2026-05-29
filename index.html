@@ -2,25 +2,22 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>一味淨生活咖啡系統</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h2>☕ 一味淨生活咖啡</h2>
+<div class="page-header">
+    <h1>☕ 一味淨生活</h1>
+</div>
+
 <script src="config.js"></script>
 <script src="main.js"></script>
 
-<div class="fab-container">
-    <button class="fab-btn fab-top" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">回到最上</button>
-    <button class="fab-btn" style="background-color: #e91e63; color: white;" onclick="openEditModal()">修改攤販</button>
-    <button class="fab-btn" onclick="document.getElementById('menuReference').scrollIntoView({ behavior: 'smooth' })">價格</button>
-    <button class="fab-btn" onclick="window.location.href='https://christypy.github.io/menu.html'">菜單</button>
-    <button class="fab-btn" onclick="window.location.href='https://christypy.github.io/been.html?mode=admin'">結帳</button>
-    <button class="fab-btn" onclick="document.getElementById('method').scrollIntoView({ behavior: 'smooth' })">作法</button>
-</div>
-
+<!-- 控制列 -->
 <div class="controls">
     <select id="daySelect">
         <option value="1">星期一 (休)</option>
@@ -35,17 +32,7 @@
     <button class="btn" id="clearAllBtn" onclick="manualClearAll()">全部重置</button>
 </div>
 
-<div class="info-section">
-    <h3>📝 常駐備忘</h3>
-    <ul id="staticMemoList">
-        <li><b>恐龍嫩仙草：</b>環保杯熱美式</li>
-        <li><b>內衣店老闆：</b>熱拿鐵</li>
-        <li><b>芭樂：</b>熱拿鐵 + 糖(3g)</li>
-        <li><b>吳家阿婆：</b>熱牛奶(比平常更燙)</li>
-    </ul>
-    <ul id="dynamicMemoList"></ul>
-</div>
-
+<!-- 攤販訂單（主區塊）-->
 <div class="stats-container">
     <div class="stat-box" style="border-top-color: var(--color-success);">
         <h3>🏠 左右鄰居 總計</h3>
@@ -61,8 +48,8 @@
     </div>
 </div>
 
-<!-- 價目表 -->
-<div id="menuReference">
+<!-- 價目表（預設隱藏）-->
+<div id="menuReference" class="collapsible-section">
     <div class="compact-menu-section">
         <div class="compact-grid-title">☕ 義式基礎飲品</div>
         <div class="multi-column-wrapper" id="baseDrinksContainer">
@@ -83,99 +70,143 @@
     </div>
 </div>
 
-<!-- 作法 + 洗機流程 -->
-<div class="method-flex-container" id="method">
-    <div class="price-card">
-        <div class="price-card-header" style="background: var(--color-secondary);">📖 咖啡調製做法</div>
-        <div style="padding: 14px; font-size: 13.5px; line-height: 1.8;">
-            <div class="method-item-block">
-                <strong style="color: var(--color-primary);">☕ 美式/拿鐵基底：</strong><br>
-                18/19/20/21g 粉 → 萃取 1:2-3g 時間大落在: 20-35秒<br>
-                ➔ <b>加糖版本：</b>加3g糖粉<br>
-                ➔ <b>熱美式：</b>加熱水至九分滿<br>
-                ➔ <b>冰美式：</b>冰塊全滿跟水八分滿+基底(試喝調濃度)<br>
-                ➔ <b>氣泡冰美式：</b>濃縮加冰塊用蒸氣打3-5秒，再倒入整杯冰塊<br>
-                ➔ <b>冰拿鐵：</b>牛奶230+冰塊120+基底(試喝調濃度)<br>
-                ➔ <b>熱拿鐵：</b>牛奶230用鋼杯打熱後加至九分滿
+<!-- 作法 + 洗機流程（預設隱藏）-->
+<div class="collapsible-section" id="method">
+    <div class="method-flex-container">
+        <div class="price-card">
+            <div class="price-card-header" style="background: var(--color-secondary);">📖 咖啡調製做法</div>
+            <div style="padding: 14px; font-size: 13.5px; line-height: 1.8;">
+                <div class="method-item-block">
+                    <strong style="color: var(--color-primary);">☕ 美式/拿鐵基底：</strong><br>
+                    18/19/20/21g 粉 → 萃取 1:2-3g 時間大落在: 20-35秒<br>
+                    ➔ <b>加糖版本：</b>加3g糖粉<br>
+                    ➔ <b>熱美式：</b>加熱水至九分滿<br>
+                    ➔ <b>冰美式：</b>冰塊全滿跟水八分滿+基底(試喝調濃度)<br>
+                    ➔ <b>氣泡冰美式：</b>濃縮加冰塊用蒸氣打3-5秒，再倒入整杯冰塊<br>
+                    ➔ <b>冰拿鐵：</b>牛奶230+冰塊120+基底(試喝調濃度)<br>
+                    ➔ <b>熱拿鐵：</b>牛奶230用鋼杯打熱後加至九分滿
+                </div>
+                <div class="method-item-block">
+                    <strong style="color: var(--color-primary);">淺焙美式：</strong><br>
+                    靜 or 果 8.5 刻度
+                </div>
+                <div class="method-item-block">
+                    <strong style="color: var(--color-primary);">🍵 抹茶歐蕾：</strong><br>
+                    粉 7g + 糖粉 6g + 熱水 60g 攪拌均勻，剩下用熱牛奶補滿。
+                </div>
+                <div class="method-item-block">
+                    <strong style="color: var(--color-primary);">🍫 可可歐蕾：</strong><br>
+                    粉 7g + 糖粉 6g + 熱牛奶一些攪拌均勻，剩下用熱牛奶補滿。
+                </div>
             </div>
-            <div class="method-item-block">
-                <strong style="color: var(--color-primary);">淺焙美式：</strong><br>
-                靜 or 果 8.5 刻度
-            </div>
-            <div class="method-item-block">
-                <strong style="color: var(--color-primary);">🍵 抹茶歐蕾：</strong><br>
-                粉 7g + 糖粉 6g + 熱水 60g 攪拌均勻，剩下用熱牛奶補滿。
-            </div>
-            <div class="method-item-block">
-                <strong style="color: var(--color-primary);">🍫 可可歐蕾：</strong><br>
-                粉 7g + 糖粉 6g + 熱牛奶一些攪拌均勻，剩下用熱牛奶補滿。
+        </div>
+        <div class="price-card">
+            <div class="price-card-header" style="background: #666;">🔧 每日洗咖啡機流程</div>
+            <div style="padding: 14px; font-size: 13.5px; line-height: 1.7;">
+                <ul style="padding-left: 18px; margin: 0;">
+                    <li style="margin-bottom: 6px;">卸下把手，將粉杯替換為<b>無孔逆洗杯</b>。</li>
+                    <li style="margin-bottom: 6px;">用<b>一字起子</b>轉開濾網螺絲，取下濾網清洗（小心燙，保管好螺絲）。</li>
+                    <li style="margin-bottom: 6px;">把手加入<b>一湯匙清潔粉</b>並扣回。</li>
+                    <li style="margin-bottom: 6px;">長按<b>「1 + 5」</b>按鈕啟動自動清洗。</li>
+                    <li style="margin-bottom: 6px;">洗完將水倒掉，重複<b>「1 + 5」</b>清洗至無泡泡。</li>
+                    <li style="margin-bottom: 6px;">卸下把手，鎖回螺絲與濾網，換回原本有孔粉杯。</li>
+                    <li style="margin-bottom: 0;">清水跑幾次觀察是否無泡沫。</li>
+                </ul>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="price-card">
-        <div class="price-card-header" style="background: #666;">🔧 每日洗咖啡機流程</div>
-        <div style="padding: 14px; font-size: 13.5px; line-height: 1.7;">
-            <ul style="padding-left: 18px; margin: 0;">
-                <li style="margin-bottom: 6px;">卸下把手，將粉杯替換為<b>無孔逆洗杯</b>。</li>
-                <li style="margin-bottom: 6px;">用<b>一字起子</b>轉開濾網螺絲，取下濾網清洗（小心燙，保管好螺絲）。</li>
-                <li style="margin-bottom: 6px;">把手加入<b>一湯匙清潔粉</b>並扣回。</li>
-                <li style="margin-bottom: 6px;">長按<b>「1 + 5」</b>按鈕啟動自動清洗。</li>
-                <li style="margin-bottom: 6px;">洗完將水倒掉，重複<b>「1 + 5」</b>清洗至無泡泡。</li>
-                <li style="margin-bottom: 6px;">卸下把手，鎖回螺絲與濾網，換回原本有孔粉杯。</li>
-                <li style="margin-bottom: 0;">清水跑幾次觀察是否無泡沫。</li>
-            </ul>
-        </div>
+<!-- 備忘 + 今日確認（移至頁面最後，預設隱藏）-->
+<div class="collapsible-section" id="memoSection">
+    <div class="info-section">
+        <h3>📝 常駐備忘</h3>
+        <ul id="staticMemoList">
+            <li><b>恐龍嫩仙草：</b>環保杯熱美式</li>
+            <li><b>內衣店老闆：</b>熱拿鐵</li>
+            <li><b>芭樂：</b>熱拿鐵 + 糖(3g)</li>
+            <li><b>吳家阿婆：</b>熱牛奶(比平常更燙)</li>
+        </ul>
+        <ul id="dynamicMemoList"></ul>
     </div>
 </div>
 
 <table id="menuTableBody" style="display: none;"></table>
 
-<!-- 修改攤販 Modal -->
+<!-- 底部導覽列 -->
+<nav class="bottom-nav">
+    <button class="nav-btn nav-home" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">回頂部</button>
+    <button class="nav-btn" onclick="toggleSection('menuReference', this)">價格</button>
+    <button class="nav-btn" onclick="toggleSection('method', this)">作法</button>
+    <button class="nav-btn" onclick="toggleSection('memoSection', this)">備忘</button>
+    
+    <!-- <button class="nav-btn" onclick="window.location.href='https://christypy.github.io/menu.html'">菜單</button>
+    <button class="nav-btn" onclick="window.location.href='https://christypy.github.io/been.html?mode=admin'">結帳</button> -->
+    <button class="nav-btn" onclick="window.location.href='menu.html'">菜單</button>
+    <button class="nav-btn" onclick="window.location.href='been.html?mode=admin'">結帳</button>
+    
+    <button class="nav-btn nav-edit" onclick="openEditModal()">修改攤販</button>
+</nav>
+
+<!-- 修改攤販 Modal（保留原 main.js 的 style.display flex/none 控制）-->
 <div id="vendorEditModal" class="modal">
     <div class="modal-content">
-        <h3>✏️ 線上修改攤販品項</h3>
-        <div class="modal-group">
-            <label for="modalVendorSelect">選擇攤販 / 姓名：</label>
-            <select id="modalVendorSelect" onchange="onModalVendorChange()"></select>
-        </div>
-        <div class="modal-group">
-            <label for="modalItemSelect">更換品項：</label>
-            <select id="modalItemSelect">
-                <option value="大拿鐵">大拿鐵</option>
-                <option value="大熱美">大熱美</option>
-                <option value="大熱拿">大熱拿</option>
-                <option value="冰手沖">冰手沖</option>
-                <option value="冰美式">冰美式</option>
-                <option value="冰拿鐵">冰拿鐵</option>
-                <option value="冰拿鐵加糖">冰拿鐵加糖</option>
-                <option value="熱手沖">熱手沖</option>
-                <option value="熱美式">熱美式</option>
-                <option value="熱拿鐵">熱拿鐵</option>
-                <option value="熱拿鐵加糖">熱拿鐵加糖</option>
-            </select>
-        </div>
-        <div class="modal-actions">
-            <button class="modal-btn cancel" onclick="closeEditModal()">取消</button>
-            <button class="modal-btn confirm" onclick="submitVendorEdit()">確認修改</button>
+        <div class="modal-header">✏️ 修改攤販品項</div>
+        <div class="modal-body">
+            <div class="modal-group">
+                <label for="modalVendorSelect">攤販 / 姓名</label>
+                <select id="modalVendorSelect" onchange="onModalVendorChange()"></select>
+            </div>
+            <div class="modal-divider"></div>
+            <div class="modal-group">
+                <label for="modalItemSelect">更換品項</label>
+                <select id="modalItemSelect">
+                    <option value="大拿鐵">大拿鐵</option>
+                    <option value="大熱美">大熱美</option>
+                    <option value="大熱拿">大熱拿</option>
+                    <option value="冰手沖">冰手沖</option>
+                    <option value="冰美式">冰美式</option>
+                    <option value="冰拿鐵">冰拿鐵</option>
+                    <option value="冰拿鐵加糖">冰拿鐵加糖</option>
+                    <option value="熱手沖">熱手沖</option>
+                    <option value="熱美式">熱美式</option>
+                    <option value="熱拿鐵">熱拿鐵</option>
+                    <option value="熱拿鐵加糖">熱拿鐵加糖</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-cancel"  onclick="closeEditModal()">取消</button>
+                <button class="modal-btn modal-confirm" onclick="submitVendorEdit()">確認修改</button>
+            </div>
         </div>
     </div>
 </div>
 
+<!-- <script>
+function toggleSection(id, btn) {
+    const sections = ['menuReference', 'method', 'memoSection'];
+    const el = document.getElementById(id);
+    const isVisible = el.classList.contains('visible');
+
+    // 全部收起（包含 nav 高亮）
+    sections.forEach(s => {
+        document.getElementById(s).classList.remove('visible');
+    });
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
+
+    // 如果原本是收起的就展開，否則就維持收起（toggle 效果）
+    if (!isVisible) {
+        el.classList.add('visible');
+        if (btn) btn.classList.add('nav-active');
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+</script> -->
+
 <script>
-// ══════════════════════════════════════════════════════════════
-// 雲端價目表設定
-// 攤販訂單用 gid=0（第一個 sheet）
-// 單品豆選單用 gid=250388087
-// ══════════════════════════════════════════════════════════════
-
-// ✅ 修正：攤販訂單 sheet（gid=0）
-const CLOUD_VENDOR_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSEiSHdIF1FlVgrSp5r8DhCDnTKAVhfRjXPIizNQ_d5kK_FFUQJfQKhQG1YXe3ViIdExAiUnAPlKCO-/pub?gid=0&single=true&output=csv";
-
-// ✅ 單品豆 sheet（gid=250388087）
+// ══ 雲端價目表同步 ══
 const CLOUD_MENU_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSEiSHdIF1FlVgrSp5r8DhCDnTKAVhfRjXPIizNQ_d5kK_FFUQJfQKhQG1YXe3ViIdExAiUnAPlKCO-/pub?gid=250388087&single=true&output=csv";
 
-// 正確解析 CSV（支援欄位內含逗號的引號格式）
 function parseCSV(text) {
     const rows = [];
     const lines = text.split(/\r?\n/);
@@ -202,7 +233,6 @@ function parseCSV(text) {
     return rows;
 }
 
-// 焙度文字 → CSS class
 function getRoastInfo(raw) {
     if (!raw) return null;
     const r = raw.trim();
@@ -214,7 +244,6 @@ function getRoastInfo(raw) {
     return { label: r, cls: 'roast-default' };
 }
 
-// ── 讀取單品豆選單（加時間戳防快取）──
 async function fetchCloudMenu() {
     try {
         const res = await fetch(CLOUD_MENU_URL + '&t=' + Date.now());
@@ -231,7 +260,6 @@ async function fetchCloudMenu() {
             const type      = row[0].trim();
             const name      = (row[2] || '').trim();
             const takePrice = (row[8] || '').trim();
-            // 欄位說明（單品豆 sheet）：[5]=roast class [6]=roastName [12]=status（注意：這個sheet的第13欄是status）
             const statusRaw = (row[12] || '').trim();
 
             if (type === 'classic') {
@@ -247,13 +275,12 @@ async function fetchCloudMenu() {
                         <span class="p-cost">$${takePrice || '0'}</span>
                     </div>`;
             } else if (type === 'single') {
-                // 只顯示上架的單品豆
                 if (statusRaw !== '1' && statusRaw !== '上架') continue;
 
                 const stayPrice  = (row[9]  || '').trim();
                 const poundPrice = (row[10] || '').trim();
                 const dripPrice  = (row[11] || '').trim();
-                const roastRaw   = (row[5]  || '').trim(); // 烘焙度 class
+                const roastRaw   = (row[5]  || '').trim();
 
                 const roastInfo  = getRoastInfo(roastRaw);
                 const roastBadge = roastInfo
