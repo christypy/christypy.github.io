@@ -11,13 +11,12 @@
 <body>
 
 <div class="page-header">
-    <h1>☕ 一味淨生活</h1>
+    <h1>一味淨生活</h1>
 </div>
 
 <script src="config.js"></script>
 <script src="main.js"></script>
 
-<!-- 控制列 -->
 <div class="controls">
     <select id="daySelect">
         <option value="1">星期一 (休)</option>
@@ -32,15 +31,13 @@
     <button class="btn" id="clearAllBtn" onclick="manualClearAll()">全部重置</button>
 </div>
 
-<!-- 攤販訂單（主區塊）-->
+<div class="summary-dashboard" id="summaryDashboard">
+    </div>
+
 <div class="stats-container">
     <div class="stat-box" style="border-top-color: var(--color-success);">
-        <h3>🏠 左右鄰居 總計</h3>
-        <div id="stats-neighbor"></div>
-    </div>
-    <div class="stat-box" style="border-top-color: var(--color-total-progress);">
-        <h3>🛵 其他區域 總計</h3>
-        <div id="stats-other"></div>
+        <h3>🚚 今日要送 總計</h3>
+        <div id="stats-deliver"></div>
     </div>
     <div class="stat-box" style="border-top-color: var(--color-accent);">
         <h3>❓ 當日需確認 總計</h3>
@@ -48,7 +45,6 @@
     </div>
 </div>
 
-<!-- 價目表（預設隱藏）-->
 <div id="menuReference" class="collapsible-section">
     <div class="compact-menu-section">
         <div class="compact-grid-title">☕ 義式基礎飲品</div>
@@ -70,7 +66,6 @@
     </div>
 </div>
 
-<!-- 作法 + 洗機流程（預設隱藏）-->
 <div class="collapsible-section" id="method">
     <div class="method-flex-container">
         <div class="price-card">
@@ -117,7 +112,6 @@
     </div>
 </div>
 
-<!-- 備忘 + 今日確認（移至頁面最後，預設隱藏）-->
 <div class="collapsible-section" id="memoSection">
     <div class="info-section">
         <h3>📝 常駐備忘</h3>
@@ -133,22 +127,16 @@
 
 <table id="menuTableBody" style="display: none;"></table>
 
-<!-- 底部導覽列 -->
 <nav class="bottom-nav">
     <button class="nav-btn nav-home" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">回頂部</button>
     <button class="nav-btn" onclick="toggleSection('menuReference', this)">價格</button>
     <button class="nav-btn" onclick="toggleSection('method', this)">作法</button>
     <button class="nav-btn" onclick="toggleSection('memoSection', this)">備忘</button>
-    
-    <!-- <button class="nav-btn" onclick="window.location.href='https://christypy.github.io/menu.html'">菜單</button>
-    <button class="nav-btn" onclick="window.location.href='https://christypy.github.io/been.html?mode=admin'">結帳</button> -->
     <button class="nav-btn" onclick="window.location.href='menu.html'">菜單</button>
     <button class="nav-btn" onclick="window.location.href='been.html?mode=admin'">結帳</button>
-    
     <button class="nav-btn nav-edit" onclick="openEditModal()">修改攤販</button>
 </nav>
 
-<!-- 修改攤販 Modal（保留原 main.js 的 style.display flex/none 控制）-->
 <div id="vendorEditModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">✏️ 修改攤販品項</div>
@@ -175,33 +163,12 @@
                 </select>
             </div>
             <div class="modal-actions">
-                <button class="modal-btn modal-cancel"  onclick="closeEditModal()">取消</button>
+                <button class="modal-btn modal-cancel" onclick="closeEditModal()">取消</button>
                 <button class="modal-btn modal-confirm" onclick="submitVendorEdit()">確認修改</button>
             </div>
         </div>
     </div>
 </div>
-
-<!-- <script>
-function toggleSection(id, btn) {
-    const sections = ['menuReference', 'method', 'memoSection'];
-    const el = document.getElementById(id);
-    const isVisible = el.classList.contains('visible');
-
-    // 全部收起（包含 nav 高亮）
-    sections.forEach(s => {
-        document.getElementById(s).classList.remove('visible');
-    });
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
-
-    // 如果原本是收起的就展開，否則就維持收起（toggle 效果）
-    if (!isVisible) {
-        el.classList.add('visible');
-        if (btn) btn.classList.add('nav-active');
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-}
-</script> -->
 
 <script>
 // ══ 雲端價目表同步 ══

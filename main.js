@@ -2,17 +2,14 @@
  * 一味淨生活咖啡系統 - 中午 12:30 自動跨日清空同步版
  */
 
-// ⚠️ 請在此處填入你的 Google 試算表 ID
 const SPREADSHEET_ID = '1aH2ap9QeqhpKI34-K9SsyiHnTpXPM1ud2rpOmAQtSIA'; 
-// ⚠️ 如果你有設定 Google Apps Script 網頁部署，請填在這邊（若尚未設定，可先保持空字串，系統會改用本地儲存備份）
 const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyAXTwhXOZfmICm1QjOd0tq5qJKYH0rMql4dWc_1SxlCkBmF8nD-1NEDrHLKzzLo481lQ/exec'; 
-
 
 let customers = [];
 let syncInterval = null; 
 
-// 前端修改品項文字與 試算表 type 代碼的快速轉換字典
 const ITEM_TYPE_MAP = {
+    "大拿鐵": "large_latte",
     "大熱美": "large_hot_am",
     "大熱拿": "large_hot_latte",
     "冰手沖": "ice_hand",
@@ -24,25 +21,19 @@ const ITEM_TYPE_MAP = {
     "熱拿鐵": "hot_latte",
     "熱拿鐵加糖": "hot_latte_sugar",
     "待確認":     "potential_item"
-
 };
 
-// --- 🚀 頁面初始化：用 DOMContentLoaded 確保 HTML 跑完立刻秒跳星期 ---
 window.addEventListener('DOMContentLoaded', () => {
     initApp();
 });
 
 function initApp() {
-    // 1. 瞬間取得今天星期幾 (0是週日, 1-6是週一到週六)
     const today = new Date().getDay(); 
-    
-    // 2. 讓下拉選單立刻選中今天
     const daySelect = document.getElementById('daySelect');
     if (daySelect) {
         daySelect.value = today;
     }
 
-    // 3. 綁定基本按鈕與手動切換選單事件
     const clearBtn = document.getElementById('clearAllBtn');
     if (clearBtn) clearBtn.addEventListener('click', manualClearAll);
     
@@ -56,21 +47,17 @@ function initApp() {
         statsContainer.addEventListener('click', handleStatsClick);
     }
 
-    // 4. 🚀 修正點：先只渲染靜態的價格表，訂單列表等雲端資料到了再畫（避免跑出「無訂單」）
     renderPrices(); 
 }
 
 function handleDaySelectChange() {
-    initData(true); // 手動切換星期時，強制刷一次雲端與畫面
+    initData(true); 
 }
 
-// --- 🕒 核心資料讀取與同步引擎 ---
 async function initData(isBackgroundSync = false) {
     try {
-        // 檢查時間是否需要自動發動中午 12:30 的大清空
         await checkAndExecuteAutoClear();
 
-        // 遠端抓取 Google 試算表最新 JSON 資料 (gid=0 攤販訂單 sheet，加時間戳記防快取)
         const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=Sheet1&v=${new Date().getTime()}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error('無法連線至雲端試算表');
@@ -100,11 +87,8 @@ async function initData(isBackgroundSync = false) {
             };
         });
 
-
-        // 雲端最新資料撈回後，強制同步至本地 LocalStorage
         syncCloudToLocal();
         
-        // 🚀 補上這段：如果目前處於修改鎖定期，強制修正抓回來的雲端舊資料，防止畫面閃爍彈回！
         if (localEditLock.groupId) {
             customers = customers.map(c => {
                 if (c.groupId === localEditLock.groupId) {
@@ -114,10 +98,8 @@ async function initData(isBackgroundSync = false) {
             });
         }
         
-        // 資料確實到齊了，這時候大腳一踩刷出正確的訂單列表！
         renderOrders();
 
-        // 如果是第一次開網頁成功，這時候才啟動背景每 5 秒的自動輪詢定時器
         if (!isBackgroundSync) {
             startAutoSync(); 
         }
@@ -127,27 +109,24 @@ async function initData(isBackgroundSync = false) {
     }
 }
 
-// 🚀 建立自動同步監聽器（每 15 秒鐘自動檢查一次雲端變更，避免過頻請求造成卡頓）
 function startAutoSync() {
     if (syncInterval) clearInterval(syncInterval);
     syncInterval = setInterval(() => {
-        initData(true); // 傳入 true 代表背景默默同步
+        initData(true); 
     }, 15000); 
 }
 
-// 每次點擊時記錄「本地操作時間戳」，防止雲端輪詢在 grace period 內覆蓋
-const LOCAL_WRITE_GRACE_MS = 8000; // 8 秒內不讓雲端覆蓋本地剛寫的狀態
+const LOCAL_WRITE_GRACE_MS = 8000; 
 let lastLocalWriteTime = 0;
 
 function markLocalWrite() {
     lastLocalWriteTime = Date.now();
 }
 
-// 將雲端最新的完成/缺席狀態覆蓋至本地（Grace Period 內不覆蓋）
 function syncCloudToLocal() {
     const now = Date.now();
     const inGrace = (now - lastLocalWriteTime) < LOCAL_WRITE_GRACE_MS;
-    if (inGrace) return; // 剛剛本地有寫入，跳過雲端覆蓋，防止閃爍
+    if (inGrace) return; 
 
     customers.forEach(c => {
         const count = c.count || 1;
@@ -168,7 +147,6 @@ function syncCloudToLocal() {
     });
 }
 
-// 🕒 自動判斷是否過了中午 12:30 且需要清空
 async function checkAndExecuteAutoClear() {
     if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL.includes('XXXXX')) return;
 
@@ -190,7 +168,7 @@ async function checkAndExecuteAutoClear() {
             const cloudLastClearDate = checkData.lastClearDate;
 
             if (cloudLastClearDate !== targetResetDateStr) {
-                console.log(`[系統通知] 已過中午 12:30，自動發動全系統跨日清空作業...`);
+                console.log(`[系統通知] 自動發動全系統跨日清空作業...`);
                 localStorage.clear(); 
                 await fetch(GAS_WEB_APP_URL, {
                     method: 'POST',
@@ -204,7 +182,6 @@ async function checkAndExecuteAutoClear() {
     }
 }
 
-// --- 🖱️ 點擊與即時資料傳輸事件 ---
 function handleStatsClick(e) {
     if (e.target.classList.contains('absence-toggle')) {
         e.stopPropagation();
@@ -231,7 +208,6 @@ async function sendStatusToCloud(action, groupId, index, value) {
             headers: { 'Content-Type': 'text/plain' },
             body: JSON.stringify({ action: action, groupId: groupId, index: index, value: value })
         });
-        // 雲端寫入後等 4 秒再輪詢，避免立刻拉回舊資料
         setTimeout(startAutoSync, 4000);
     } catch (err) {
         console.error('同步至雲端失敗:', err);
@@ -251,7 +227,7 @@ function toggleDone(name, item, loc, index, groupId) {
         localStorage.setItem(key, 'true');
         newValue = true;
     }
-    markLocalWrite(); // 記錄本地寫入時間，防止輪詢閃爍
+    markLocalWrite(); 
     renderOrders();
     if (groupId) sendStatusToCloud('toggleDone', groupId, index, newValue);
 }
@@ -269,7 +245,7 @@ function toggleAbsence(name, item, loc, index, groupId) {
         localStorage.removeItem(getStorageKey(name, item, loc, index));
         if (groupId) sendStatusToCloud('toggleDone', groupId, index, false);
     }
-    markLocalWrite(); // 記錄本地寫入時間，防止輪詢閃爍
+    markLocalWrite(); 
     renderOrders();
     if (groupId) sendStatusToCloud('toggleAbsence', groupId, index, newAbsentValue);
 }
@@ -293,7 +269,6 @@ function manualClearAll() {
     }
 }
 
-// --- 🚀 修正版：打開彈窗時，自動將品項選單預設為該攤販目前的品項 ---
 function openEditModal() {
     const modal = document.getElementById('vendorEditModal');
     const vendorSelect = document.getElementById('modalVendorSelect');
@@ -301,22 +276,18 @@ function openEditModal() {
     
     if (!modal || !vendorSelect || !itemSelect) return;
     
-    // 1. 清空舊的選項
     vendorSelect.innerHTML = '';
     
-    // 2. 找出「今天有營業」且有 groupId 的攤販
     const daySelect = document.getElementById('daySelect');
     const day = daySelect ? parseInt(daySelect.value) : new Date().getDay();
     const todaysVendors = customers.filter(c => (c.days.length === 0 || c.days.includes(day)) && c.groupId);
     
     if (todaysVendors.length === 0) {
         vendorSelect.innerHTML = '<option value="">-- 本日無營業攤販 --</option>';
-        itemSelect.value = "hot_am"; // 預設防呆
+        itemSelect.value = "hot_am"; 
     } else {
-        // 3. 渲染攤販選項，並把目前的品項塞進 data-item 屬性中
         vendorSelect.innerHTML = todaysVendors.map(c => {
             let displayName = (c.name || c.groupId).trim();
-            // 如果名字太長，自動切斷
             if (displayName.length > 6) {
                 displayName = displayName.slice(0, 6) + '...';
             }
@@ -324,28 +295,19 @@ function openEditModal() {
         }).join('');
     }
     
-    // 4. 🚀 關鍵核心：立刻觸發一次選單連動，讓「更換品項」秒變為當前店家的品項
     onModalVendorChange();
-    
-    // 5. 顯示彈窗
     modal.style.display = 'flex';
 }
 
-// --- 🚀 連動更新：當切換店家時，更換品項自動切過去 ---
 function onModalVendorChange() {
     const vendorSelect = document.getElementById('modalVendorSelect');
     const itemSelect = document.getElementById('modalItemSelect');
     
     if (!vendorSelect || !itemSelect || vendorSelect.value === "") return;
-    
-    // 抓取目前被選中的 <option> 標籤
     const selectedOption = vendorSelect.options[vendorSelect.selectedIndex];
-    
-    // 從標籤中取出我們剛剛埋進去的 data-item（也就是這家店目前的品項，如 "冰手沖"）
     const currentItem = selectedOption.dataset.item;
     
     if (currentItem) {
-        // 🚀 讓底下的品項選單數值，直接秒切成跟目前品項一模一樣！
         itemSelect.value = currentItem;
     }
 }
@@ -353,15 +315,12 @@ function closeEditModal() {
     document.getElementById('vendorEditModal').style.display = 'none';
 }
 
-
-// 建立一個全域的暫時鎖定物件，用來防止雲端時間差造成的彈回現象
 let localEditLock = {
     groupId: null,
     newItem: null,
     newType: null
 };
 
-// --- 🚀 安全升級：密碼防護版 ---
 async function submitVendorEdit() {
     const vendorSelect = document.getElementById('modalVendorSelect');
     const itemSelect = document.getElementById('modalItemSelect');
@@ -371,31 +330,25 @@ async function submitVendorEdit() {
         return;
     }
 
-    // 🔒 1. 彈出密碼確認視窗
     const password = prompt("請輸入管理員密碼以確認修改：");
-    
-    // 💡 這裡設定你的密碼，例如我幫你預設 "8888"，你可以自己改成想要的密碼
     if (password !== "1008") { 
         alert("密碼錯誤，拒絕修改！");
-        return; // 密碼不對就直接切斷，不執行後續動作
+        return; 
     }
     
     const groupId = vendorSelect.value;
     const newItem = itemSelect.value;
     const newType = ITEM_TYPE_MAP[newItem] || "hot_am"; 
     
-    // 2. 確實關閉計時器，停止背景輪詢
     if (syncInterval) {
         clearInterval(syncInterval);
         syncInterval = null;
     }
     
-    // 3. 關鍵鎖定：把這次修改的品項釘死在全域變數裡，防止被舊資料覆蓋
     localEditLock.groupId = groupId;
     localEditLock.newItem = newItem;
     localEditLock.newType = newType;
     
-    // 4. 立即強制更新前端陣列並刷畫面
     customers = customers.map(c => {
         if (c.groupId === groupId) {
             return { ...c, item: newItem, type: newType };
@@ -405,11 +358,8 @@ async function submitVendorEdit() {
     renderOrders();
     closeEditModal();
     
-    // 5. 發送請求至雲端
     if (GAS_WEB_APP_URL && !GAS_WEB_APP_URL.includes('XXXXX')) {
         try {
-            console.log("[系統] 密碼驗證通過，正在發送請求至雲端...");
-            
             await fetch(GAS_WEB_APP_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain' }, 
@@ -419,24 +369,19 @@ async function submitVendorEdit() {
                     newItem: newItem
                 })
             });
-            
-            console.log("[系統] 雲端已成功接收並處理完畢！");
         } catch (err) {
-            console.error('更新雲端品項失敗，保留本地修改狀態:', err);
+            console.error('更新雲端品項失敗:', err);
         }
     }
     
-    // 6. 拉長安全重啟時間
     setTimeout(() => {
         localEditLock.groupId = null;
         localEditLock.newItem = null;
         localEditLock.newType = null;
-        console.log("[系統] 緩衝結束，解除鎖定並重啟背景輪詢...");
         startAutoSync();
     }, 6000); 
 }
 
-// --- 🎨 頁面 HTML 渲染引擎 ---
 function makeHtml(stats, prefix) {
     let html = '', totalN = 0, totalD = 0; let hasData = false;
     for (const k in CONFIG.TYPE_NAMES) {
@@ -470,19 +415,58 @@ function makeHtml(stats, prefix) {
     return html;
 }
 
+// 🚀 新增：統計剩餘製作杯數的頂部大看板引擎
+function renderDashboard(todaysOrders) {
+    const dashboard = document.getElementById('summaryDashboard');
+    if (!dashboard) return;
+
+    // 用來加總各個品項目前「剩餘未做」的杯數
+    let itemCounts = {};
+
+    todaysOrders.forEach(c => {
+        const count = c.count || 1;
+        for (let i = 0; i < count; i++) {
+            let isAbsent = isItemAbsent(c.name, c.item, c.loc, i);
+            let isDone = isItemDone(c.name, c.item, c.loc, i);
+            
+            // 排除掉已經缺席或已經送達做好的，只統計「真正還需要製作的杯數」
+            if (!isAbsent && !isDone) {
+                const itemName = c.item || "未定品項";
+                itemCounts[itemName] = (itemCounts[itemName] || 0) + 1;
+            }
+        }
+    });
+
+    const entries = Object.entries(itemCounts);
+    if (entries.length === 0) {
+        dashboard.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--color-success); font-weight: bold; font-size: 14px; padding: 4px 0;">🎉 今日所有咖啡皆已製作送達！</div>';
+        return;
+    }
+
+    // 依杯數由大到小排序，方便優先準備大單品項
+    entries.sort((a, b) => b[1] - a[1]);
+
+    dashboard.innerHTML = entries.map(([name, count]) => `
+        <div class="dashboard-pill">
+            <span class="pill-name">☕ ${name}</span>
+            <span class="pill-count">${count} 杯</span>
+        </div>
+    `).join('');
+}
+
 function renderOrders() {
     const daySelect = document.getElementById('daySelect');
     if (!daySelect) return;
     const day = parseInt(daySelect.value);
     
-    const sNDiv = document.getElementById('stats-neighbor');
+    const sDDiv = document.getElementById('stats-deliver');
     const sADiv = document.getElementById('stats-ask');
-    const sODiv = document.getElementById('stats-other');
+    const dashboard = document.getElementById('summaryDashboard');
     
     if (day === 1) { 
-        if (sNDiv) sNDiv.innerHTML = '<div style="text-align:center;color:#999;padding:10px;">本日休息</div>';
+        if (sDDiv) sDDiv.innerHTML = '<div style="text-align:center;color:#999;padding:10px;">本日休息</div>';
         if (sADiv) sADiv.innerHTML = '<div style="text-align:center;color:#999;padding:10px;">本日休息</div>';
-        if (sODiv) sODiv.innerHTML = '<div style="text-align:center;color:#999;padding:10px;">本日休息</div>';
+        if (dashboard) dashboard.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#999;font-size:14px;">本日公休</div>';
         const clearBtn = document.getElementById('clearAllBtn');
         if (clearBtn) clearBtn.disabled = true; 
         const memoList = document.getElementById('dynamicMemoList');
@@ -493,19 +477,22 @@ function renderOrders() {
     const clearBtn = document.getElementById('clearAllBtn');
     if (clearBtn) clearBtn.disabled = false;
 
-    // 如果雲端資料還沒下載完（長度為0），先直接返回，不要渲染「無訂單」三個字
     if (!customers || customers.length === 0) return;
 
     const createStatsObj = () => { let obj = {}; for (const k in CONFIG.TYPE_NAMES) obj[k] = { total: 0, done: 0, orders: [] }; return obj; };
-    let sNeigh = createStatsObj(), sOther = createStatsObj(), sAsk = createStatsObj();
+    let sDeliver = createStatsObj(), sAsk = createStatsObj();
     const todaysOrders = customers.filter(c => c.days.length === 0 || c.days.includes(day));
     
+    // 🚀 執行頂部看板與備忘錄渲染
+    renderDashboard(todaysOrders);
     renderMemos(todaysOrders);
 
     todaysOrders.forEach(c => {
-        let target = (c.loc === "當日問") ? sAsk : (c.loc.includes("鄰居") ? sNeigh : sOther);
+        // 🚀 分流邏輯簡化：只要 loc 是 "當日問" 就進 sAsk，其餘全部合併進今日要送的 sDeliver
+        let target = (c.loc === "當日問") ? sAsk : sDeliver;
         if (CONFIG.TYPE_NAMES[c.type]) {
-            const count = c.count || 1; target[c.type].total += count;
+            const count = c.count || 1; 
+            target[c.type].total += count;
             for (let i = 0; i < count; i++) {
                 let isAbsent = isItemAbsent(c.name, c.item, c.loc, i); 
                 let done = isItemDone(c.name, c.item, c.loc, i);
@@ -514,9 +501,8 @@ function renderOrders() {
             }
         }
     });
-    if (sNDiv) sNDiv.innerHTML = makeHtml(sNeigh, 'n'); 
+    if (sDDiv) sDDiv.innerHTML = makeHtml(sDeliver, 'd'); 
     if (sADiv) sADiv.innerHTML = makeHtml(sAsk, 'a'); 
-    if (sODiv) sODiv.innerHTML = makeHtml(sOther, 'o');
 }
 
 function renderMemos(todaysOrders) {
@@ -562,13 +548,11 @@ function toggleSection(id, btn) {
     const el = document.getElementById(id);
     const isVisible = el.classList.contains('visible');
 
-    // 全部收起（包含 nav 高亮）
     sections.forEach(s => {
         document.getElementById(s).classList.remove('visible');
     });
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
 
-    // 如果原本是收起的就展開，否則就維持收起（toggle 效果）
     if (!isVisible) {
         el.classList.add('visible');
         if (btn) btn.classList.add('nav-active');
@@ -576,7 +560,6 @@ function toggleSection(id, btn) {
     }
 }
 
-// --- 🛠️ 輔助工具函式區 ---
 function getTodayDateString() {
     const t = new Date(); return t.getFullYear() + (t.getMonth() + 1).toString().padStart(2, '0') + t.getDate().toString().padStart(2, '0');
 }
@@ -586,5 +569,4 @@ function isItemDone(n, i, l, idx = 0) { return localStorage.getItem(getStorageKe
 function getAbsenceKey(n, i, l, idx = 0) { return `${getTodayDateString()}_absent_${sanitize(n)}_${sanitize(i)}_${sanitize(l)}_${idx}`; }
 function isItemAbsent(n, i, l, idx = 0) { return localStorage.getItem(getAbsenceKey(n, i, l, idx)) === 'true'; }
 
-// 🚀 唯一啟動執行入口
 initData();
