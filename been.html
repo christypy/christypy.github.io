@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>☕ 一味淨 · 收銀台</title>
+    <title>☕ 收銀系統</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
     <style>
@@ -44,7 +44,7 @@ body {
 }
 
 /* ═══════════════════════════════════════════════
-   TOP NAV BAR  (always visible)
+   TOP NAV BAR
 ═══════════════════════════════════════════════ */
 .topbar {
     flex-shrink: 0;
@@ -89,54 +89,9 @@ body {
 .topbar-btn:active { opacity: 0.75; }
 .btn-home   { background: rgba(255,255,255,0.14); color: #fff; }
 .btn-admin  { background: var(--roast); color: #fff; }
-.btn-cart   { background: var(--white); color: var(--espresso); position: relative; display: none; }
-.btn-cart .badge {
-    position: absolute;
-    top: -5px; right: -5px;
-    background: var(--red);
-    color: #fff;
-    width: 16px; height: 16px;
-    border-radius: 50%;
-    font-size: 0.65em;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 900;
-}
 
 /* ═══════════════════════════════════════════════
-   TAB BAR  (mobile only)
-═══════════════════════════════════════════════ */
-.tabbar {
-    flex-shrink: 0;
-    display: none;
-    height: 44px;
-    background: var(--white);
-    border-bottom: 1px solid var(--border);
-    overflow-x: auto;
-    scrollbar-width: none;
-}
-.tabbar::-webkit-scrollbar { display: none; }
-.tabbar-inner {
-    display: flex;
-    height: 100%;
-    min-width: max-content;
-}
-.tab-pill {
-    height: 100%;
-    padding: 0 18px;
-    display: flex;
-    align-items: center;
-    font-size: 0.82em;
-    font-weight: 700;
-    color: var(--bark);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: color 0.15s, border-color 0.15s;
-    white-space: nowrap;
-}
-.tab-pill.active { color: var(--espresso); border-bottom-color: var(--roast); }
-
-/* ═══════════════════════════════════════════════
-   MAIN LAYOUT
+   MAIN LAYOUT (強制限手機、電腦一律左右雙欄佈局)
 ═══════════════════════════════════════════════ */
 .app {
     flex: 1;
@@ -145,12 +100,10 @@ body {
     min-height: 0;
 }
 
-/* ── Left panel: menu ── */
+/* 左側：菜單滾動區 */
 .panel-menu {
-    width: 230px;
-    flex-shrink: 0;
-    background: var(--white);
-    border-right: 1px solid var(--border);
+    flex: 1;
+    background: var(--cream);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -159,34 +112,14 @@ body {
     flex: 1;
     overflow-y: auto;
     scrollbar-width: thin;
-    scrollbar-color: var(--tan) transparent;
-    padding: 0 0 24px;
+    padding: 12px;
 }
-.panel-menu-scroll::-webkit-scrollbar { width: 3px; }
-.panel-menu-scroll::-webkit-scrollbar-thumb { background: var(--tan); border-radius: 3px; }
+.panel-menu-scroll::-webkit-scrollbar { width: 4px; }
+.panel-menu-scroll::-webkit-scrollbar-thumb { background: var(--tan); }
 
-/* ── Center panel: beans ── */
-.panel-beans {
-    flex: 1;
-    background: var(--parchment);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    min-width: 0;
-}
-.panel-beans-scroll {
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--tan) transparent;
-}
-.panel-beans-scroll::-webkit-scrollbar { width: 3px; }
-.panel-beans-scroll::-webkit-scrollbar-thumb { background: var(--tan); border-radius: 3px; }
-
-/* ── Right panel: cashier ── */
+/* 右側：固定不隱藏的收銀台（在手機上依比例縮放，確保看得見） */
 .panel-cashier {
-    width: 280px;
+    width: 340px; /* 電腦版預設寬度 */
     flex-shrink: 0;
     background: var(--white);
     border-left: 1px solid var(--border);
@@ -197,528 +130,233 @@ body {
 }
 
 /* ═══════════════════════════════════════════════
-   SECTION HEADING
+   COMPONENTS
 ═══════════════════════════════════════════════ */
 .section-head {
-    padding: 14px 14px 8px;
-    font-size: 0.65em;
+    padding: 12px 4px 6px;
+    font-size: 0.85em;
     font-weight: 700;
-    letter-spacing: 3px;
+    letter-spacing: 2px;
     color: var(--bark);
     text-transform: uppercase;
     display: flex;
     align-items: center;
     gap: 6px;
-    position: sticky;
-    top: 0;
-    background: var(--white);
-    z-index: 2;
 }
 .section-head::before {
     content: '';
-    width: 3px; height: 12px;
+    width: 4px; height: 14px;
     background: var(--roast);
     border-radius: 2px;
-    flex-shrink: 0;
-}
-.section-head.on-parchment { background: var(--parchment); }
-
-/* ═══════════════════════════════════════════════
-   MENU ITEMS LIST
-═══════════════════════════════════════════════ */
-.menu-list { list-style: none; padding: 0 8px; }
-.menu-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-    padding: 9px 8px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.12s, transform 0.1s;
-}
-.menu-item:hover  { background: var(--cream); }
-.menu-item:active { background: var(--parchment); transform: scale(0.99); }
-.mi-name  { font-size: 0.85em; font-weight: 600; line-height: 1.3; }
-.mi-price { font-size: 0.9em; font-weight: 800; color: var(--red); white-space: nowrap; flex-shrink: 0; }
-.mi-price::before { content: '$'; font-size: 0.75em; }
-.divider-line {
-    height: 1px;
-    background: linear-gradient(to right, transparent, var(--border), transparent);
-    margin: 1px 8px;
 }
 
-/* ═══════════════════════════════════════════════
-   BEAN GRID
-═══════════════════════════════════════════════ */
-.bean-grid {
+/* 菜單卡片 Grid 佈局 */
+.menu-grid { 
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    gap: 10px;
+    gap: 8px;
 }
+.menu-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 4px;
+    padding: 12px 8px;
+    background: #fdfbf7;
+    border: 1px solid rgba(61,43,31,0.08);
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+    transition: all 0.12s;
+}
+.menu-item:hover  { background: var(--parchment); border-color: var(--tan); }
+.menu-item:active { transform: scale(0.97); }
+.mi-name  { font-size: 0.82em; font-weight: 600; color: var(--espresso); word-break: break-all; }
+.mi-price { font-size: 0.9em; font-weight: 800; color: var(--red); }
+.mi-price::before { content: '$'; font-size: 0.8em; }
+
+/* 單品咖啡豆專用卡片 */
 .bean-card {
     background: var(--white);
     border: 1px solid var(--border);
     border-radius: var(--r);
-    padding: 12px 10px 10px;
+    padding: 12px 8px;
     cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 4px;
     box-shadow: var(--shadow);
-    transition: transform 0.14s, box-shadow 0.14s, border-color 0.14s;
-    position: relative;
     text-align: center;
+    transition: transform 0.12s, border-color 0.12s;
 }
-.bean-card:hover  { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(61,43,31,0.12); border-color: var(--bark); }
-.bean-card:active { transform: scale(0.97); }
-.bean-badge {
-    font-size: 0.6em;
-    font-weight: 700;
-    padding: 2px 7px;
-    border-radius: 20px;
-    letter-spacing: 0.5px;
-    align-self: flex-end;
-}
+.bean-card:hover { transform: translateY(-2px); border-color: var(--bark); }
+.bean-badge { font-size: 0.58em; font-weight: 700; padding: 1px 6px; border-radius: 20px; margin-bottom: 2px; }
 .lr { background: var(--lr-col); color: #5a3e2b; }
 .mr { background: var(--mr-col); color: #fff; }
 .dr { background: var(--dr-col); color: #fff; }
-.bean-name {
-    font-family: var(--display);
-    font-size: 1.05em;
-    color: var(--espresso);
-    line-height: 1.25;
-    margin-top: 2px;
-}
-.bean-tag {
-    font-size: 0.68em;
-    color: var(--bark);
-}
+.bean-name { font-family: var(--display); font-size: 0.95em; font-weight:600; word-break: break-all; }
+.bean-tag { font-size: 0.65em; color: var(--bark); }
 
-/* ═══════════════════════════════════════════════
-   CASHIER PANEL
-═══════════════════════════════════════════════ */
+/* 收銀列表與明細 */
 .cashier-head {
     flex-shrink: 0;
-    padding: 14px 14px 10px;
+    padding: 12px;
     border-bottom: 1px solid var(--border);
-    font-size: 0.65em;
+    font-size: 0.8em;
     font-weight: 700;
-    letter-spacing: 3px;
-    color: var(--bark);
-    text-transform: uppercase;
+    color: var(--espresso);
     display: flex;
     align-items: center;
     gap: 6px;
+    background: #faf8f5;
 }
-.cashier-head::before {
-    content: '';
-    width: 3px; height: 12px;
-    background: var(--bark);
-    border-radius: 2px;
-}
-
-.cart-list {
-    flex: 1;
-    overflow-y: auto;
-    padding: 8px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--tan) transparent;
-}
-.cart-list::-webkit-scrollbar { width: 3px; }
-.cart-list::-webkit-scrollbar-thumb { background: var(--tan); border-radius: 3px; }
-.cart-empty {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: var(--tan);
-    gap: 8px;
-    font-size: 0.85em;
-}
-.cart-empty-icon { font-size: 2.2em; }
-
-.cart-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 9px 10px;
-    background: var(--cream);
-    border-radius: 8px;
-    margin-bottom: 6px;
-    border: 1px solid transparent;
-    transition: border-color 0.15s;
-}
-.cart-row:hover { border-color: var(--border); }
+.cashier-head::before { content: ''; width: 4px; height: 14px; background: var(--bark); border-radius: 2px; }
+.cart-list { flex: 1; overflow-y: auto; padding: 6px; }
+.cart-empty { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--tan); gap: 4px; font-size: 0.8em; }
+.cart-row { display: flex; align-items: center; gap: 6px; padding: 8px; background: var(--cream); border-radius: 8px; margin-bottom: 6px; border: 1px solid rgba(0,0,0,0.02); }
 .cart-info { flex: 1; min-width: 0; }
-.cart-name { font-size: 0.83em; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.cart-meta { font-size: 0.72em; color: var(--bark); margin-top: 1px; }
-.cart-controls { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
-.qty-btn {
-    width: 22px; height: 22px;
-    border-radius: 50%;
-    border: 1px solid var(--border);
-    background: var(--white);
-    font-weight: 700;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.85em;
-    color: var(--espresso);
-    transition: background 0.12s;
-}
-.qty-btn:hover  { background: var(--parchment); }
-.qty-btn:active { background: var(--tan); }
+.cart-name { font-size: 0.8em; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cart-meta { font-size: 0.7em; color: var(--bark); margin-top: 1px; }
+.cart-controls { display: flex; align-items: center; gap: 4px; }
+.qty-btn { width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--border); background: var(--white); font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .qty-num { font-weight: 700; font-size: 0.85em; min-width: 16px; text-align: center; }
-.temp-btn {
-    font-size: 0.65em;
-    font-weight: 700;
-    padding: 2px 6px;
-    border-radius: 4px;
-    border: 1px solid var(--border);
-    background: var(--white);
-    cursor: pointer;
-    color: var(--espresso);
-    transition: background 0.12s;
-}
-.temp-btn:hover { background: var(--parchment); }
+.temp-btn { font-size: 0.65em; font-weight: 700; padding: 2px 5px; border-radius: 4px; border: 1px solid var(--border); background: var(--white); cursor: pointer; }
 
-/* ── Bill ── */
-.cashier-bill {
-    flex-shrink: 0;
-    padding: 12px 14px 14px;
-    border-top: 2px solid var(--parchment);
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
+.cashier-bill { flex-shrink: 0; padding: 12px; border-top: 2px solid var(--parchment); display: flex; flex-direction: column; gap: 6px; background: #faf8f5; }
 .bill-row { display: flex; justify-content: space-between; align-items: center; }
-.bill-label { font-size: 0.8em; color: #666; font-weight: 600; }
-.bill-total { font-size: 1.5em; font-weight: 800; color: var(--red); }
-.bill-change { font-size: 1.5em; font-weight: 800; color: var(--green); }
-.cash-input {
-    width: 90px;
-    padding: 5px 8px;
-    border: 1.5px solid var(--bark);
-    border-radius: 6px;
-    font-size: 1em;
-    font-weight: 700;
-    text-align: right;
-    color: var(--espresso);
-    font-family: var(--font);
-    background: #fdfaf6;
-}
-.cash-input:focus { outline: none; border-color: var(--roast); box-shadow: 0 0 0 2px rgba(188,108,37,0.15); }
-.quick-cash { display: flex; gap: 4px; justify-content: flex-end; }
-.qc-btn {
-    padding: 3px 7px;
-    background: var(--parchment);
-    border: none; border-radius: 4px;
-    font-size: 0.72em; font-weight: 700;
-    cursor: pointer; color: var(--espresso);
-    transition: background 0.12s;
-}
-.qc-btn:hover { background: var(--tan); }
-.dashed { border: none; border-top: 1px dashed var(--border); }
-.clear-btn {
-    padding: 9px;
-    background: var(--parchment);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 0.8em; font-weight: 700;
-    color: #888;
-    cursor: pointer;
-    font-family: var(--font);
-    transition: background 0.12s;
-    width: 100%;
-}
-.clear-btn:hover { background: var(--tan); color: var(--espresso); }
+.bill-label { font-size: 0.75em; color: #555; font-weight: 600; }
+.bill-total { font-size: 1.25em; font-weight: 800; color: var(--red); }
+.bill-change { font-size: 1.25em; font-weight: 800; color: var(--green); }
+.cash-input { width: 85px; padding: 5px; border: 1.5px solid var(--bark); border-radius: 6px; font-size: 0.95em; font-weight: 700; text-align: right; }
+.quick-cash { display: flex; gap: 3px; }
+.qc-btn { padding: 3px 6px; background: var(--parchment); border: none; border-radius: 4px; font-size: 0.7em; font-weight: 700; cursor: pointer; }
+.dashed { border: none; border-top: 1px dashed var(--border); margin: 4px 0; }
+.clear-btn { padding: 8px; background: #eee; border: 1px solid var(--border); border-radius: 8px; font-size: 0.8em; font-weight: 700; color: #555; cursor: pointer; width: 100%; transition: background 0.1s; }
+.clear-btn:active { background: #ddd; }
 
 /* ═══════════════════════════════════════════════
-   SPEC BOTTOM SHEET
+   規格細項選擇彈窗
 ═══════════════════════════════════════════════ */
-.overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.45);
-    z-index: 500;
-    align-items: flex-end;
-    justify-content: center;
-}
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 500; align-items: center; justify-content: center; }
 .overlay.open { display: flex; }
-.spec-sheet {
-    background: var(--white);
-    border-radius: 20px 20px 0 0;
-    width: 100%;
-    max-width: 480px;
-    padding: 20px 20px 40px;
-    box-shadow: 0 -8px 40px rgba(61,43,31,0.18);
-    animation: slideUp 0.25s ease;
-}
-@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-.spec-name { font-family: var(--display); font-size: 1.2em; font-weight: 600; color: var(--espresso); margin-bottom: 2px; }
-.spec-sub  { font-size: 0.78em; color: var(--bark); margin-bottom: 16px; }
-.spec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.spec-btn {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 13px 14px;
-    background: var(--cream);
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    cursor: pointer;
-    font-family: var(--font);
-    transition: background 0.12s, border-color 0.12s, transform 0.1s;
-}
-.spec-btn:hover  { background: var(--parchment); border-color: var(--bark); }
-.spec-btn:active { transform: scale(0.97); }
-.spec-label { font-weight: 700; font-size: 0.9em; }
-.spec-price { font-weight: 800; color: var(--red); font-size: 1em; }
-.spec-price::before { content: '$'; font-size: 0.78em; }
-.spec-cancel {
-    width: 100%; margin-top: 12px;
-    padding: 11px; background: var(--parchment);
-    border: none; border-radius: 10px;
-    font-size: 0.88em; font-weight: 700; color: #888;
-    cursor: pointer; font-family: var(--font);
-}
-.spec-cancel:hover { background: var(--tan); }
+.spec-sheet { background: var(--white); border-radius: 14px; width: 90%; max-width: 400px; padding: 20px; box-shadow: 0 4px 25px rgba(0,0,0,0.15); }
+.spec-name { font-family: var(--display); font-size: 1.2em; font-weight: 600; margin-bottom: 2px; }
+.spec-sub  { font-size: 0.78em; color: var(--bark); margin-bottom: 14px; }
+.spec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.spec-btn { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--cream); border: 1.5px solid var(--border); border-radius: 8px; cursor: pointer; font-family: var(--font); }
+.spec-label { font-weight: 700; font-size: 0.85em; }
+.spec-price { font-weight: 800; color: var(--red); }
+.spec-price::before { content: '$'; }
+.spec-cancel { width: 100%; margin-top: 10px; padding: 10px; background: var(--parchment); border: none; border-radius: 8px; font-size: 0.85em; font-weight: 700; color: #666; cursor: pointer; }
 
-/* ═══════════════════════════════════════════════
-   ADMIN MODAL
-═══════════════════════════════════════════════ */
-.admin-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.45);
-    z-index: 600;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-}
+/* ── 後台管理彈窗 ── */
+.admin-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 600; align-items: center; justify-content: center; padding: 16px; }
 .admin-overlay.open { display: flex; }
-.admin-panel {
-    background: var(--white);
-    border-radius: 14px;
-    width: 100%; max-width: 520px;
-    max-height: 88dvh;
-    display: flex; flex-direction: column;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(61,43,31,0.2);
-}
-.admin-header {
-    background: var(--espresso);
-    color: #fff; padding: 14px 18px;
-    font-weight: 700; font-size: 0.92em;
-    display: flex; justify-content: space-between; align-items: center;
-    flex-shrink: 0;
-}
-.admin-close {
-    background: rgba(255,255,255,0.15);
-    border: none; color: #fff;
-    width: 28px; height: 28px;
-    border-radius: 50%; cursor: pointer;
-    font-size: 1em; display: flex; align-items: center; justify-content: center;
-}
-.admin-close:hover { background: rgba(255,255,255,0.25); }
-.admin-tabs { display: flex; background: var(--parchment); flex-shrink: 0; border-bottom: 1px solid var(--border); }
-.admin-tab {
-    flex: 1; padding: 10px; text-align: center;
-    font-size: 0.8em; font-weight: 700;
-    cursor: pointer; color: var(--bark);
-    border-bottom: 2px solid transparent;
-    transition: all 0.15s;
-}
-.admin-tab.active { color: var(--espresso); border-bottom-color: var(--roast); background: var(--white); }
+.admin-panel { background: var(--white); border-radius: 14px; width: 100%; max-width: 480px; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; }
+.admin-header { background: var(--espresso); color: #fff; padding: 12px 16px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+.admin-close { background: rgba(255,255,255,0.15); border: none; color: #fff; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; }
+.admin-tabs { display: flex; background: var(--parchment); }
+.admin-tab { flex: 1; padding: 10px; text-align: center; font-size: 0.8em; font-weight: 700; cursor: pointer; color: var(--bark); }
+.admin-tab.active { color: var(--espresso); background: var(--white); border-bottom: 2px solid var(--roast); }
 .admin-body { flex: 1; overflow-y: auto; padding: 16px; }
-.status-item {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 10px 12px; border-radius: 8px;
-    border: 1px solid var(--border); margin-bottom: 8px;
-    background: var(--white);
-}
-.si-name { font-weight: 600; font-size: 0.87em; }
-.si-sub  { font-size: 0.74em; color: var(--bark); margin-top: 1px; }
-.toggle { position: relative; width: 42px; height: 22px; flex-shrink: 0; }
+.status-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 6px; }
+.si-name { font-weight: 600; font-size: 0.85em; }
+.si-sub  { font-size: 0.72em; color: var(--bark); }
+.toggle { position: relative; width: 38px; height: 20px; }
 .toggle input { display: none; }
-.toggle-slider {
-    position: absolute; inset: 0;
-    background: #ccc; border-radius: 22px;
-    cursor: pointer; transition: background 0.2s;
-}
-.toggle-slider::before {
-    content: '';
-    position: absolute; left: 3px; top: 3px;
-    width: 16px; height: 16px;
-    background: #fff; border-radius: 50%;
-    transition: transform 0.2s;
-}
+.toggle-slider { position: absolute; inset: 0; background: #ccc; border-radius: 20px; cursor: pointer; }
+.toggle-slider::before { content: ''; position: absolute; left: 2px; top: 2px; width: 16px; height: 16px; background: #fff; border-radius: 50%; transition: 0.2s; }
 .toggle input:checked + .toggle-slider { background: var(--roast); }
-.toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
-.batch-row { display: flex; gap: 8px; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
-.batch-btn {
-    flex: 1; padding: 9px; border: none; border-radius: 8px;
-    font-weight: 700; font-size: 0.82em; cursor: pointer;
-    font-family: var(--font); transition: opacity 0.15s;
-}
-.batch-btn:hover { opacity: 0.85; }
-.add-form { display: flex; flex-direction: column; gap: 10px; }
-.form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.form-group { display: flex; flex-direction: column; gap: 4px; }
+.toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
+.batch-row { display: flex; gap: 8px; margin-bottom: 12px; }
+.batch-btn { flex: 1; padding: 8px; border: none; border-radius: 6px; font-weight: 700; font-size: 0.8em; cursor: pointer; }
+.add-form { display: flex; flex-direction: column; gap: 8px; }
+.form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.form-group { display: flex; flex-direction: column; gap: 2px; }
 .form-group.full { grid-column: 1/-1; }
-.form-label { font-size: 0.74em; font-weight: 700; color: var(--bark); }
-.form-input, .form-select {
-    padding: 7px 10px;
-    border: 1.5px solid #e0d8d0;
-    border-radius: 7px;
-    font-family: var(--font); font-size: 0.85em;
-    color: var(--espresso); background: #fdfaf6;
-    transition: border-color 0.15s;
-}
-.form-input:focus, .form-select:focus { outline: none; border-color: var(--roast); }
-.submit-btn {
-    background: var(--roast); color: #fff;
-    border: none; padding: 10px; border-radius: 8px;
-    font-weight: 700; font-size: 0.9em;
-    cursor: pointer; font-family: var(--font);
-    transition: background 0.15s; margin-top: 4px;
-}
-.submit-btn:hover { background: var(--espresso); }
-.form-note {
-    font-size: 0.74em; color: #999;
-    background: #fdf8f1; padding: 8px 10px;
-    border-radius: 6px; border-left: 3px solid var(--lr-col);
-    line-height: 1.6;
-}
-.success-msg {
-    display: none; background: #e8f5e9; color: var(--green);
-    padding: 10px 12px; border-radius: 8px;
-    font-size: 0.82em; font-weight: 600; text-align: center;
-}
+.form-label { font-size: 0.72em; font-weight: 700; color: var(--bark); }
+.form-input, .form-select { padding: 6px 10px; border: 1.5px solid #e0d8d0; border-radius: 6px; font-size: 0.85em; }
+.submit-btn { background: var(--roast); color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: 700; margin-top: 4px; cursor: pointer; }
+.form-note { font-size: 0.72em; color: #999; background: #fdf8f1; padding: 6px 10px; border-radius: 4px; border-left: 3px solid var(--lr-col); }
+.success-msg { display: none; background: #e8f5e9; color: var(--green); padding: 8px; border-radius: 6px; font-size: 0.8em; text-align: center; }
 
 /* ═══════════════════════════════════════════════
-   MOBILE CART DRAWER
+   手機版：強制限縮收銀台在右側 (RWD 覆寫設定)
 ═══════════════════════════════════════════════ */
-.cart-drawer-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.4);
-    z-index: 400;
-}
-.cart-drawer-overlay.open { display: block; }
-.cart-drawer {
-    position: fixed;
-    right: 0; top: 0; bottom: 0;
-    width: min(86vw, 320px);
-    background: var(--white);
-    box-shadow: -6px 0 30px rgba(61,43,31,0.15);
-    display: flex; flex-direction: column;
-    z-index: 401;
-    transform: translateX(100%);
-    transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
-}
-.cart-drawer-overlay.open .cart-drawer { transform: translateX(0); }
-
-/* ═══════════════════════════════════════════════
-   RESPONSIVE
-═══════════════════════════════════════════════ */
-
-/* TABLET: 481–900 */
-@media (max-width: 900px) {
-    .panel-cashier { display: none; }
-    .btn-cart { display: flex !important; }
-}
-
-/* MOBILE: ≤ 480 */
-@media (max-width: 480px) {
-    .topbar { height: 48px; padding: 0 10px; gap: 6px; }
-    .topbar-title { font-size: 0.92em; }
-    .tabbar { display: flex; }
-    .panel-menu { display: none; }
-    .panel-beans { display: none; }
-    .panel-beans.tab-active,
-    .panel-menu.tab-active { display: flex; }
-    .section-head { padding: 12px 12px 6px; }
-    .bean-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
-    .spec-sheet { padding: 18px 16px 36px; }
-}
-
-/* DESKTOP: ≥ 901 */
-@media (min-width: 901px) {
-    .panel-cashier { display: flex; }
-    .btn-cart { display: none !important; }
-}
-
-/* LARGE DESKTOP */
-@media (min-width: 1280px) {
-    .panel-menu { width: 260px; }
-    .panel-cashier { width: 300px; }
-    .bean-grid { grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); }
+@media (max-width: 768px) {
+    /* 調整左右分配比例，左側菜單佔 58%、右側收銀台佔 42% */
+    .panel-menu { flex: 58; }
+    .panel-cashier { width: auto; flex: 42; border-left: 1.5px solid var(--bark); }
+    
+    /* 縮小手機上 Grid 的品項大小，避免太擠 */
+    .menu-grid { grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); gap: 5px; }
+    .menu-item { padding: 10px 4px; }
+    .mi-name { font-size: 0.76em; }
+    
+    /* 縮小單品豆卡片 */
+    .bean-card { padding: 10px 4px; }
+    .bean-name { font-size: 0.85em; }
+    
+    /* 微調手機版收銀台裡面的控制項尺寸 */
+    .cart-row { padding: 6px 4px; gap: 4px; }
+    .cart-name { font-size: 0.75em; }
+    .cart-meta { font-size: 0.65em; }
+    .qty-btn { width: 20px; height: 20px; font-size: 0.8em; }
+    .qty-num { font-size: 0.8em; min-width: 12px; }
+    .temp-btn { font-size: 0.6em; padding: 1px 3px; }
+    
+    /* 縮小下方結帳輸入與快速金額按鈕 */
+    .cash-input { width: 70px; font-size: 0.85em; padding: 4px; }
+    .qc-btn { padding: 2px 4px; font-size: 0.65em; }
+    .bill-total, .bill-change { font-size: 1.1em; }
 }
     </style>
 </head>
 <body>
 
-<!-- ═══ TOP NAV ═══ -->
 <header class="topbar">
-    <span class="topbar-title">☕ 一味淨 · 收銀台</span>
+    <span class="topbar-title">☕ 收銀系統</span>
     <span class="topbar-count" id="topbarCount">0 品項</span>
     <a href="https://christypy.github.io/" class="topbar-btn btn-home">🏠 首頁</a>
     <button class="topbar-btn btn-admin" onclick="openAdminPanel()">⚙️ 管理</button>
-    <button class="topbar-btn btn-cart" id="cartToggleBtn" onclick="openCartDrawer()">
-        🛒 收銀
-        <span class="badge" id="cartBadge" style="display:none"></span>
-    </button>
 </header>
 
-<!-- ═══ TAB BAR (mobile) ═══ -->
-<nav class="tabbar" id="tabbar">
-    <div class="tabbar-inner">
-        <div class="tab-pill active" id="tab-classic" onclick="switchTab('classic')">☕ 義式飲品</div>
-        <div class="tab-pill" id="tab-other"   onclick="switchTab('other')">📦 其他品項</div>
-        <div class="tab-pill" id="tab-beans"   onclick="switchTab('beans')">🫘 單品豆</div>
-    </div>
-</nav>
-
-<!-- ═══ MAIN ═══ -->
 <div class="app">
 
-    <!-- LEFT: Menu list -->
-    <aside class="panel-menu tab-active" id="panel-menu">
+    <main class="panel-menu">
         <div class="panel-menu-scroll">
-            <div class="section-head">義式飲品</div>
-            <ul class="menu-list" id="classicList"></ul>
+            
+            <div class="section-head">☕ 義式飲品</div>
+            <div class="menu-grid" id="classicList"></div>
 
-            <div class="section-head" style="margin-top:4px;">其他品項</div>
-            <ul class="menu-list" id="otherList"></ul>
-        </div>
-    </aside>
+            <div class="section-head" style="margin-top:12px;">📦 其他品項</div>
+            <div class="menu-grid" id="otherList"></div>
 
-    <!-- CENTER: Beans -->
-    <main class="panel-beans" id="panel-beans">
-        <div class="panel-beans-scroll">
-            <div class="section-head on-parchment">單品咖啡豆</div>
-            <div class="bean-grid" id="beanGrid">
-                <div style="grid-column:1/-1;text-align:center;padding:40px;color:#bbb;font-size:0.85em;">☕ 讀取雲端資料中…</div>
+            <div class="section-head" style="margin-top:12px;">🫘 單品咖啡豆</div>
+            <div class="menu-grid" id="beanGrid">
+                <div style="grid-column:1/-1;text-align:center;padding:20px;color:#bbb;font-size:0.85em;">☕ 讀取雲端資料中…</div>
             </div>
+            
         </div>
     </main>
 
-    <!-- RIGHT: Cashier (desktop/tablet) -->
-    <aside class="panel-cashier" id="desktopCashier">
-        <div class="cashier-head">收銀台</div>
+    <aside class="panel-cashier">
+        <div class="cashier-head">🛒 明細</div>
         <div class="cart-list" id="cartList">
-            <div class="cart-empty"><div class="cart-empty-icon">🛒</div><span>收銀台空空如也</span></div>
+            <div class="cart-empty"><div class="cart-empty-icon">🛒</div><span>無品項</span></div>
         </div>
-        <div class="cashier-bill" id="desktopBill">
+        <div class="cashier-bill">
             <div class="bill-row">
-                <span class="bill-label">應收總計</span>
+                <span class="bill-label">總計</span>
                 <span class="bill-total">$<span id="calcTotal">0</span></span>
             </div>
             <hr class="dashed">
             <div class="bill-row">
-                <span class="bill-label">實收金額</span>
-                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+                <span class="bill-label">實收</span>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
                     <input type="number" id="cashReceived" class="cash-input" placeholder="0" oninput="calculateChange()" inputmode="numeric">
                     <div class="quick-cash">
                         <button class="qc-btn" onclick="setFastCash(100)">100</button>
@@ -728,51 +366,14 @@ body {
                 </div>
             </div>
             <div class="bill-row">
-                <span class="bill-label">應找零</span>
+                <span class="bill-label">找零</span>
                 <span class="bill-change">$<span id="calcChange">0</span></span>
             </div>
-            <button class="clear-btn" onclick="clearCart()">🧹 清空收銀台</button>
+            <button class="clear-btn" onclick="clearCart()">🧹 清空</button>
         </div>
     </aside>
 </div>
 
-<!-- ═══ CART DRAWER (mobile/tablet) ═══ -->
-<div class="cart-drawer-overlay" id="cartDrawerOverlay" onclick="handleCartOverlayClick(event)">
-    <div class="cart-drawer">
-        <div class="cashier-head" style="border-bottom:1px solid var(--border);flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding-right:12px;">
-            <span style="display:flex;align-items:center;gap:6px;"><span style="width:3px;height:12px;background:var(--bark);border-radius:2px;display:block;"></span>收銀台</span>
-            <button onclick="closeCartDrawer()" style="background:none;border:none;font-size:1.1em;cursor:pointer;color:var(--bark);padding:4px;">✕</button>
-        </div>
-        <div class="cart-list" id="drawerCartList">
-            <div class="cart-empty"><div class="cart-empty-icon">🛒</div><span>收銀台空空如也</span></div>
-        </div>
-        <div class="cashier-bill">
-            <div class="bill-row">
-                <span class="bill-label">應收總計</span>
-                <span class="bill-total">$<span id="drawerTotal">0</span></span>
-            </div>
-            <hr class="dashed">
-            <div class="bill-row">
-                <span class="bill-label">實收金額</span>
-                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
-                    <input type="number" id="drawerCash" class="cash-input" placeholder="0" oninput="calculateChange()" inputmode="numeric">
-                    <div class="quick-cash">
-                        <button class="qc-btn" onclick="setFastCash(100)">100</button>
-                        <button class="qc-btn" onclick="setFastCash(500)">500</button>
-                        <button class="qc-btn" onclick="setFastCash(1000)">1000</button>
-                    </div>
-                </div>
-            </div>
-            <div class="bill-row">
-                <span class="bill-label">應找零</span>
-                <span class="bill-change">$<span id="drawerChange">0</span></span>
-            </div>
-            <button class="clear-btn" onclick="clearCart()">🧹 清空收銀台</button>
-        </div>
-    </div>
-</div>
-
-<!-- ═══ SPEC BOTTOM SHEET ═══ -->
 <div class="overlay" id="specOverlay" onclick="handleSpecOverlayClick(event)">
     <div class="spec-sheet">
         <div class="spec-name" id="specName"></div>
@@ -782,7 +383,6 @@ body {
     </div>
 </div>
 
-<!-- ═══ ADMIN MODAL ═══ -->
 <div class="admin-overlay" id="adminOverlay" onclick="handleAdminOverlayClick(event)">
     <div class="admin-panel">
         <div class="admin-header">
@@ -798,23 +398,13 @@ body {
 </div>
 
 <script>
-// ══════════════════════════════════════
-// CONFIG
-// ══════════════════════════════════════
 const MENU_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSEiSHdIF1FlVgrSp5r8DhCDnTKAVhfRjXPIizNQ_d5kK_FFUQJfQKhQG1YXe3ViIdExAiUnAPlKCO-/pub?gid=250388087&single=true&output=csv";
 const GAS_URL = "https://script.google.com/macros/s/AKfycbyAXTwhXOZfmICm1QjOd0tq5qJKYH0rMql4dWc_1SxlCkBmF8nD-1NEDrHLKzzLo481lQ/exec";
 
-// ══════════════════════════════════════
-// STATE
-// ══════════════════════════════════════
 let coffeeData = [];
 let cart = {};
 let currentAdminTab = 'status';
-let currentMobileTab = 'classic'; // 'classic' | 'other' | 'beans'
 
-// ══════════════════════════════════════
-// CSV PARSER
-// ══════════════════════════════════════
 function parseCSV(text) {
     const rows = [];
     for (const line of text.split(/\r?\n/)) {
@@ -831,9 +421,6 @@ function parseCSV(text) {
     return rows;
 }
 
-// ══════════════════════════════════════
-// FETCH
-// ══════════════════════════════════════
 async function fetchMenuData() {
     try {
         const res = await fetch(MENU_CSV_URL + '&t=' + Date.now());
@@ -845,9 +432,7 @@ async function fetchMenuData() {
             if (!r[0]) continue;
             const type = r[0].trim(), name = (r[2]||'').trim();
             if (!name) continue;
-            if (type === 'classic') {
-                coffeeData.push({ type, name, price: parseInt(r[8])||0 });
-            } else if (type === 'other') {
+            if (type === 'classic' || type === 'other') {
                 coffeeData.push({ type, name, price: parseInt(r[8])||0 });
             } else if (type === 'single') {
                 const status = (r[12]||'').trim();
@@ -864,40 +449,37 @@ async function fetchMenuData() {
         }
         render();
     } catch {
-        document.getElementById('beanGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#a44a3f;font-size:0.85em;">⚠️ 讀取失敗，請重新整理</div>';
+        document.getElementById('beanGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:#a44a3f;font-size:0.85em;">⚠️ 讀取失敗</div>';
     }
 }
 
-// ══════════════════════════════════════
-// RENDER MENU
-// ══════════════════════════════════════
 function esc(s) { return s.replace(/'/g,"\\'"); }
 
 function render() {
-    // Classic list
+    // 義式飲品
     document.getElementById('classicList').innerHTML = coffeeData
         .filter(d => d.type === 'classic')
-        .map((item, i, arr) => `
-            <li class="menu-item" onclick="addToCart('${esc(item.name)}',${item.price},'義式')">
+        .map(item => `
+            <div class="menu-item" onclick="addToCart('${esc(item.name)}',${item.price},'義式')">
                 <span class="mi-name">${item.name}</span>
                 <span class="mi-price">${item.price}</span>
-            </li>${i < arr.length-1 ? '<div class="divider-line"></div>' : ''}
+            </div>
         `).join('');
 
-    // Other list
+    // 其他品項
     document.getElementById('otherList').innerHTML = coffeeData
         .filter(d => d.type === 'other')
-        .map((item, i, arr) => `
-            <li class="menu-item" onclick="addToCart('${esc(item.name)}',${item.price},'其他')">
+        .map(item => `
+            <div class="menu-item" onclick="addToCart('${esc(item.name)}',${item.price},'其他')">
                 <span class="mi-name">${item.name}</span>
                 <span class="mi-price">${item.price}</span>
-            </li>${i < arr.length-1 ? '<div class="divider-line"></div>' : ''}
+            </div>
         `).join('');
 
-    // Bean grid
+    // 單品咖啡豆
     const singles = coffeeData.filter(d => d.type === 'single' && d.available);
     document.getElementById('beanGrid').innerHTML = singles.length === 0
-        ? '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#bbb;font-size:0.85em;">目前無供應單品豆</div>'
+        ? '<div style="grid-column:1/-1;text-align:center;padding:20px;color:#bbb;font-size:0.85em;">無供應單品豆</div>'
         : singles.map(item => `
             <div class="bean-card" onclick="openSpecSheet(${item.id})">
                 <span class="bean-badge ${item.roast}">${item.roastName}</span>
@@ -907,9 +489,6 @@ function render() {
         `).join('');
 }
 
-// ══════════════════════════════════════
-// SPEC SHEET
-// ══════════════════════════════════════
 function openSpecSheet(id) {
     const item = coffeeData.find(c => c.id === id);
     if (!item) return;
@@ -932,39 +511,42 @@ function openSpecSheet(id) {
 function closeSpecSheet() { document.getElementById('specOverlay').classList.remove('open'); }
 function handleSpecOverlayClick(e) { if (e.target === document.getElementById('specOverlay')) closeSpecSheet(); }
 
-// ══════════════════════════════════════
-// CART
-// ══════════════════════════════════════
 function addToCart(name, price, subText) {
-    cart[`${name}-${subText}-${Date.now()}`] = { name, subText, price, qty:1, temp:'冰' };
+    const key = `${name}-${subText}`;
+    if (cart[key]) {
+        cart[key].qty += 1;
+    } else {
+        cart[key] = { name, subText, price, qty:1, temp:'冰' };
+    }
     updateCartUI();
 }
 function toggleTemp(k)   { if (cart[k]) { cart[k].temp = cart[k].temp==='冰'?'熱':'冰'; updateCartUI(); } }
 function changeQty(k, d) { if (!cart[k]) return; cart[k].qty += d; if (cart[k].qty <= 0) delete cart[k]; updateCartUI(); }
-function clearCart()     { cart = {}; document.getElementById('cashReceived').value=''; document.getElementById('drawerCash').value=''; updateCartUI(); }
-function setFastCash(n)  {
-    document.getElementById('cashReceived').value = n;
-    document.getElementById('drawerCash').value = n;
-    calculateChange();
-}
+function clearCart()     { cart = {}; document.getElementById('cashReceived').value=''; updateCartUI(); }
+function setFastCash(n)  { document.getElementById('cashReceived').value = n; calculateChange(); }
 
 function calculateChange() {
     const total = Object.values(cart).reduce((s,i) => s + i.price * i.qty, 0);
-    const desk  = parseInt(document.getElementById('cashReceived').value) || 0;
-    const draw  = parseInt(document.getElementById('drawerCash').value)   || 0;
-    const cash  = desk || draw;
+    const cash  = parseInt(document.getElementById('cashReceived').value) || 0;
     const change = cash >= total ? cash - total : 0;
-    document.getElementById('calcChange').textContent   = change;
-    document.getElementById('drawerChange').textContent = change;
+    document.getElementById('calcChange').textContent = change;
 }
 
-function buildCartHTML(listId) {
+function updateCartUI() {
+    const total = Object.values(cart).reduce((s,i) => s + i.price * i.qty, 0);
+    const count = Object.values(cart).reduce((s,i) => s + i.qty, 0);
+
+    document.getElementById('topbarCount').textContent = count + ' 品項';
+    document.getElementById('calcTotal').textContent   = total;
+
     const keys = Object.keys(cart);
     if (keys.length === 0) {
-        document.getElementById(listId).innerHTML = '<div class="cart-empty"><div class="cart-empty-icon">🛒</div><span>收銀台空空如也</span></div>';
+        document.getElementById('cartList').innerHTML = '<div class="cart-empty"><div class="cart-empty-icon">🛒</div><span>無品項</span></div>';
+        calculateChange();
         return;
     }
-    document.getElementById(listId).innerHTML = keys.map(k => {
+    
+    document.getElementById('cartList').innerHTML = keys.map(k => {
         const item = cart[k];
         const showTemp = item.subText === '內用' || item.subText === '外帶';
         return `
@@ -981,61 +563,9 @@ function buildCartHTML(listId) {
                 </div>
             </div>`;
     }).join('');
-}
-
-function updateCartUI() {
-    const keys  = Object.keys(cart);
-    const total = Object.values(cart).reduce((s,i) => s + i.price * i.qty, 0);
-    const count = Object.values(cart).reduce((s,i) => s + i.qty, 0);
-
-    document.getElementById('topbarCount').textContent = count + ' 品項';
-    document.getElementById('calcTotal').textContent   = total;
-    document.getElementById('drawerTotal').textContent = total;
-    document.getElementById('cartBadge').textContent   = count;
-    document.getElementById('cartBadge').style.display = count > 0 ? 'flex' : 'none';
-
-    buildCartHTML('cartList');
-    buildCartHTML('drawerCartList');
     calculateChange();
 }
 
-// ══════════════════════════════════════
-// CART DRAWER (mobile/tablet)
-// ══════════════════════════════════════
-function openCartDrawer()  { document.getElementById('cartDrawerOverlay').classList.add('open'); }
-function closeCartDrawer() { document.getElementById('cartDrawerOverlay').classList.remove('open'); }
-function handleCartOverlayClick(e) {
-    if (e.target === document.getElementById('cartDrawerOverlay')) closeCartDrawer();
-}
-
-// ══════════════════════════════════════
-// MOBILE TABS
-// ══════════════════════════════════════
-function switchTab(tab) {
-    currentMobileTab = tab;
-    ['classic','other','beans'].forEach(t => {
-        document.getElementById('tab-' + t).classList.toggle('active', t === tab);
-    });
-    const panelMenu  = document.getElementById('panel-menu');
-    const panelBeans = document.getElementById('panel-beans');
-
-    if (tab === 'beans') {
-        panelMenu.classList.remove('tab-active');
-        panelBeans.classList.add('tab-active');
-    } else {
-        panelBeans.classList.remove('tab-active');
-        panelMenu.classList.add('tab-active');
-        // scroll to right section
-        setTimeout(() => {
-            const head = document.getElementById(tab === 'classic' ? 'classicList' : 'otherList');
-            if (head) head.closest('.panel-menu-scroll')?.scrollTo({ top: head.previousElementSibling?.offsetTop || 0, behavior: 'smooth' });
-        }, 50);
-    }
-}
-
-// ══════════════════════════════════════
-// ADMIN
-// ══════════════════════════════════════
 function openAdminPanel()  { document.getElementById('adminOverlay').classList.add('open'); renderAdminTab(); }
 function closeAdminPanel() { document.getElementById('adminOverlay').classList.remove('open'); }
 function handleAdminOverlayClick(e) { if (e.target === document.getElementById('adminOverlay')) closeAdminPanel(); }
@@ -1147,9 +677,6 @@ async function submitNewBean() {
     finally { btn.textContent='＋ 新增單品豆'; btn.disabled=false; }
 }
 
-// ══════════════════════════════════════
-// BOOT
-// ══════════════════════════════════════
 fetchMenuData();
 updateCartUI();
 </script>
