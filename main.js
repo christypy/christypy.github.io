@@ -1,5 +1,5 @@
 /**
- * 一味淨生活咖啡系統 - 中午 12:30 自動跨日清空同步版
+ * 一味淨生活咖啡系統 - 🚀 效能極速優化版（快取優先、背景同步）
  */
 
 const SPREADSHEET_ID = '1aH2ap9QeqhpKI34-K9SsyiHnTpXPM1ud2rpOmAQtSIA'; 
@@ -48,18 +48,47 @@ function initApp() {
     }
 
     renderPrices(); 
+    
+    // 🚀 【關鍵優化】: 開機時立刻嘗試載入快取，達到秒開效果
+    loadLocalCache();
+    renderOrders();
+    
+    // 隨後立刻去抓一次雲端最新資料，並啟動定時器
+    initData(false);
 }
 
 function handleDaySelectChange() {
+    renderOrders(); // 切換星期時立刻切換畫面，不等待網路
     initData(true); 
+}
+
+// 🚀 【新增】從本地 LocalStorage 快速撈回客戶名單快取
+function loadLocalCache() {
+    try {
+        const cachedData = localStorage.getItem('coffee_customers_cache');
+        if (cachedData) {
+            customers = JSON.parse(cachedData);
+            console.log('[🚀 系統快取] 已成功秒開本地客戶快取資料');
+        }
+    } catch (e) {
+        console.error('讀取本地客戶快取失敗', e);
+    }
 }
 
 async function initData(isBackgroundSync = false) {
     try {
         await checkAndExecuteAutoClear();
 
+        // 加上隨機參數防止瀏覽器快取舊資料
         const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=Sheet1&v=${new Date().getTime()}`;
-        const res = await fetch(url);
+        
+        // 🚀 使用較短的 timeout 限制，避免網路卡死時轉圈太久
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000); 
+
+        const res = await fetch(url, { signal: controller.signal });
+        clearTimeout(timeoutId);
+
         if (!res.ok) throw new Error('無法連線至雲端試算表');
         
         const text = await res.text();
@@ -87,6 +116,9 @@ async function initData(isBackgroundSync = false) {
             };
         });
 
+        // 🚀 【關鍵優化】: 將最新的客戶結構同步儲存到快取，下次開網頁直接用
+        localStorage.setItem('coffee_customers_cache', JSON.stringify(customers));
+
         syncCloudToLocal();
         
         if (localEditLock.groupId) {
@@ -98,22 +130,30 @@ async function initData(isBackgroundSync = false) {
             });
         }
         
+        // 重新渲染最新狀態
         renderOrders();
 
         if (!isBackgroundSync) {
             startAutoSync(); 
         }
     } catch (error) {
-        console.error('雲端同步失敗，採用本地資料墊底:', error);
-        renderOrders();
+        console.warn('⚠️ 雲端讀取超時或失敗，系統繼續維持使用本地快取:', error);
+        // 如果原本沒撈到快取，才需要再次渲染空畫面
+        if(customers.length === 0) {
+            renderOrders();
+        }
+        if (!isBackgroundSync) {
+            startAutoSync(); 
+        }
     }
 }
 
 function startAutoSync() {
     if (syncInterval) clearInterval(syncInterval);
+    // 調整為 20 秒背景偷偷刷新一次即可，減少頻繁請求造成的卡頓
     syncInterval = setInterval(() => {
         initData(true); 
-    }, 15000); 
+    }, 20000); 
 }
 
 const LOCAL_WRITE_GRACE_MS = 8000; 
@@ -415,12 +455,10 @@ function makeHtml(stats, prefix) {
     return html;
 }
 
-// 🚀 新增：統計剩餘製作杯數的頂部大看板引擎
 function renderDashboard(todaysOrders) {
     const dashboard = document.getElementById('summaryDashboard');
     if (!dashboard) return;
 
-    // 用來加總各個品項目前「剩餘未做」的杯數
     let itemCounts = {};
 
     todaysOrders.forEach(c => {
@@ -429,7 +467,6 @@ function renderDashboard(todaysOrders) {
             let isAbsent = isItemAbsent(c.name, c.item, c.loc, i);
             let isDone = isItemDone(c.name, c.item, c.loc, i);
             
-            // 排除掉已經缺席或已經送達做好的，只統計「真正還需要製作的杯數」
             if (!isAbsent && !isDone) {
                 const itemName = c.item || "未定品項";
                 itemCounts[itemName] = (itemCounts[itemName] || 0) + 1;
@@ -443,7 +480,6 @@ function renderDashboard(todaysOrders) {
         return;
     }
 
-    // 依杯數由大到小排序，方便優先準備大單品項
     entries.sort((a, b) => b[1] - a[1]);
 
     dashboard.innerHTML = entries.map(([name, count]) => `
@@ -477,18 +513,20 @@ function renderOrders() {
     const clearBtn = document.getElementById('clearAllBtn');
     if (clearBtn) clearBtn.disabled = false;
 
-    if (!customers || customers.length === 0) return;
+    // 如果連快取都沒有（初次安裝或手動重置後），先提示讀取中
+    if (!customers || customers.length === 0) {
+        if (sDDiv) sDDiv.innerHTML = '<div style="text-align:center;color:#999;padding:10px;">☕ 正在聯絡雲端建立名單...</div>';
+        return;
+    }
 
     const createStatsObj = () => { let obj = {}; for (const k in CONFIG.TYPE_NAMES) obj[k] = { total: 0, done: 0, orders: [] }; return obj; };
     let sDeliver = createStatsObj(), sAsk = createStatsObj();
     const todaysOrders = customers.filter(c => c.days.length === 0 || c.days.includes(day));
     
-    // 🚀 執行頂部看板與備忘錄渲染
     renderDashboard(todaysOrders);
     renderMemos(todaysOrders);
 
     todaysOrders.forEach(c => {
-        // 🚀 分流邏輯簡化：只要 loc 是 "當日問" 就進 sAsk，其餘全部合併進今日要送的 sDeliver
         let target = (c.loc === "當日問") ? sAsk : sDeliver;
         if (CONFIG.TYPE_NAMES[c.type]) {
             const count = c.count || 1; 
@@ -568,5 +606,3 @@ function getStorageKey(n, i, l, idx = 0) { return `${getTodayDateString()}_${san
 function isItemDone(n, i, l, idx = 0) { return localStorage.getItem(getStorageKey(n, i, l, idx)) === 'true'; }
 function getAbsenceKey(n, i, l, idx = 0) { return `${getTodayDateString()}_absent_${sanitize(n)}_${sanitize(i)}_${sanitize(l)}_${idx}`; }
 function isItemAbsent(n, i, l, idx = 0) { return localStorage.getItem(getAbsenceKey(n, i, l, idx)) === 'true'; }
-
-initData();
