@@ -34,8 +34,7 @@ function initApp() {
         daySelect.value = today;
     }
 
-    const clearBtn = document.getElementById('clearAllBtn');
-    if (clearBtn) clearBtn.addEventListener('click', manualClearAll);
+    // clearAllBtn 已在 HTML 以 onclick 綁定，不需重複 addEventListener
     
     if (daySelect) {
         daySelect.removeEventListener('change', handleDaySelectChange);
@@ -491,6 +490,14 @@ function renderDashboard(todaysOrders) {
 }
 
 function renderOrders() {
+    // 防禦性檢查：若 config.js 尚未載入或載入失敗，提示並退出
+    if (typeof CONFIG === 'undefined' || !CONFIG.TYPE_NAMES) {
+        const sDDiv = document.getElementById('stats-deliver');
+        if (sDDiv) sDDiv.innerHTML = '<div style="text-align:center;color:red;padding:10px;">⚠️ 設定檔(config.js)未載入，請檢查檔案是否存在</div>';
+        console.error('[錯誤] CONFIG 未定義，請確認 config.js 已正確載入於 main.js 之前');
+        return;
+    }
+
     const daySelect = document.getElementById('daySelect');
     if (!daySelect) return;
     const day = parseInt(daySelect.value);
@@ -528,14 +535,27 @@ function renderOrders() {
 
     todaysOrders.forEach(c => {
         let target = (c.loc === "當日問") ? sAsk : sDeliver;
-        if (CONFIG.TYPE_NAMES[c.type]) {
+
+        // 【修正】雲端 type 欄位可能直接是中文品項名（如「熱拿鐵」）而非 type key
+        // 嘗試以 ITEM_TYPE_MAP 轉換，讓新舊格式都能正確渲染
+        let resolvedType = c.type;
+        if (!CONFIG.TYPE_NAMES[resolvedType]) {
+            const mapped = ITEM_TYPE_MAP[resolvedType] || ITEM_TYPE_MAP[c.item];
+            if (mapped && CONFIG.TYPE_NAMES[mapped]) {
+                resolvedType = mapped;
+            } else {
+                console.warn(`[跳過] 找不到對應的 type：name="${c.name}", item="${c.item}", type="${c.type}"`);
+            }
+        }
+
+        if (CONFIG.TYPE_NAMES[resolvedType]) {
             const count = c.count || 1; 
-            target[c.type].total += count;
+            target[resolvedType].total += count;
             for (let i = 0; i < count; i++) {
                 let isAbsent = isItemAbsent(c.name, c.item, c.loc, i); 
                 let done = isItemDone(c.name, c.item, c.loc, i);
-                if (done && !isAbsent) target[c.type].done++;
-                target[c.type].orders.push({ ...c, isDone: done, isAbsent, index: i });
+                if (done && !isAbsent) target[resolvedType].done++;
+                target[resolvedType].orders.push({ ...c, type: resolvedType, isDone: done, isAbsent, index: i });
             }
         }
     });
@@ -567,6 +587,7 @@ function renderMemos(todaysOrders) {
 }
 
 function renderPrices() {
+    if (typeof CONFIG === 'undefined') return; // config.js 未載入時靜默跳過
     const baseContainer = document.getElementById('baseDrinksContainer'); 
     if (baseContainer && CONFIG.BASE_DRINKS) { 
         baseContainer.innerHTML = CONFIG.BASE_DRINKS.map(item => `<div class="mini-price-item">${item.name}<span class="p-cost">${item.price}</span></div>`).join(''); 

@@ -14,9 +14,6 @@
     <h1>一味淨生活</h1>
 </div>
 
-<script src="config.js"></script>
-<script src="main.js"></script>
-
 <div class="controls">
     <select id="daySelect">
         <option value="1">星期一 (休)</option>
@@ -170,6 +167,9 @@
     </div>
 </div>
 
+<script src="config.js"></script>
+<script src="main.js"></script>
+
 <script>
 // ══ 雲端價目表同步 ══
 const CLOUD_MENU_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSEiSHdIF1FlVgrSp5r8DhCDnTKAVhfRjXPIizNQ_d5kK_FFUQJfQKhQG1YXe3ViIdExAiUnAPlKCO-/pub?gid=250388087&single=true&output=csv";
@@ -275,9 +275,13 @@ async function fetchCloudMenu() {
 
     } catch (err) {
         console.error('雲端選單同步錯誤:', err);
-        document.getElementById('baseDrinksContainer').innerHTML = '<div class="cloud-loading-mini" style="color:red;">連線失敗，請重新整理</div>';
-        document.getElementById('otherItemsContainer').innerHTML = '<div class="cloud-loading-mini" style="color:red;">連線失敗</div>';
-        document.getElementById('singleBeansGrid').innerHTML     = '<div class="cloud-loading-mini" style="color:red;">單品豆載入失敗</div>';
+        // 雲端失敗時，若 CONFIG 靜態資料存在則已由 renderPrices() 填入，不需額外處理
+        const hasContent = document.getElementById('baseDrinksContainer').innerHTML.trim();
+        if (!hasContent || hasContent.includes('同步雲端')) {
+            document.getElementById('baseDrinksContainer').innerHTML = '<div class="cloud-loading-mini" style="color:red;">連線失敗，請重新整理</div>';
+            document.getElementById('otherItemsContainer').innerHTML = '<div class="cloud-loading-mini" style="color:red;">連線失敗</div>';
+        }
+        document.getElementById('singleBeansGrid').innerHTML = '<div class="cloud-loading-mini" style="color:red;">單品豆載入失敗</div>';
     }
 }
 
