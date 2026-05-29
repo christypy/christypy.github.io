@@ -1,24 +1,39 @@
 /* ═══════════════════════════════════════════════
-   DESIGN TOKENS
+   DESIGN TOKENS — 與 menu.html 對齊
 ═══════════════════════════════════════════════ */
 :root {
-    --cream:     #f7f3ed;
-    --parchment: #ede8df;
-    --tan:       #d4c4a8;
-    --bark:      #8d6e63;
-    --espresso:  #3d2b1f;
-    --roast:     #bc6c25;
-    --red:       #a44a3f;
+    /* 主色系（來自 menu） */
+    --primary:   #2c1e15;
+    --secondary: #8c6a5c;
+    --accent:    #b85a4b;
+
+    /* 背景 */
+    --bg:        #f9f6f0;
+    --card-bg:   #ffffff;
+    --surface:   #faf8f5;   /* 收銀台、標頭底色 */
+    --parchment: #f4f0ea;   /* 按鈕次要底色 */
+    --tan:       #d4c4a8;   /* scrollbar、分隔色 */
+
+    /* 邊框 & 陰影 */
+    --border:    rgba(44, 30, 21, 0.08);
+    --shadow:    0 4px 16px rgba(44, 30, 21, 0.04);
+
+    /* 烘焙度 badge（來自 menu） */
+    --lr-col:    #e3b074;
+    --mr-col:    #a9703c;
+    --dr-col:    #543d2b;
+
+    /* 功能色 */
     --green:     #2e7d32;
     --white:     #ffffff;
-    --border:    rgba(61, 43, 31, 0.12);
-    --shadow:    0 2px 12px rgba(61, 43, 31, 0.10);
+
+    /* 字體（來自 menu） */
     --font:      "Noto Serif TC", "PingFang TC", serif;
     --display:   "Playfair Display", "Noto Serif TC", serif;
-    --r:         10px;
-    --lr-col:    #e6b37e;
-    --mr-col:    #bc6c25;
-    --dr-col:    #4a3728;
+
+    /* 圓角（來自 menu） */
+    --r:         12px;
+    --r-sm:      6px;
 }
 
 /* ═══════════════════════════════════════════════
@@ -36,10 +51,14 @@ html, body {
 }
 body {
     font-family: var(--font);
-    background: var(--cream);
-    color: var(--espresso);
+    background: var(--bg);
+    /* 細點陣底紋（來自 menu） */
+    background-image: radial-gradient(rgba(0, 0, 0, 0.025) 1px, transparent 1px);
+    background-size: 20px 20px;
+    color: var(--primary);
     display: flex;
     flex-direction: column;
+    line-height: 1.6;
 }
 
 /* ═══════════════════════════════════════════════
@@ -48,7 +67,7 @@ body {
 .topbar {
     flex-shrink: 0;
     height: 52px;
-    background: var(--espresso);
+    background: var(--primary);
     display: flex;
     align-items: center;
     padding: 0 12px;
@@ -59,11 +78,11 @@ body {
     font-family: var(--display);
     font-size: 1.05em;
     color: var(--white);
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
     flex: 1;
 }
 .topbar-count {
-    background: var(--roast);
+    background: var(--accent);
     color: #fff;
     font-size: 0.72em;
     font-weight: 700;
@@ -74,7 +93,7 @@ body {
     height: 32px;
     padding: 0 12px;
     border: none;
-    border-radius: 8px;
+    border-radius: 30px;  /* menu 風格的膠囊按鈕 */
     font-family: var(--font);
     font-size: 0.75em;
     font-weight: 700;
@@ -82,12 +101,14 @@ body {
     display: flex;
     align-items: center;
     gap: 4px;
-    transition: opacity 0.15s;
+    transition: all 0.2s ease;
     text-decoration: none;
 }
 .topbar-btn:active { opacity: 0.75; }
-.btn-home  { background: rgba(255, 255, 255, 0.14); color: #fff; }
-.btn-admin { background: var(--roast); color: #fff; }
+.btn-home  { background: rgba(255, 255, 255, 0.12); color: rgba(255, 255, 255, 0.85); }
+.btn-home:hover  { background: rgba(255, 255, 255, 0.2); color: #fff; }
+.btn-admin { background: var(--accent); color: #fff; }
+.btn-admin:hover { opacity: 0.88; }
 
 /* ═══════════════════════════════════════════════
    MAIN LAYOUT
@@ -102,7 +123,7 @@ body {
 /* 左側：菜單滾動區 */
 .panel-menu {
     flex: 1;
-    background: var(--cream);
+    background: var(--bg);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -111,45 +132,40 @@ body {
     flex: 1;
     overflow-y: auto;
     scrollbar-width: thin;
+    scrollbar-color: var(--tan) transparent;
     padding: 12px;
 }
 .panel-menu-scroll::-webkit-scrollbar { width: 4px; }
-.panel-menu-scroll::-webkit-scrollbar-thumb { background: var(--tan); }
+.panel-menu-scroll::-webkit-scrollbar-thumb { background: var(--tan); border-radius: 4px; }
 
 /* 右側：固定收銀台 */
 .panel-cashier {
     width: 340px;
     flex-shrink: 0;
-    background: var(--white);
+    background: var(--card-bg);
     border-left: 1px solid var(--border);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: -4px 0 20px rgba(61, 43, 31, 0.06);
+    box-shadow: -4px 0 20px rgba(44, 30, 21, 0.06);
 }
 
 /* ═══════════════════════════════════════════════
-   SECTION HEADING
+   SECTION HEADING — 與 menu .section-title 對齊
 ═══════════════════════════════════════════════ */
 .section-head {
-    padding: 12px 4px 6px;
-    font-size: 0.85em;
+    padding: 12px 2px 8px;
+    font-size: 1em;
     font-weight: 700;
-    letter-spacing: 2px;
-    color: var(--bark);
-    text-transform: uppercase;
+    color: var(--primary);
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 10px;
 }
-.section-head::before {
-    content: '';
-    width: 4px;
-    height: 14px;
-    background: var(--roast);
-    border-radius: 2px;
-    flex-shrink: 0;
-}
+/* 移除原本的色條 ::before，改用底線樣式 */
+.section-head::before { display: none; }
 
 /* ═══════════════════════════════════════════════
    MENU ITEMS (義式飲品 / 其他品項)
@@ -158,6 +174,7 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     gap: 8px;
+    margin-bottom: 4px;
 }
 .menu-item {
     display: flex;
@@ -167,27 +184,32 @@ body {
     text-align: center;
     gap: 4px;
     padding: 12px 8px;
-    background: #fdfbf7;
-    border: 1px solid rgba(61, 43, 31, 0.08);
-    border-radius: 8px;
-    cursor: pointer;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
-    transition: background 0.12s, border-color 0.12s, transform 0.12s;
-}
-.menu-item:hover  { background: var(--parchment); border-color: var(--tan); }
-.menu-item:active { transform: scale(0.97); }
-.mi-name  { font-size: 0.82em; font-weight: 600; color: var(--espresso); word-break: break-all; }
-.mi-price { font-size: 0.9em; font-weight: 800; color: var(--red); }
-.mi-price::before { content: '$'; font-size: 0.8em; }
-
-/* ═══════════════════════════════════════════════
-   SINGLE-ORIGIN BEAN CARDS
-═══════════════════════════════════════════════ */
-.bean-card {
-    background: var(--white);
+    background: var(--card-bg);
     border: 1px solid var(--border);
     border-radius: var(--r);
-    padding: 12px 8px;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: all 0.2s ease;
+}
+.menu-item:hover  { background: var(--parchment); border-color: rgba(44, 30, 21, 0.18); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(44, 30, 21, 0.07); }
+.menu-item:active { transform: scale(0.97); }
+.mi-name  { font-size: 0.82em; font-weight: 500; color: var(--primary); word-break: break-all; }
+.mi-price {
+    font-size: 0.95em;
+    font-weight: 700;
+    color: var(--accent);
+    font-family: var(--display);  /* Playfair Display，與 menu .item-price 一致 */
+}
+.mi-price::before { content: '$'; font-size: 0.85em; margin-right: 1px; }
+
+/* ═══════════════════════════════════════════════
+   SINGLE-ORIGIN BEAN CARDS — 與 menu .card 對齊
+═══════════════════════════════════════════════ */
+.bean-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 12px 10px;
     cursor: pointer;
     display: flex;
     flex-direction: column;
@@ -195,49 +217,54 @@ body {
     gap: 4px;
     box-shadow: var(--shadow);
     text-align: center;
-    transition: transform 0.12s, border-color 0.12s;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
 }
-.bean-card:hover { transform: translateY(-2px); border-color: var(--bark); }
+.bean-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(44, 30, 21, 0.2);
+    box-shadow: 0 8px 24px rgba(44, 30, 21, 0.08);
+}
+
+/* Badge — 與 menu .badge 對齊（矩形 border-radius: 4px） */
 .bean-badge {
-    font-size: 0.58em;
+    font-size: 0.72em;
     font-weight: 700;
-    padding: 1px 6px;
-    border-radius: 20px;
+    padding: 2px 7px;
+    border-radius: 4px;
     margin-bottom: 2px;
 }
-.lr { background: var(--lr-col); color: #5a3e2b; }
+.lr { background: var(--lr-col); color: #4a2e10; }
 .mr { background: var(--mr-col); color: #fff; }
 .dr { background: var(--dr-col); color: #fff; }
-.bean-name { font-family: var(--display); font-size: 0.95em; font-weight: 600; word-break: break-all; }
-.bean-tag  { font-size: 0.65em; color: var(--bark); }
+
+.bean-name { font-family: var(--display); font-size: 0.95em; font-weight: 600; color: var(--primary); word-break: break-all; line-height: 1.3; }
+.bean-tag  { font-size: 0.68em; color: var(--secondary); }
 
 /* ═══════════════════════════════════════════════
    CASHIER PANEL
 ═══════════════════════════════════════════════ */
 .cashier-head {
     flex-shrink: 0;
-    padding: 12px;
+    padding: 12px 14px;
     border-bottom: 1px solid var(--border);
-    font-size: 0.8em;
+    font-size: 0.82em;
     font-weight: 700;
-    color: var(--espresso);
+    color: var(--primary);
     display: flex;
     align-items: center;
     gap: 6px;
-    background: #faf8f5;
+    background: var(--surface);
 }
-.cashier-head::before {
-    content: '';
-    width: 4px;
-    height: 14px;
-    background: var(--bark);
-    border-radius: 2px;
-}
+/* 移除原本的色條，改用文字顏色與 menu 一致 */
+.cashier-head::before { display: none; }
 
 .cart-list {
     flex: 1;
     overflow-y: auto;
-    padding: 6px;
+    padding: 8px;
+    background: #fdfcf9;
 }
 .cart-empty {
     height: 100%;
@@ -255,51 +282,117 @@ body {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 8px;
-    background: var(--cream);
-    border-radius: 8px;
+    padding: 8px 10px;
+    background: var(--card-bg);
+    border-radius: var(--r);
     margin-bottom: 6px;
-    border: 1px solid rgba(0, 0, 0, 0.02);
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 4px rgba(44, 30, 21, 0.02);
+    transition: box-shadow 0.15s;
 }
+.cart-row:hover { box-shadow: 0 2px 8px rgba(44, 30, 21, 0.06); }
 .cart-info    { flex: 1; min-width: 0; }
-.cart-name    { font-size: 0.8em; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.cart-meta    { font-size: 0.7em; color: var(--bark); margin-top: 1px; }
+.cart-name    { font-size: 0.8em; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--primary); }
+.cart-meta    { font-size: 0.7em; color: var(--secondary); margin-top: 1px; }
 .cart-controls { display: flex; align-items: center; gap: 4px; }
 .qty-btn {
-    width: 24px; height: 24px;
+    width: 22px; height: 22px;
     border-radius: 50%;
     border: 1px solid var(--border);
-    background: var(--white);
+    background: var(--parchment);
     font-weight: 700;
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
+    font-size: 0.85em;
+    transition: background 0.15s;
+    color: var(--primary);
 }
+.qty-btn:hover { background: var(--tan); }
 .qty-num  { font-weight: 700; font-size: 0.85em; min-width: 16px; text-align: center; }
-.temp-btn { font-size: 0.65em; font-weight: 700; padding: 2px 5px; border-radius: 4px; border: 1px solid var(--border); background: var(--white); cursor: pointer; }
+.temp-btn {
+    font-size: 0.65em;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--parchment);
+    cursor: pointer;
+    color: var(--secondary);
+    transition: background 0.15s;
+}
+.temp-btn:hover { background: var(--tan); }
 
 /* ── 結帳計算區 ── */
 .cashier-bill {
     flex-shrink: 0;
-    padding: 12px;
-    border-top: 2px solid var(--parchment);
+    padding: 12px 14px;
+    border-top: 1px solid var(--border);
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    background: #faf8f5;
+    gap: 7px;
+    background: var(--surface);
 }
 .bill-row    { display: flex; justify-content: space-between; align-items: center; }
-.bill-label  { font-size: 0.75em; color: #555; font-weight: 600; }
-.bill-total  { font-size: 1.25em; font-weight: 800; color: var(--red); }
-.bill-change { font-size: 1.25em; font-weight: 800; color: var(--green); }
-.cash-input  { width: 85px; padding: 5px; border: 1.5px solid var(--bark); border-radius: 6px; font-size: 0.95em; font-weight: 700; text-align: right; font-family: var(--font); }
+.bill-label  { font-size: 0.75em; color: var(--secondary); font-weight: 600; }
+.bill-total  {
+    font-size: 1.25em;
+    font-weight: 700;
+    color: var(--accent);
+    font-family: var(--display);
+}
+.bill-change {
+    font-size: 1.25em;
+    font-weight: 700;
+    color: var(--green);
+    font-family: var(--display);
+}
+.cash-input  {
+    width: 85px;
+    padding: 5px 8px;
+    border: 1.5px solid rgba(44, 30, 21, 0.25);
+    border-radius: var(--r-sm);
+    font-size: 0.95em;
+    font-weight: 700;
+    text-align: right;
+    font-family: var(--font);
+    background: var(--card-bg);
+    color: var(--primary);
+    transition: border-color 0.15s;
+}
+.cash-input:focus { outline: none; border-color: var(--secondary); }
 .quick-cash  { display: flex; gap: 3px; }
-.qc-btn      { padding: 3px 6px; background: var(--parchment); border: none; border-radius: 4px; font-size: 0.7em; font-weight: 700; cursor: pointer; color: var(--espresso); }
-.dashed      { border: none; border-top: 1px dashed var(--border); margin: 4px 0; }
-.clear-btn   { padding: 8px; background: #eee; border: 1px solid var(--border); border-radius: 8px; font-size: 0.8em; font-weight: 700; color: #555; cursor: pointer; width: 100%; transition: background 0.1s; }
-.clear-btn:active { background: #ddd; }
+.qc-btn      {
+    padding: 3px 8px;
+    background: var(--parchment);
+    border: 1px solid transparent;
+    border-radius: 20px;
+    font-size: 0.68em;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--primary);
+    font-family: var(--font);
+    transition: all 0.15s;
+}
+.qc-btn:hover { background: #ebe4da; border-color: rgba(44,30,21,0.1); }
+.dashed      { border: none; border-top: 1px dotted rgba(44, 30, 21, 0.15); margin: 2px 0; }
+.clear-btn   {
+    padding: 8px;
+    background: var(--parchment);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    font-size: 0.8em;
+    font-weight: 700;
+    color: var(--secondary);
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s ease;
+    font-family: var(--font);
+}
+.clear-btn:hover  { background: #ebe4da; color: var(--primary); }
+.clear-btn:active { background: var(--tan); }
 
 /* ═══════════════════════════════════════════════
-   SPEC SHEET MODAL
+   SPEC SHEET MODAL — 與 menu 卡片風格對齊
 ═══════════════════════════════════════════════ */
 .overlay {
     display: none;
@@ -312,21 +405,47 @@ body {
 }
 .overlay.open { display: flex; }
 .spec-sheet {
-    background: var(--white);
-    border-radius: 14px;
+    background: var(--card-bg);
+    border-radius: var(--r);
     width: 90%;
     max-width: 400px;
     padding: 20px;
-    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
 }
-.spec-name   { font-family: var(--display); font-size: 1.2em; font-weight: 600; margin-bottom: 2px; }
-.spec-sub    { font-size: 0.78em; color: var(--bark); margin-bottom: 14px; }
+.spec-name   { font-family: var(--display); font-size: 1.2em; font-weight: 600; color: var(--primary); margin-bottom: 2px; }
+.spec-sub    { font-size: 0.78em; color: var(--secondary); margin-bottom: 14px; }
 .spec-grid   { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.spec-btn    { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--cream); border: 1.5px solid var(--border); border-radius: 8px; cursor: pointer; font-family: var(--font); }
-.spec-label  { font-weight: 700; font-size: 0.85em; }
-.spec-price  { font-weight: 800; color: var(--red); }
-.spec-price::before { content: '$'; }
-.spec-cancel { width: 100%; margin-top: 10px; padding: 10px; background: var(--parchment); border: none; border-radius: 8px; font-size: 0.85em; font-weight: 700; color: #666; cursor: pointer; }
+.spec-btn {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: #faf8f5;
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    cursor: pointer;
+    font-family: var(--font);
+    transition: all 0.2s ease;
+}
+.spec-btn:hover { background: var(--parchment); border-color: rgba(44,30,21,0.18); }
+.spec-label  { font-weight: 700; font-size: 0.85em; color: var(--primary); }
+.spec-price  { font-weight: 700; color: var(--accent); font-family: var(--display); }
+.spec-price::before { content: '$'; font-size: 0.85em; margin-right: 1px; }
+.spec-cancel {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    background: var(--parchment);
+    border: none;
+    border-radius: var(--r);
+    font-size: 0.85em;
+    font-weight: 700;
+    color: var(--secondary);
+    cursor: pointer;
+    font-family: var(--font);
+    transition: background 0.15s;
+}
+.spec-cancel:hover { background: #ebe4da; }
 
 /* ═══════════════════════════════════════════════
    ADMIN MODAL
@@ -343,44 +462,60 @@ body {
 }
 .admin-overlay.open { display: flex; }
 .admin-panel {
-    background: var(--white);
-    border-radius: 14px;
+    background: var(--card-bg);
+    border-radius: var(--r);
     width: 100%;
     max-width: 480px;
     max-height: 85vh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
 }
 .admin-header {
-    background: var(--espresso);
+    background: var(--primary);
     color: #fff;
     padding: 12px 16px;
     font-weight: 700;
+    letter-spacing: 0.03em;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 .admin-close {
-    background: rgba(255, 255, 255, 0.15);
-    border: none;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255,255,255,0.15);
     color: #fff;
     width: 26px; height: 26px;
     border-radius: 50%;
     cursor: pointer;
     font-size: 0.9em;
+    transition: background 0.15s;
 }
-.admin-tabs { display: flex; background: var(--parchment); }
-.admin-tab  { flex: 1; padding: 10px; text-align: center; font-size: 0.8em; font-weight: 700; cursor: pointer; color: var(--bark); }
-.admin-tab.active { color: var(--espresso); background: var(--white); border-bottom: 2px solid var(--roast); }
+.admin-close:hover { background: rgba(255,255,255,0.22); }
+.admin-tabs { display: flex; background: var(--parchment); border-bottom: 1px solid var(--border); }
+.admin-tab  { flex: 1; padding: 10px; text-align: center; font-size: 0.8em; font-weight: 700; cursor: pointer; color: var(--secondary); font-family: var(--font); transition: all 0.15s; }
+.admin-tab:hover { color: var(--primary); }
+.admin-tab.active { color: var(--primary); background: var(--card-bg); border-bottom: 2px solid var(--accent); }
 .admin-body { flex: 1; overflow-y: auto; padding: 16px; }
 
-.status-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 6px; }
-.si-name { font-weight: 600; font-size: 0.85em; }
-.si-sub  { font-size: 0.72em; color: var(--bark); }
+.status-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    margin-bottom: 6px;
+    background: #fdfcf9;
+    transition: background 0.15s;
+}
+.status-item:hover { background: var(--parchment); }
+.si-name { font-weight: 600; font-size: 0.85em; color: var(--primary); }
+.si-sub  { font-size: 0.72em; color: var(--secondary); }
 
 /* Toggle Switch */
-.toggle { position: relative; width: 38px; height: 20px; }
+.toggle { position: relative; width: 38px; height: 20px; flex-shrink: 0; }
 .toggle input { display: none; }
 .toggle-slider {
     position: absolute;
@@ -398,24 +533,66 @@ body {
     background: #fff;
     border-radius: 50%;
     transition: transform 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
-.toggle input:checked + .toggle-slider { background: var(--roast); }
+.toggle input:checked + .toggle-slider { background: var(--accent); }
 .toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
 
 .batch-row { display: flex; gap: 8px; margin-bottom: 12px; }
-.batch-btn { flex: 1; padding: 8px; border: none; border-radius: 6px; font-weight: 700; font-size: 0.8em; cursor: pointer; }
+.batch-btn { flex: 1; padding: 8px; border: none; border-radius: var(--r-sm); font-weight: 700; font-size: 0.8em; cursor: pointer; font-family: var(--font); transition: opacity 0.15s; }
+.batch-btn:hover { opacity: 0.85; }
 
 /* Add Bean Form */
 .add-form     { display: flex; flex-direction: column; gap: 8px; }
 .form-grid-2  { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-.form-group   { display: flex; flex-direction: column; gap: 2px; }
+.form-group   { display: flex; flex-direction: column; gap: 3px; }
 .form-group.full { grid-column: 1 / -1; }
-.form-label   { font-size: 0.72em; font-weight: 700; color: var(--bark); }
+.form-label   { font-size: 0.72em; font-weight: 700; color: var(--secondary); letter-spacing: 0.02em; }
 .form-input,
-.form-select  { padding: 6px 10px; border: 1.5px solid #e0d8d0; border-radius: 6px; font-size: 0.85em; font-family: var(--font); color: var(--espresso); background: #fdfaf6; }
-.submit-btn   { background: var(--roast); color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: 700; margin-top: 4px; cursor: pointer; font-family: var(--font); }
-.form-note    { font-size: 0.72em; color: #999; background: #fdf8f1; padding: 6px 10px; border-radius: 4px; border-left: 3px solid var(--lr-col); line-height: 1.5; }
-.success-msg  { display: none; background: #e8f5e9; color: var(--green); padding: 8px; border-radius: 6px; font-size: 0.8em; text-align: center; font-weight: 600; }
+.form-select  {
+    padding: 6px 10px;
+    border: 1px solid rgba(44, 30, 21, 0.18);
+    border-radius: var(--r-sm);
+    font-size: 0.85em;
+    font-family: var(--font);
+    color: var(--primary);
+    background: var(--card-bg);
+    transition: border-color 0.15s;
+}
+.form-input:focus,
+.form-select:focus { outline: none; border-color: var(--secondary); }
+.submit-btn   {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: var(--r-sm);
+    font-weight: 700;
+    margin-top: 4px;
+    cursor: pointer;
+    font-family: var(--font);
+    transition: opacity 0.15s;
+}
+.submit-btn:hover { opacity: 0.88; }
+.form-note    {
+    font-size: 0.72em;
+    color: #888;
+    background: #fdf8f1;
+    padding: 8px 10px;
+    border-radius: 4px;
+    border-left: 2px solid rgba(140, 106, 92, 0.35);
+    line-height: 1.5;
+}
+.success-msg  {
+    display: none;
+    background: #e8f5e9;
+    color: var(--green);
+    padding: 8px;
+    border-radius: var(--r-sm);
+    font-size: 0.8em;
+    text-align: center;
+    font-weight: 600;
+}
 
 /* ═══════════════════════════════════════════════
    RESPONSIVE — MOBILE
@@ -423,19 +600,19 @@ body {
 @media (max-width: 768px) {
     /* 左側菜單 58%、右側收銀台 42% */
     .panel-menu     { flex: 58; }
-    .panel-cashier  { width: auto; flex: 42; border-left: 1.5px solid var(--bark); }
+    .panel-cashier  { width: auto; flex: 42; border-left: 1px solid rgba(44, 30, 21, 0.2); }
 
     /* 菜單格子縮小 */
     .menu-grid  { grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); gap: 5px; }
-    .menu-item  { padding: 10px 4px; }
+    .menu-item  { padding: 10px 6px; border-radius: 8px; }
     .mi-name    { font-size: 0.76em; }
 
     /* 單品豆卡片縮小 */
-    .bean-card  { padding: 10px 4px; }
+    .bean-card  { padding: 10px 6px; border-radius: 8px; }
     .bean-name  { font-size: 0.85em; }
 
     /* 收銀台細節縮小 */
-    .cart-row   { padding: 6px 4px; gap: 4px; }
+    .cart-row   { padding: 6px 6px; gap: 4px; border-radius: 8px; }
     .cart-name  { font-size: 0.75em; }
     .cart-meta  { font-size: 0.65em; }
     .qty-btn    { width: 20px; height: 20px; font-size: 0.8em; }
@@ -443,8 +620,8 @@ body {
     .temp-btn   { font-size: 0.6em; padding: 1px 3px; }
 
     /* 結帳區縮小 */
-    .cash-input { width: 70px; font-size: 0.85em; padding: 4px; }
-    .qc-btn     { padding: 2px 4px; font-size: 0.65em; }
+    .cash-input  { width: 70px; font-size: 0.85em; padding: 4px 6px; }
+    .qc-btn      { padding: 2px 5px; font-size: 0.65em; }
     .bill-total,
     .bill-change { font-size: 1.1em; }
 }
