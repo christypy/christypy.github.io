@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>咖啡選單</title>
+    <title>菜單</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
     <style>
@@ -40,7 +40,7 @@
             margin: 0;
             font-family: var(--font-main);
             min-height: 100vh;
-            padding: 16px 16px 30px 16px;
+            padding: 12px 16px 30px 16px; /* 🚀 縮減頂部內距 */
             padding-bottom: 90px; /* 留出底部導覽列空間 */
             line-height: 1.6;
         }
@@ -50,24 +50,24 @@
             margin: 0 auto; 
         }
 
-        /* ☕ 標頭設計 */
+        /* ☕ 標頭設計（已縮減內外距與高度） */
         .header {
             text-align: center;
-            margin: 24px 0 32px;
+            margin: 12px 0 20px; /* 🚀 大幅縮減與上下內容的間距 */
         }
         .header h1 {
-            font-size: 1.8em;
+            font-size: 1.6em; /* 稍微縮小更精緻 */
             color: var(--primary);
-            margin: 0 0 8px 0;
-            letter-spacing: 2px;
+            margin: 0;
+            letter-spacing: 4px;
         }
         .header::after {
             content: '';
             display: block;
-            width: 40px;
+            width: 30px;
             height: 2px;
             background: var(--secondary);
-            margin: 12px auto 0;
+            margin: 8px auto 0;
             opacity: 0.5;
         }
 
@@ -121,10 +121,10 @@
 
         /* 統一的區塊大標題 */
         .section-title {
-            font-size: 1.2em;
+            font-size: 1.15em;
             font-weight: 700;
             color: var(--primary);
-            margin: 0 0 16px 0;
+            margin: 0 0 12px 0; /* 🚀 縮減標題下方間距 */
             padding-bottom: 6px;
             border-bottom: 1px solid var(--border);
             display: flex;
@@ -132,35 +132,36 @@
             gap: 8px;
         }
         
+        /* 縮減滾動定位與區塊頂部的間距 */
         .scroll-section {
-            scroll-margin-top: 20px;
-            margin-top: 32px;
+            scroll-margin-top: 15px;
+            margin-top: 20px; /* 🚀 大幅縮減區塊彼此間的空隙 */
         }
 
         /* 📌 響應式排版架構 */
         .main-layout {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 32px;
+            gap: 24px; /* 🚀 縮減排版欄位間隙 */
         }
 
         @media (min-width: 992px) {
             .main-layout {
                 grid-template-columns: 38% 62%; 
-                gap: 40px;
+                gap: 32px;
             }
         }
 
-        /* 📌 篩選器樣式設計 (烘焙度與處理法) */
+        /* 📌 篩選器樣式設計 */
         .filter-container {
             background: #fff;
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 16px;
+            padding: 10px 12px;
+            margin-bottom: 14px; /* 🚀 縮減篩選器下方的空白 */
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             box-shadow: 0 4px 12px rgba(44,30,21,0.01);
         }
         .filter-group {
@@ -179,8 +180,8 @@
             background: #f4f0ea;
             border: 1px solid transparent;
             color: #555;
-            padding: 4px 12px;
-            font-size: 0.8em;
+            padding: 3px 10px;
+            font-size: 0.78em;
             font-family: var(--font-main);
             border-radius: 20px;
             cursor: pointer;
@@ -199,9 +200,9 @@
         .menu-list-classic {
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 12px; /* 🚀 稍微縮減飲品行距，畫面更緊湊 */
             background: var(--card-bg);
-            padding: 20px;
+            padding: 16px 20px;
             border-radius: 12px;
             box-shadow: 0 4px 16px rgba(44,30,21,0.02);
             border: 1px solid var(--border);
@@ -235,7 +236,7 @@
         .single-grid { 
             display: grid;
             grid-template-columns: 1fr; 
-            gap: 16px; 
+            gap: 14px; /* 🚀 縮減卡片與卡片間的空隙 */
         }
         @media (min-width: 576px) {
             .single-grid { grid-template-columns: repeat(2, 1fr); }
@@ -246,7 +247,7 @@
             background: var(--card-bg); 
             border-radius: 12px; 
             border: 1px solid var(--border); 
-            padding: 20px; 
+            padding: 16px; /* 🚀 縮減內距，讓手機螢幕能看見更多卡片 */
             display: flex; 
             flex-direction: column; 
             box-shadow: 0 4px 16px rgba(44,30,21,0.02);
@@ -254,7 +255,6 @@
             position: relative;
             overflow: hidden;
         }
-        /* 篩選隱藏時的動畫過渡效果 */
         .card.hidden {
             display: none !important;
         }
@@ -262,12 +262,12 @@
         .badge-row {
             display: flex;
             gap: 6px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             flex-wrap: wrap;
         }
         .badge {
             font-size: 0.75em; 
-            padding: 3px 8px; 
+            padding: 2px 7px; 
             color: #fff; 
             font-weight: 700; 
             border-radius: 4px;
@@ -283,25 +283,25 @@
         }
 
         .theme-word { 
-            font-size: 1.25em; 
+            font-size: 1.2em; 
             font-weight: 700;
             color: var(--primary); 
-            margin: 0 0 4px 0; 
+            margin: 0 0 2px 0; 
             line-height: 1.3;
         }
         .origin { 
-            font-size: 0.85em; 
+            font-size: 0.82em; 
             color: var(--secondary); 
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .flavor { 
-            font-size: 0.9em; 
+            font-size: 0.88em; 
             color: #555; 
-            margin: 0 0 16px 0; 
+            margin: 0 0 12px 0; 
             flex-grow: 1; 
-            line-height: 1.5;
-            padding: 10px;
+            line-height: 1.4;
+            padding: 8px 10px;
             background: #faf8f5;
             border-radius: 6px;
             border-left: 2px solid rgba(140, 106, 92, 0.2);
@@ -311,37 +311,42 @@
         .price-matrix { 
             display: grid; 
             grid-template-columns: repeat(2, 1fr); 
-            gap: 8px; 
+            gap: 6px; 
             border-top: 1px dashed var(--border); 
-            padding-top: 14px; 
+            padding-top: 10px; 
         }
         .price-box { 
             background: #fff;
             border: 1px solid rgba(44, 30, 21, 0.04);
-            padding: 6px 10px; 
+            padding: 5px 8px; 
             border-radius: 6px; 
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .p-label { font-size: 0.8em; color: #777; }
+        .p-label { font-size: 0.78em; color: #777; }
         .p-amount { 
             font-weight: 700; 
             color: var(--accent); 
-            font-size: 0.95em; 
+            font-size: 0.9em; 
             font-family: 'Playfair Display', serif;
         }
         .p-amount::before { content: '$'; font-size: 0.85em; margin-right: 1px; }
 
-        .loading-text { text-align: center; color: #999; padding: 30px; font-size: 0.9em; }
-        .no-match-text { text-align: center; color: #aaa; padding: 40px 10px; font-size: 0.9em; grid-column: 1 / -1; }
+        .loading-text { text-align: center; color: #999; padding: 20px; font-size: 0.9em; }
+        .no-match-text { text-align: center; color: #aaa; padding: 30px 10px; font-size: 0.9em; grid-column: 1 / -1; }
+        
+        /* 📌 底部次要區塊 */
+        .bottom-layout {
+            margin-top: 24px; /* 🚀 縮減頂部空隙 */
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1>☕ 咖啡選單</h1>
+        <h1>菜單</h1>
     </div>
 
     <div class="bottom-nav">
@@ -398,7 +403,6 @@
 <script>
 const SPREADSHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSEiSHdIF1FlVgrSp5r8DhCDnTKAVhfRjXPIizNQ_d5kK_FFUQJfQKhQG1YXe3ViIdExAiUnAPlKCO-/pub?gid=250388087&single=true&output=csv";
 
-// 全局變數儲存篩選狀態
 let currentRoastFilter = 'all';
 let currentProcessFilter = 'all';
 
@@ -435,19 +439,16 @@ function parseCSV(text) {
     return rows;
 }
 
-// 🚀 核心篩選邏輯
 function applyFilters() {
     const cards = document.querySelectorAll('#singleGrid .card');
     let visibleCount = 0;
 
     cards.forEach(card => {
         const roast = card.getAttribute('data-roast');
-        const processStr = card.getAttribute('data-process'); // 原始處理法中文字
+        const processStr = card.getAttribute('data-process');
 
-        // 1. 檢查烘焙度
         const matchRoast = (currentRoastFilter === 'all' || roast === currentRoastFilter);
 
-        // 2. 檢查處理法
         let matchProcess = false;
         if (currentProcessFilter === 'all') {
             matchProcess = true;
@@ -456,11 +457,9 @@ function applyFilters() {
         } else if (currentProcessFilter === 'natural') {
             matchProcess = processStr.includes('日曬');
         } else if (currentProcessFilter === 'honey') {
-            // 不是水洗也不是日曬，歸類為蜜處理或其他特殊處理
             matchProcess = !processStr.includes('水洗') && !processStr.includes('日曬');
         }
 
-        // 3. 同時滿足則顯示，否則隱藏
         if (matchRoast && matchProcess) {
             card.classList.remove('hidden');
             visibleCount++;
@@ -469,7 +468,6 @@ function applyFilters() {
         }
     });
 
-    // 處理如果完全沒有符合的豆子時的提示
     const existingNoMatch = document.getElementById('no-match-msg');
     if (visibleCount === 0) {
         if (!existingNoMatch) {
@@ -484,24 +482,20 @@ function applyFilters() {
     }
 }
 
-// 初始化篩選按鈕點擊監聽
 function initFilterEvents() {
     const buttons = document.querySelectorAll('.filter-btn');
     buttons.forEach(btn => {
         btn.addEventListener('click', function() {
-            // 切換同組按鈕的 active 狀態
             const parent = this.parentElement;
             parent.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
 
-            // 更新篩選變數
             const type = this.getAttribute('data-type');
             const val = this.getAttribute('data-val');
 
             if (type === 'roast') currentRoastFilter = val;
             if (type === 'process') currentProcessFilter = val;
 
-            // 執行篩選
             applyFilters();
         });
     });
@@ -574,7 +568,6 @@ async function fetchMenu() {
             return b.pTakeout - a.pTakeout;
         });
 
-        // 🛠 在生成的 HTML 卡片加入 data-roast 與 data-process 屬性供 JS 篩選
         let singleHTML = '';
         for (const b of singleBeans) {
             singleHTML += `
@@ -599,7 +592,6 @@ async function fetchMenu() {
         document.getElementById('otherList').innerHTML   = otherHTML   || '<div class="loading-text">暫無品項</div>';
         document.getElementById('singleGrid').innerHTML  = singleHTML  || '<div class="loading-text">目前無供應單品豆</div>';
 
-        // 資料載入完成後，初始化監聽並執行一次篩選(確保初始狀態正確)
         initFilterEvents();
         applyFilters();
 
