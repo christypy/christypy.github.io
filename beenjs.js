@@ -21,254 +21,275 @@ function parseCSV(text) {
         const row = []; let cur = '', inQ = false;
         for (let i = 0; i < line.length; i++) {
             const c = line[i];
-            if (c === '"') { if (inQ && line[i+1] === '"') { cur += '"'; i++; } else inQ = !inQ; }
-            else if (c === ',' && !inQ) { row.push(cur.trim()); cur = ''; }
-            else cur += c;
+            if (c === '"') { 
+                if (inQ && line[i+1] === '"') { cur += '"'; i++; } 
+                else { inQ = !inQ; }
+            } else if (c === ',' && !inQ) { row.push(cur); cur = ''; }
+            else { cur += c; }
         }
-        row.push(cur.trim()); rows.push(row);
+        row.push(cur); rows.push(row);
     }
     return rows;
 }
 
 // ══════════════════════════════════════
-// FETCH DATA
+// 🚀 【關鍵優化】DATA LIFECYCLE (快取優先、背景同步)
 // ══════════════════════════════════════
-async function fetchMenuData() {
+async function loadData() {
+    // 1. ⚡ 零秒開機：優先撈手機本地舊快取，畫面直接出來，不用等網路！
     try {
-        const res = await fetch(MENU_CSV_URL + '&t=' + Date.now());
-        if (!res.ok) throw new Error();
-        const rows = parseCSV(await res.text());
-        coffeeData = [];
+        const localCache = localStorage.getItem('cashier_coffee_data_cache');
+        if (localCache) {
+            coffeeData = JSON.parse(localCache);
+            console.log("[🚀 快取系統] 已秒開本地收銀快取資料");
+            render(); 
+        }
+    } catch (e) {
+        console.error("讀取本地快取失敗", e);
+    }
+
+    // 2. 🌍 背景靜態同步：悄悄去抓雲端最新狀態
+    try {
+        // 設定 5 秒超時限制，防止山區或市集網路卡死時轉圈圈
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+        const res = await fetch(`${MENU_CSV_URL}&t=${new Date().getTime()}`, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        
+        if (!res.ok) throw new Error("CSV 讀取失敗");
+        const text = await res.text();
+        const rows = parseCSV(text);
+
+        const freshData = [];
+        // 跳過 CSV 標題列
         for (let i = 1; i < rows.length; i++) {
             const r = rows[i];
-            if (!r[0]) continue;
-            const type = r[0].trim(), name = (r[2]||'').trim();
-            if (!name) continue;
-            if (type === 'classic' || type === 'other') {
-                coffeeData.push({ type, name, price: parseInt(r[8])||0 });
-            } else if (type === 'single') {
-                const status = (r[12]||'').trim();
-                coffeeData.push({
-                    id: parseInt(r[1])||i, type, name,
-                    origin: (r[3]||'').trim(), process: (r[4]||'').trim(),
-                    roast:  (r[5]||'lr').trim(), roastName:(r[6]||'淺焙').trim(),
-                    flavor: (r[7]||'').trim(),
-                    take:  parseInt(r[8])||0, stay: parseInt(r[9])||0,
-                    pound: parseInt(r[10])||0, drip: parseInt(r[11])||0,
-                    available: status === '1' || status === '上架'
-                });
-            }
+            if (r.length < 11) continue;
+            freshData.push({
+                id: r[0].trim(),
+                type: r[1].trim(), // classic / other / single
+                name: r[2].trim(),
+                origin: r[3].trim(),
+                process: r[4].trim(),
+                roast: r[5].trim(),
+                roastName: r[6].trim(),
+                flavor: r[7].trim(),
+                take: parseInt(r[8]) || 0,
+                stay: parseInt(r[9]) || 0,
+                pound: parseInt(r[10]) || 0,
+                drip: parseInt(r[11]) || 0,
+                available: r[12] ? r[12].trim().toLowerCase() === 'true' : true
+            });
         }
-        render();
-    } catch {
-        document.getElementById('beanGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:#a44a3f;font-size:0.8em;">⚠️ 讀取失敗，請重新整理</div>';
-    }
-}
 
-// ══════════════════════════════════════
-// RENDER INTERFACE
-// ══════════════════════════════════════
-function esc(s) { return s.replace(/'/g,"\\'"); }
-
-function render() {
-    // 渲染義式飲品
-    document.getElementById('classicList').innerHTML = coffeeData
-        .filter(d => d.type === 'classic')
-        .map((item, i, arr) => `
-            <li class="menu-item" onclick="addToCart('${esc(item.name)}',${item.price},'義式')">
-                <span class="mi-name">${item.name}</span>
-                <span class="mi-price">${item.price}</span>
-            </li>${i < arr.length-1 ? '<div class="divider-line"></div>' : ''}
-        `).join('');
-
-    // 渲染其他品項
-    document.getElementById('otherList').innerHTML = coffeeData
-        .filter(d => d.type === 'other')
-        .map((item, i, arr) => `
-            <li class="menu-item" onclick="addToCart('${esc(item.name)}',${item.price},'其他')">
-                <span class="mi-name">${item.name}</span>
-                <span class="mi-price">${item.price}</span>
-            </li>${i < arr.length-1 ? '<div class="divider-line"></div>' : ''}
-        `).join('');
-
-    // 渲染單品豆網格
-    const singles = coffeeData.filter(d => d.type === 'single' && d.available);
-    document.getElementById('beanGrid').innerHTML = singles.length === 0
-        ? '<div style="grid-column:1/-1;text-align:center;padding:20px;color:#bbb;font-size:0.8em;">目前無供應單品豆</div>'
-        : singles.map(item => `
-            <div class="bean-card" onclick="openSpecSheet(${item.id})">
-                <span class="bean-badge ${item.roast}">${item.roastName}</span>
-                <div class="bean-name">${item.name}</div>
-                ${item.origin ? `<div class="bean-tag">${item.origin}</div>` : ''}
-            </div>
-        `).join('');
-}
-
-// ══════════════════════════════════════
-// SPEC SHEET (規格小彈窗)
-// ══════════════════════════════════════
-function openSpecSheet(id) {
-    const item = coffeeData.find(c => c.id === id);
-    if (!item) return;
-    document.getElementById('specName').textContent = '🫘 ' + item.name;
-    document.getElementById('specSub').textContent  = [item.roastName, item.origin, item.process].filter(Boolean).join(' · ');
-    const specs = [
-        { label:'外帶', price:item.take },
-        { label:'內用', price:item.stay },
-        { label:'濾掛', price:item.drip },
-        { label:'半磅', price:item.pound }
-    ].filter(s => s.price > 0);
-    document.getElementById('specGrid').innerHTML = specs.map(s => `
-        <button class="spec-btn" onclick="addToCart('${esc(item.name)}',${s.price},'${s.label}');closeSpecSheet();">
-            <span class="spec-label">${s.label}</span>
-            <span class="spec-price">${s.price}</span>
-        </button>
-    `).join('');
-    document.getElementById('specOverlay').classList.add('open');
-}
-function closeSpecSheet() { document.getElementById('specOverlay').classList.remove('open'); }
-function handleSpecOverlayClick(e) { if (e.target === document.getElementById('specOverlay')) closeSpecSheet(); }
-
-// ══════════════════════════════════════
-// CART CORE LOGIC
-// ══════════════════════════════════════
-function addToCart(name, price, subText) {
-    cart[`${name}-${subText}-${Date.now()}`] = { name, subText, price, qty:1, temp:'冰' };
-    updateCartUI();
-}
-function toggleTemp(k)   { if (cart[k]) { cart[k].temp = cart[k].temp==='冰'?'熱':'冰'; updateCartUI(); } }
-function changeQty(k, d) { if (!cart[k]) return; cart[k].qty += d; if (cart[k].qty <= 0) delete cart[k]; updateCartUI(); }
-function clearCart()     { cart = {}; document.getElementById('cashReceived').value=''; updateCartUI(); }
-function setFastCash(n)  {
-    document.getElementById('cashReceived').value = n;
-    calculateChange();
-}
-
-function calculateChange() {
-    const total = Object.values(cart).reduce((s,i) => s + i.price * i.qty, 0);
-    const cash  = parseInt(document.getElementById('cashReceived').value) || 0;
-    const change = cash >= total ? cash - total : 0;
-    document.getElementById('calcChange').textContent = change;
-}
-
-function updateCartUI() {
-    const keys  = Object.keys(cart);
-    const total = Object.values(cart).reduce((s,i) => s + i.price * i.qty, 0);
-    const count = Object.values(cart).reduce((s,i) => s + i.qty, 0);
-
-    document.getElementById('topbarCount').textContent = count + ' 品項';
-    document.getElementById('calcTotal').textContent   = total;
-
-    if (keys.length === 0) {
-        document.getElementById('cartList').innerHTML = '<div class="cart-empty"><div class="cart-empty-icon">🛒</div><span>收銀台空空如也</span></div>';
-        calculateChange();
-        return;
-    }
-    
-    document.getElementById('cartList').innerHTML = keys.map(k => {
-        const item = cart[k];
-        const showTemp = item.subText === '內用' || item.subText === '外帶';
-        return `
-            <div class="cart-row">
-                <div class="cart-info">
-                    <div class="cart-name">${item.name}</div>
-                    <div class="cart-meta">${item.subText}${showTemp ? ' · ' + item.temp : ''} &nbsp;·&nbsp; $${item.price}</div>
-                </div>
-                <div class="cart-controls">
-                    ${showTemp ? `<button class="temp-btn" onclick="toggleTemp('${k}')">${item.temp}</button>` : ''}
-                    <button class="qty-btn" onclick="changeQty('${k}',-1)">−</button>
-                    <span class="qty-num">${item.qty}</span>
-                    <button class="qty-btn" onclick="changeQty('${k}',1)">+</button>
-                </div>
-            </div>`;
-    }).join('');
-    
-    calculateChange();
-}
-
-// ══════════════════════════════════════
-// ADMIN MODAL
-// ══════════════════════════════════════
-function openAdminPanel()  { document.getElementById('adminOverlay').classList.add('open'); renderAdminTab(); }
-function closeAdminPanel() { document.getElementById('adminOverlay').classList.remove('open'); }
-function handleAdminOverlayClick(e) { if (e.target === document.getElementById('adminOverlay')) closeAdminPanel(); }
-function switchAdminTab(tab) {
-    currentAdminTab = tab;
-    document.getElementById('tabStatus').classList.toggle('active', tab === 'status');
-    document.getElementById('tabAdd').classList.toggle('active', tab === 'add');
-    renderAdminTab();
-}
-
-function renderAdminTab() {
-    const body = document.getElementById('adminBody');
-    if (currentAdminTab === 'status') {
-        const singles = coffeeData.filter(c => c.type === 'single');
-        if (!singles.length) { body.innerHTML = '<div style="text-align:center;color:#bbb;padding:20px;font-size:0.85em;">尚無單品豆資料</div>'; return; }
-        body.innerHTML = `
-            <div class="batch-row">
-                <button class="batch-btn" style="background:#4a3728;color:#fff;" onclick="batchUpdate(true)">✅ 全數上架</button>
-                <button class="batch-btn" style="background:#bbb;color:#fff;" onclick="batchUpdate(false)">❌ 全數下架</button>
-            </div>
-            ${singles.map(item => `
-                <div class="status-item">
-                    <div><div class="si-name">${item.name}</div><div class="si-sub">${item.origin} · ${item.roastName}</div></div>
-                    <label class="toggle">
-                        <input type="checkbox" id="tog_${item.id}" ${item.available?'checked':''} onchange="toggleStatus(${item.id},this.checked)">
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>`).join('')}`;
-    } else {
-        body.innerHTML = `
-            <div class="form-note" style="margin-bottom:10px;">填寫後點「新增」，自動寫入試算表並設為上架。</div>
-            <div class="success-msg" id="addSuccessMsg">✅ 已寫入試算表！</div>
-            <div class="add-form">
-                <div class="form-group full"><label class="form-label">豆子名稱 *</label><input class="form-input" id="f_name" placeholder="例：肯亞 AA" type="text"></div>
-                <div class="form-grid-2">
-                    <div class="form-group"><label class="form-label">產地</label><input class="form-input" id="f_origin" placeholder="肯亞" type="text"></div>
-                    <div class="form-group"><label class="form-label">處理法</label><input class="form-input" id="f_process" placeholder="日曬" type="text"></div>
-                    <div class="form-group"><label class="form-label">烘焙度</label>
-                        <select class="form-select" id="f_roast"><option value="lr">淺焙</option><option value="mr">中焙</option><option value="dr">深焙</option></select>
-                    </div>
-                    <div class="form-group"><label class="form-label">風味描述</label><input class="form-input" id="f_flavor" placeholder="藍莓" type="text"></div>
-                </div>
-                <div class="form-grid-2" style="margin-top:2px;">
-                    <div class="form-group"><label class="form-label">外帶 $</label><input class="form-input" id="f_take" type="number" placeholder="150" inputmode="numeric"></div>
-                    <div class="form-group"><label class="form-label">內用 $</label><input class="form-input" id="f_stay" type="number" placeholder="160" inputmode="numeric"></div>
-                    <div class="form-group"><label class="form-label">半磅 $</label><input class="form-input" id="f_pound" type="number" placeholder="350" inputmode="numeric"></div>
-                    <div class="form-group"><label class="form-label">濾掛 $</label><input class="form-input" id="f_drip" type="number" placeholder="80" inputmode="numeric"></div>
-                </div>
-                <button class="submit-btn" onclick="submitNewBean()">＋ 新增單品豆</button>
-            </div>`;
+        // 資料有變才覆蓋並重新渲染，避免干擾正在點餐的操作
+        if (JSON.stringify(coffeeData) !== JSON.stringify(freshData)) {
+            coffeeData = freshData;
+            localStorage.setItem('cashier_coffee_data_cache', JSON.stringify(freshData));
+            console.log("[🌍 雲端同步] 資料已在背景更新完畢");
+            render();
+        }
+    } catch (err) {
+        console.warn("⚠️ 雲端讀取超時或失敗，繼續維持本地快取操作:", err);
+        // 如果連快取都全新沒資料，才渲染空提示
+        if (coffeeData.length === 0) render();
     }
 }
 
 async function callGAS(payload) {
-    const res = await fetch(GAS_URL, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(payload) });
-    return res.json();
+    const res = await fetch(GAS_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error("GAS 請求失敗");
+    return await res.json();
 }
 
-async function toggleStatus(id, checked) {
-    const item = coffeeData.find(c => c.id === id);
-    if (!item) return;
-    item.available = checked; render();
-    const cb = document.getElementById('tog_' + id);
-    if (cb) cb.disabled = true;
+// ══════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════
+function render() {
+    const grid = document.getElementById('menuGrid');
+    if (!grid) return;
+
+    if (coffeeData.length === 0) {
+        grid.innerHTML = '<div class="loading-state">☕ 正在從雲端建立收銀選單...</div>';
+        return;
+    }
+
+    let html = '';
+    // 只顯示上架中(available)的品項
+    const avails = coffeeData.filter(b => b.available);
+
+    if (avails.length === 0) {
+        grid.innerHTML = '<div class="loading-state">目前無上架品項</div>';
+        renderCart();
+        renderAdminStatus();
+        return;
+    }
+
+    avails.forEach(b => {
+        let badge = '';
+        if (b.type === 'single') {
+            const rc = { lr: '浅', mr: '中', dr: '深' }[b.roast] || '中';
+            badge = `<span class="badge ${b.roast || 'mr'}">${rc}</span>`;
+        } else {
+            badge = `<span class="badge classic-badge">經典</span>`;
+        }
+
+        const sub = b.type === 'single' ? `${b.origin} • ${b.process}` : '一味淨生活經典調配';
+
+        html += `
+        <div class="menu-card">
+            ${badge}
+            <div class="card-title">${b.name}</div>
+            <div class="card-subtitle">${sub}</div>
+            <div class="price-grid">
+        `;
+        if (b.take)  html += `<button class="p-btn" onclick="addToCart('${b.id}','take','外帶',${b.take})">外帶 $${b.take}</button>`;
+        if (b.stay)  html += `<button class="p-btn" onclick="addToCart('${b.id}','stay','內用',${b.stay})">內用 $${b.stay}</button>`;
+        if (b.pound) html += `<button class="p-btn" onclick="addToCart('${b.id}','pound','半磅',${b.pound})">半磅 $${b.pound}</button>`;
+        if (b.drip)  html += `<button class="p-btn" onclick="addToCart('${b.id}','drip','濾掛',${b.drip})">濾掛 $${b.drip}</button>`;
+        html += `</div></div>`;
+    });
+
+    grid.innerHTML = html;
+    renderCart();
+    renderAdminStatus();
+}
+
+// ══════════════════════════════════════
+// CART & PRICING LOGIC
+// ══════════════════════════════════════
+function addToCart(id, pType, pLabel, price) {
+    const bean = coffeeData.find(x => x.id === id);
+    if (!bean) return;
+    const k = `${id}_${pType}`;
+    if (cart[k]) { cart[k].qty++; } 
+    else { cart[k] = { id, name: bean.name, pType, pLabel, price, qty: 1 }; }
+    renderCart();
+}
+
+function updateQty(k, delta) {
+    if (!cart[k]) return;
+    cart[k].qty += delta;
+    if (cart[k].qty <= 0) delete cart[k];
+    renderCart();
+}
+
+function renderCart() {
+    const itemsDiv = document.getElementById('cartItems');
+    const totalDiv = document.getElementById('cartTotal');
+    if (!itemsDiv || !totalDiv) return;
+
+    const entries = Object.entries(cart);
+    if (entries.length === 0) {
+        itemsDiv.innerHTML = '<div class="empty-cart">🛒 購物車空空如也</div>';
+        totalDiv.textContent = '$0';
+        return;
+    }
+
+    let html = '', total = 0;
+    for (const [k, item] of entries) {
+        const sub = item.price * item.qty;
+        total += sub;
+        html += `
+        <div class="cart-item">
+            <div class="item-meta">
+                <div class="item-name">${item.name}</div>
+                <div class="item-spec">${item.pLabel} $${item.price}</div>
+            </div>
+            <div class="item-ctrl">
+                <button class="qty-btn" onclick="updateQty('${k}',-1)">-</button>
+                <span class="qty-val">${item.qty}</span>
+                <button class="qty-btn" onclick="updateQty('${k}',1)">+</button>
+                <span class="item-sub">$${sub}</span>
+            </div>
+        </div>`;
+    }
+    itemsDiv.innerHTML = html;
+    totalDiv.textContent = `$${total}`;
+}
+
+function clearCart() { cart = {}; renderCart(); }
+
+async function checkout() {
+    const entries = Object.entries(cart);
+    if (entries.length === 0) { alert('購物車是空的'); return; }
+    const btn = document.querySelector('.checkout-btn');
+    const oldText = btn.textContent;
+    btn.textContent = '⏳ 雲端結帳中…'; btn.disabled = true;
+
+    const items = entries.map(([_, x]) => ({ id: x.id, name: x.name, pType: x.pType, pLabel: x.pLabel, price: x.price, qty: x.qty }));
     try {
-        const r = await callGAS({ action:'updateStatus', id, status:checked });
-        if (!r.ok) throw new Error();
-    } catch {
-        alert('試算表同步失敗。');
-        item.available = !checked; render();
+        await callGAS({ action: 'checkout', items });
+        alert('🎉 結帳成功！已同步扣減雲端庫存/紀錄');
+        clearCart();
+    } catch (err) {
+        alert('❌ 結帳失敗，請檢查網路連線：' + err.message);
     } finally {
-        if (cb) cb.disabled = false;
+        btn.textContent = oldText; btn.disabled = false;
     }
 }
 
-async function batchUpdate(status) {
-    coffeeData.filter(c => c.type==='single').forEach(c => c.available = status);
-    render(); renderAdminTab();
-    try { await callGAS({ action:'batchUpdateStatus', status }); }
-    catch { alert('批次同步失敗。'); }
+// ══════════════════════════════════════
+// ADMIN: STATUS MANAGEMENT
+// ══════════════════════════════════════
+function switchAdminTab(t) {
+    currentAdminTab = t;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`tab_${t}`).classList.add('active');
+    document.getElementById('panel_status').style.display = t === 'status' ? 'block' : 'none';
+    document.getElementById('panel_add').style.display = t === 'add' ? 'block' : 'none';
+}
+
+function renderAdminStatus() {
+    const container = document.getElementById('adminStatusContainer');
+    if (!container) return;
+
+    if (coffeeData.length === 0) {
+        container.innerHTML = '<div>暫無選單資料</div>';
+        return;
+    }
+
+    container.innerHTML = coffeeData.map(b => {
+        const info = b.type === 'single' ? `[${b.roastName}] ${b.origin}` : '經典供應';
+        return `
+        <div class="status-row">
+            <div class="status-info">
+                <strong>${b.name}</strong>
+                <div style="font-size:11px; color:#777;">${info}</div>
+            </div>
+            <button class="toggle-btn ${b.available ? 'on' : 'off'}" onclick="toggleAvailable('${b.id}', ${b.available})">
+                ${b.available ? '上架中' : '已下架'}
+            </button>
+        </div>`;
+    }).join('');
+}
+
+async function toggleAvailable(id, curState) {
+    // 💡 本地立即切換狀態，不讓使用者在畫面上等網路轉圈
+    const target = coffeeData.find(x => x.id === id);
+    if (target) {
+        target.available = !curState;
+        localStorage.setItem('cashier_coffee_data_cache', JSON.stringify(coffeeData));
+        render();
+    }
+
+    try {
+        // 背景靜態向雲端發送修改指令
+        await callGAS({ action: 'toggleAvailable', id, available: !curState });
+    } catch (err) {
+        alert('雲端狀態同步失敗，網頁重新整理後將回復原本狀態。錯誤：' + err.message);
+        // 若失敗，則復原
+        if (target) {
+            target.available = curState;
+            localStorage.setItem('cashier_coffee_data_cache', JSON.stringify(coffeeData));
+            render();
+        }
+    }
 }
 
 async function submitNewBean() {
@@ -276,31 +297,38 @@ async function submitNewBean() {
     if (!name) { alert('請填寫豆子名稱'); return; }
     const rv = document.getElementById('f_roast').value;
     const bean = {
-        name, origin:document.getElementById('f_origin').value.trim(),
-        process:document.getElementById('f_process').value.trim(),
-        roast:rv, roastName:{lr:'淺焙',mr:'中焙',dr:'深焙'}[rv],
-        flavor:document.getElementById('f_flavor').value.trim(),
-        take:parseInt(document.getElementById('f_take').value)||0,
-        stay:parseInt(document.getElementById('f_stay').value)||0,
-        pound:parseInt(document.getElementById('f_pound').value)||0,
-        drip:parseInt(document.getElementById('f_drip').value)||0,
+        name, origin: document.getElementById('f_origin').value.trim(),
+        process: document.getElementById('f_process').value.trim(),
+        roast: rv, roastName: { lr: '淺焙', mr: '中焙', dr: '深焙' }[rv],
+        flavor: document.getElementById('f_flavor').value.trim(),
+        take: parseInt(document.getElementById('f_take').value) || 0,
+        stay: parseInt(document.getElementById('f_stay').value) || 0,
+        pound: parseInt(document.getElementById('f_pound').value) || 0,
+        drip: parseInt(document.getElementById('f_drip').value) || 0,
     };
     const btn = document.querySelector('.submit-btn');
     btn.textContent = '⏳ 寫入中…'; btn.disabled = true;
     try {
-        const r = await callGAS({ action:'addBean', bean });
-        coffeeData.push({ ...bean, id:r.newId, type:'single', available:true });
+        const r = await callGAS({ action: 'addBean', bean });
+        
+        // 成功後直接推進本地變數，並主動更新快取，省去重新拉整份雲端的時間
+        const newBean = { ...bean, id: r.newId, type: 'single', available: true };
+        coffeeData.push(newBean);
+        localStorage.setItem('cashier_coffee_data_cache', JSON.stringify(coffeeData));
         render();
+
         const msg = document.getElementById('addSuccessMsg');
-        if (msg) { msg.style.display='block'; setTimeout(()=>msg.style.display='none', 3000); }
-        ['f_name','f_origin','f_process','f_flavor','f_take','f_stay','f_pound','f_drip'].forEach(id=>document.getElementById(id).value='');
-        setTimeout(()=>switchAdminTab('status'), 1200);
-    } catch { alert('寫入失敗。'); }
-    finally { btn.textContent='＋ 新增單品豆'; btn.disabled=false; }
+        if (msg) { msg.style.display = 'block'; setTimeout(() => msg.style.display = 'none', 3000); }
+        ['f_name', 'f_origin', 'f_process', 'f_flavor', 'f_take', 'f_stay', 'f_pound', 'f_drip'].forEach(id => document.getElementById(id).value = '');
+        setTimeout(() => switchAdminTab('status'), 1200);
+    } catch (err) {
+        alert('新增單品豆失敗：' + err.message);
+    } finally {
+        btn.textContent = '✨ 確認上架並寫入雲端'; btn.disabled = false;
+    }
 }
 
 // ══════════════════════════════════════
-// BOOT
+// INIT
 // ══════════════════════════════════════
-fetchMenuData();
-updateCartUI();
+window.addEventListener('DOMContentLoaded', loadData);

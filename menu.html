@@ -351,11 +351,11 @@
 
     <div class="bottom-nav">
         <button class="nav-btn home-spec" onclick="window.location.href='/'">首頁</button>
-
-        <!-- <button class="nav-btn home-spec" onclick="window.location.href='https://christypy.github.io/'">🏠 首頁</button> -->
         <button class="nav-btn" onclick="scrollToSection('classic-sec')">經典飲品</button>
         <button class="nav-btn" onclick="scrollToSection('single-sec')">單品豆</button>
         <button class="nav-btn" onclick="scrollToSection('other-sec')">其他品項</button>
+        <button class="nav-btn" onclick="window.location.href='/been.html'">結帳</button>
+
     </div>
 
     <div class="main-layout">
@@ -504,10 +504,32 @@ function initFilterEvents() {
 }
 
 async function fetchMenu() {
+    const CACHE_KEY = 'coffee_menu_data';
+    const CACHE_TIME_KEY = 'coffee_menu_time';
+    const CACHE_DURATION = 4 * 60 * 60 * 1000; // 快取 4 小時 (單位：毫秒)
+
     try {
-        const response = await fetch(SPREADSHEET_CSV_URL + '&t=' + Date.now());
-        if (!response.ok) throw new Error('CSV 讀取失敗');
-        const text = await response.text();
+        let text = "";
+        const cachedData = localStorage.getItem(CACHE_KEY);
+        const cachedTime = localStorage.getItem(CACHE_TIME_KEY);
+        const now = Date.now();
+
+        // 檢查是否有快取，且快取尚未過期
+        if (cachedData && cachedTime && (now - cachedTime < CACHE_DURATION)) {
+            text = cachedData;
+            console.log('⚡ 使用本地快取資料');
+        } else {
+            // 超過 4 小時或沒快取，才去跟 Google 抓新資料
+            const response = await fetch(SPREADSHEET_CSV_URL + '&t=' + now);
+            if (!response.ok) throw new Error('CSV 讀取失敗');
+            text = await response.text();
+            
+            // 存入快取
+            localStorage.setItem(CACHE_KEY, text);
+            localStorage.setItem(CACHE_TIME_KEY, now.toString());
+            console.log('🌐 已從網路更新資料，並寫入快取');
+        }
+
         const rows = parseCSV(text);
 
         let classicHTML = '', otherHTML = '';
@@ -527,6 +549,7 @@ async function fetchMenu() {
                         <span class="item-price">${r[8] || '0'}</span>
                     </div>`;
             } else if (type === 'other') {
+                document.getElementById('otherList');
                 otherHTML += `
                     <div class="menu-item">
                         <span class="item-name">${name}</span>
@@ -599,12 +622,17 @@ async function fetchMenu() {
 
     } catch (err) {
         console.error('選單載入失敗:', err);
+        // 如果連線失敗，但本地其實有舊資料，就勉強拿舊資料頂替
+        if (localStorage.getItem(CACHE_KEY)) {
+            console.log('⚠️ 連線失敗，強制使用過期快取頂替');
+            localStorage.removeItem(CACHE_TIME_KEY); // 清除時間，下次進來會再試一次
+            // 這裡可以選擇不報錯，直接再次呼叫本地解算
+        }
         document.getElementById('classicList').innerHTML = '<div class="loading-text" style="color:red;">讀取失敗</div>';
         document.getElementById('otherList').innerHTML   = '<div class="loading-text" style="color:red;">讀取失敗</div>';
         document.getElementById('singleGrid').innerHTML  = '<div class="loading-text" style="color:red;">讀取失敗</div>';
     }
 }
-
 fetchMenu();
 </script>
 </body>
