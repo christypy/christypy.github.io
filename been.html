@@ -6,332 +6,25 @@
     <title>☕ 收銀系統</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-/* ═══════════════════════════════════════════════
-   TOKENS
-═══════════════════════════════════════════════ */
-:root {
-    --cream:   #f7f3ed;
-    --parchment: #ede8df;
-    --tan:     #d4c4a8;
-    --bark:    #8d6e63;
-    --espresso:#3d2b1f;
-    --roast:   #bc6c25;
-    --red:     #a44a3f;
-    --green:   #2e7d32;
-    --white:   #ffffff;
-    --border:  rgba(61,43,31,0.12);
-    --shadow:  0 2px 12px rgba(61,43,31,0.10);
-    --font:    "Noto Serif TC", "PingFang TC", serif;
-    --display: "Playfair Display", "Noto Serif TC", serif;
-    --r:       10px;
-    --lr-col:  #e6b37e;
-    --mr-col:  #bc6c25;
-    --dr-col:  #4a3728;
-}
-
-/* ═══════════════════════════════════════════════
-   RESET & BASE
-═══════════════════════════════════════════════ */
-*, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-html, body { height: 100%; overflow: hidden; }
-body {
-    font-family: var(--font);
-    background: var(--cream);
-    color: var(--espresso);
-    display: flex;
-    flex-direction: column;
-}
-
-/* ═══════════════════════════════════════════════
-   TOP NAV BAR
-═══════════════════════════════════════════════ */
-.topbar {
-    flex-shrink: 0;
-    height: 52px;
-    background: var(--espresso);
-    display: flex;
-    align-items: center;
-    padding: 0 12px;
-    gap: 8px;
-    z-index: 100;
-}
-.topbar-title {
-    font-family: var(--display);
-    font-size: 1.05em;
-    color: var(--white);
-    letter-spacing: 0.04em;
-    flex: 1;
-}
-.topbar-count {
-    background: var(--roast);
-    color: #fff;
-    font-size: 0.72em;
-    font-weight: 700;
-    padding: 2px 9px;
-    border-radius: 20px;
-}
-.topbar-btn {
-    height: 32px;
-    padding: 0 12px;
-    border: none;
-    border-radius: 8px;
-    font-family: var(--font);
-    font-size: 0.75em;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    transition: opacity 0.15s;
-    text-decoration: none;
-}
-.topbar-btn:active { opacity: 0.75; }
-.btn-home   { background: rgba(255,255,255,0.14); color: #fff; }
-.btn-admin  { background: var(--roast); color: #fff; }
-
-/* ═══════════════════════════════════════════════
-   MAIN LAYOUT (強制限手機、電腦一律左右雙欄佈局)
-═══════════════════════════════════════════════ */
-.app {
-    flex: 1;
-    display: flex;
-    overflow: hidden;
-    min-height: 0;
-}
-
-/* 左側：菜單滾動區 */
-.panel-menu {
-    flex: 1;
-    background: var(--cream);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-.panel-menu-scroll {
-    flex: 1;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    padding: 12px;
-}
-.panel-menu-scroll::-webkit-scrollbar { width: 4px; }
-.panel-menu-scroll::-webkit-scrollbar-thumb { background: var(--tan); }
-
-/* 右側：固定不隱藏的收銀台（在手機上依比例縮放，確保看得見） */
-.panel-cashier {
-    width: 340px; /* 電腦版預設寬度 */
-    flex-shrink: 0;
-    background: var(--white);
-    border-left: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    box-shadow: -4px 0 20px rgba(61,43,31,0.06);
-}
-
-/* ═══════════════════════════════════════════════
-   COMPONENTS
-═══════════════════════════════════════════════ */
-.section-head {
-    padding: 12px 4px 6px;
-    font-size: 0.85em;
-    font-weight: 700;
-    letter-spacing: 2px;
-    color: var(--bark);
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-.section-head::before {
-    content: '';
-    width: 4px; height: 14px;
-    background: var(--roast);
-    border-radius: 2px;
-}
-
-/* 菜單卡片 Grid 佈局 */
-.menu-grid { 
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    gap: 8px;
-}
-.menu-item {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    gap: 4px;
-    padding: 12px 8px;
-    background: #fdfbf7;
-    border: 1px solid rgba(61,43,31,0.08);
-    border-radius: 8px;
-    cursor: pointer;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.02);
-    transition: all 0.12s;
-}
-.menu-item:hover  { background: var(--parchment); border-color: var(--tan); }
-.menu-item:active { transform: scale(0.97); }
-.mi-name  { font-size: 0.82em; font-weight: 600; color: var(--espresso); word-break: break-all; }
-.mi-price { font-size: 0.9em; font-weight: 800; color: var(--red); }
-.mi-price::before { content: '$'; font-size: 0.8em; }
-
-/* 單品咖啡豆專用卡片 */
-.bean-card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--r);
-    padding: 12px 8px;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    box-shadow: var(--shadow);
-    text-align: center;
-    transition: transform 0.12s, border-color 0.12s;
-}
-.bean-card:hover { transform: translateY(-2px); border-color: var(--bark); }
-.bean-badge { font-size: 0.58em; font-weight: 700; padding: 1px 6px; border-radius: 20px; margin-bottom: 2px; }
-.lr { background: var(--lr-col); color: #5a3e2b; }
-.mr { background: var(--mr-col); color: #fff; }
-.dr { background: var(--dr-col); color: #fff; }
-.bean-name { font-family: var(--display); font-size: 0.95em; font-weight:600; word-break: break-all; }
-.bean-tag { font-size: 0.65em; color: var(--bark); }
-
-/* 收銀列表與明細 */
-.cashier-head {
-    flex-shrink: 0;
-    padding: 12px;
-    border-bottom: 1px solid var(--border);
-    font-size: 0.8em;
-    font-weight: 700;
-    color: var(--espresso);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: #faf8f5;
-}
-.cashier-head::before { content: ''; width: 4px; height: 14px; background: var(--bark); border-radius: 2px; }
-.cart-list { flex: 1; overflow-y: auto; padding: 6px; }
-.cart-empty { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--tan); gap: 4px; font-size: 0.8em; }
-.cart-row { display: flex; align-items: center; gap: 6px; padding: 8px; background: var(--cream); border-radius: 8px; margin-bottom: 6px; border: 1px solid rgba(0,0,0,0.02); }
-.cart-info { flex: 1; min-width: 0; }
-.cart-name { font-size: 0.8em; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.cart-meta { font-size: 0.7em; color: var(--bark); margin-top: 1px; }
-.cart-controls { display: flex; align-items: center; gap: 4px; }
-.qty-btn { width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--border); background: var(--white); font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.qty-num { font-weight: 700; font-size: 0.85em; min-width: 16px; text-align: center; }
-.temp-btn { font-size: 0.65em; font-weight: 700; padding: 2px 5px; border-radius: 4px; border: 1px solid var(--border); background: var(--white); cursor: pointer; }
-
-.cashier-bill { flex-shrink: 0; padding: 12px; border-top: 2px solid var(--parchment); display: flex; flex-direction: column; gap: 6px; background: #faf8f5; }
-.bill-row { display: flex; justify-content: space-between; align-items: center; }
-.bill-label { font-size: 0.75em; color: #555; font-weight: 600; }
-.bill-total { font-size: 1.25em; font-weight: 800; color: var(--red); }
-.bill-change { font-size: 1.25em; font-weight: 800; color: var(--green); }
-.cash-input { width: 85px; padding: 5px; border: 1.5px solid var(--bark); border-radius: 6px; font-size: 0.95em; font-weight: 700; text-align: right; }
-.quick-cash { display: flex; gap: 3px; }
-.qc-btn { padding: 3px 6px; background: var(--parchment); border: none; border-radius: 4px; font-size: 0.7em; font-weight: 700; cursor: pointer; }
-.dashed { border: none; border-top: 1px dashed var(--border); margin: 4px 0; }
-.clear-btn { padding: 8px; background: #eee; border: 1px solid var(--border); border-radius: 8px; font-size: 0.8em; font-weight: 700; color: #555; cursor: pointer; width: 100%; transition: background 0.1s; }
-.clear-btn:active { background: #ddd; }
-
-/* ═══════════════════════════════════════════════
-   規格細項選擇彈窗
-═══════════════════════════════════════════════ */
-.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 500; align-items: center; justify-content: center; }
-.overlay.open { display: flex; }
-.spec-sheet { background: var(--white); border-radius: 14px; width: 90%; max-width: 400px; padding: 20px; box-shadow: 0 4px 25px rgba(0,0,0,0.15); }
-.spec-name { font-family: var(--display); font-size: 1.2em; font-weight: 600; margin-bottom: 2px; }
-.spec-sub  { font-size: 0.78em; color: var(--bark); margin-bottom: 14px; }
-.spec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.spec-btn { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--cream); border: 1.5px solid var(--border); border-radius: 8px; cursor: pointer; font-family: var(--font); }
-.spec-label { font-weight: 700; font-size: 0.85em; }
-.spec-price { font-weight: 800; color: var(--red); }
-.spec-price::before { content: '$'; }
-.spec-cancel { width: 100%; margin-top: 10px; padding: 10px; background: var(--parchment); border: none; border-radius: 8px; font-size: 0.85em; font-weight: 700; color: #666; cursor: pointer; }
-
-/* ── 後台管理彈窗 ── */
-.admin-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 600; align-items: center; justify-content: center; padding: 16px; }
-.admin-overlay.open { display: flex; }
-.admin-panel { background: var(--white); border-radius: 14px; width: 100%; max-width: 480px; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; }
-.admin-header { background: var(--espresso); color: #fff; padding: 12px 16px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
-.admin-close { background: rgba(255,255,255,0.15); border: none; color: #fff; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; }
-.admin-tabs { display: flex; background: var(--parchment); }
-.admin-tab { flex: 1; padding: 10px; text-align: center; font-size: 0.8em; font-weight: 700; cursor: pointer; color: var(--bark); }
-.admin-tab.active { color: var(--espresso); background: var(--white); border-bottom: 2px solid var(--roast); }
-.admin-body { flex: 1; overflow-y: auto; padding: 16px; }
-.status-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 6px; }
-.si-name { font-weight: 600; font-size: 0.85em; }
-.si-sub  { font-size: 0.72em; color: var(--bark); }
-.toggle { position: relative; width: 38px; height: 20px; }
-.toggle input { display: none; }
-.toggle-slider { position: absolute; inset: 0; background: #ccc; border-radius: 20px; cursor: pointer; }
-.toggle-slider::before { content: ''; position: absolute; left: 2px; top: 2px; width: 16px; height: 16px; background: #fff; border-radius: 50%; transition: 0.2s; }
-.toggle input:checked + .toggle-slider { background: var(--roast); }
-.toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
-.batch-row { display: flex; gap: 8px; margin-bottom: 12px; }
-.batch-btn { flex: 1; padding: 8px; border: none; border-radius: 6px; font-weight: 700; font-size: 0.8em; cursor: pointer; }
-.add-form { display: flex; flex-direction: column; gap: 8px; }
-.form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-.form-group { display: flex; flex-direction: column; gap: 2px; }
-.form-group.full { grid-column: 1/-1; }
-.form-label { font-size: 0.72em; font-weight: 700; color: var(--bark); }
-.form-input, .form-select { padding: 6px 10px; border: 1.5px solid #e0d8d0; border-radius: 6px; font-size: 0.85em; }
-.submit-btn { background: var(--roast); color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: 700; margin-top: 4px; cursor: pointer; }
-.form-note { font-size: 0.72em; color: #999; background: #fdf8f1; padding: 6px 10px; border-radius: 4px; border-left: 3px solid var(--lr-col); }
-.success-msg { display: none; background: #e8f5e9; color: var(--green); padding: 8px; border-radius: 6px; font-size: 0.8em; text-align: center; }
-
-/* ═══════════════════════════════════════════════
-   手機版：強制限縮收銀台在右側 (RWD 覆寫設定)
-═══════════════════════════════════════════════ */
-@media (max-width: 768px) {
-    /* 調整左右分配比例，左側菜單佔 58%、右側收銀台佔 42% */
-    .panel-menu { flex: 58; }
-    .panel-cashier { width: auto; flex: 42; border-left: 1.5px solid var(--bark); }
-    
-    /* 縮小手機上 Grid 的品項大小，避免太擠 */
-    .menu-grid { grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); gap: 5px; }
-    .menu-item { padding: 10px 4px; }
-    .mi-name { font-size: 0.76em; }
-    
-    /* 縮小單品豆卡片 */
-    .bean-card { padding: 10px 4px; }
-    .bean-name { font-size: 0.85em; }
-    
-    /* 微調手機版收銀台裡面的控制項尺寸 */
-    .cart-row { padding: 6px 4px; gap: 4px; }
-    .cart-name { font-size: 0.75em; }
-    .cart-meta { font-size: 0.65em; }
-    .qty-btn { width: 20px; height: 20px; font-size: 0.8em; }
-    .qty-num { font-size: 0.8em; min-width: 12px; }
-    .temp-btn { font-size: 0.6em; padding: 1px 3px; }
-    
-    /* 縮小下方結帳輸入與快速金額按鈕 */
-    .cash-input { width: 70px; font-size: 0.85em; padding: 4px; }
-    .qc-btn { padding: 2px 4px; font-size: 0.65em; }
-    .bill-total, .bill-change { font-size: 1.1em; }
-}
-    </style>
+    <link rel="stylesheet" href="been.css">
 </head>
 <body>
 
 <header class="topbar">
     <span class="topbar-title">☕ 收銀系統</span>
     <span class="topbar-count" id="topbarCount">0 品項</span>
-    <button class="topbar-btn btn-home" onclick="window.location.href='/'">首頁</button>
-
+    <!-- 如需連結首頁，改用下方 <a> 版本並移除 <button> -->
+    <button class="topbar-btn btn-home" onclick="window.location.href='/'">🏠 首頁</button>
     <!-- <a href="https://christypy.github.io/" class="topbar-btn btn-home">🏠 首頁</a> -->
     <button class="topbar-btn btn-admin" onclick="openAdminPanel()">⚙️ 管理</button>
-    <button class="topbar-btn btn-menu" onclick="window.location.href='/menu.html'">菜單</button>
+    <button class="topbar-btn" onclick="window.location.href='/menu.html'">菜單</button>
 </header>
 
 <div class="app">
 
     <main class="panel-menu">
         <div class="panel-menu-scroll">
-            
+
             <div class="section-head">☕ 義式飲品</div>
             <div class="menu-grid" id="classicList"></div>
 
@@ -342,14 +35,17 @@ body {
             <div class="menu-grid" id="beanGrid">
                 <div style="grid-column:1/-1;text-align:center;padding:20px;color:#bbb;font-size:0.85em;">☕ 讀取雲端資料中…</div>
             </div>
-            
+
         </div>
     </main>
 
     <aside class="panel-cashier">
         <div class="cashier-head">🛒 明細</div>
         <div class="cart-list" id="cartList">
-            <div class="cart-empty"><div class="cart-empty-icon">🛒</div><span>無品項</span></div>
+            <div class="cart-empty">
+                <div class="cart-empty-icon">🛒</div>
+                <span>無品項</span>
+            </div>
         </div>
         <div class="cashier-bill">
             <div class="bill-row">
@@ -360,7 +56,8 @@ body {
             <div class="bill-row">
                 <span class="bill-label">實收</span>
                 <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
-                    <input type="number" id="cashReceived" class="cash-input" placeholder="0" oninput="calculateChange()" inputmode="numeric">
+                    <input type="number" id="cashReceived" class="cash-input" placeholder="0"
+                           oninput="calculateChange()" inputmode="numeric">
                     <div class="quick-cash">
                         <button class="qc-btn" onclick="setFastCash(100)">100</button>
                         <button class="qc-btn" onclick="setFastCash(500)">500</button>
@@ -375,8 +72,10 @@ body {
             <button class="clear-btn" onclick="clearCart()">🧹 清空</button>
         </div>
     </aside>
+
 </div>
 
+<!-- 規格細項選擇彈窗 -->
 <div class="overlay" id="specOverlay" onclick="handleSpecOverlayClick(event)">
     <div class="spec-sheet">
         <div class="spec-name" id="specName"></div>
@@ -386,6 +85,7 @@ body {
     </div>
 </div>
 
+<!-- 後台管理彈窗 -->
 <div class="admin-overlay" id="adminOverlay" onclick="handleAdminOverlayClick(event)">
     <div class="admin-panel">
         <div class="admin-header">
@@ -400,288 +100,6 @@ body {
     </div>
 </div>
 
-<script>
-const MENU_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSEiSHdIF1FlVgrSp5r8DhCDnTKAVhfRjXPIizNQ_d5kK_FFUQJfQKhQG1YXe3ViIdExAiUnAPlKCO-/pub?gid=250388087&single=true&output=csv";
-const GAS_URL = "https://script.google.com/macros/s/AKfycbyAXTwhXOZfmICm1QjOd0tq5qJKYH0rMql4dWc_1SxlCkBmF8nD-1NEDrHLKzzLo481lQ/exec";
-
-let coffeeData = [];
-let cart = {};
-let currentAdminTab = 'status';
-
-function parseCSV(text) {
-    const rows = [];
-    for (const line of text.split(/\r?\n/)) {
-        if (!line.trim()) continue;
-        const row = []; let cur = '', inQ = false;
-        for (let i = 0; i < line.length; i++) {
-            const c = line[i];
-            if (c === '"') { if (inQ && line[i+1] === '"') { cur += '"'; i++; } else inQ = !inQ; }
-            else if (c === ',' && !inQ) { row.push(cur.trim()); cur = ''; }
-            else cur += c;
-        }
-        row.push(cur.trim()); rows.push(row);
-    }
-    return rows;
-}
-
-async function fetchMenuData() {
-    try {
-        const res = await fetch(MENU_CSV_URL + '&t=' + Date.now());
-        if (!res.ok) throw new Error();
-        const rows = parseCSV(await res.text());
-        coffeeData = [];
-        for (let i = 1; i < rows.length; i++) {
-            const r = rows[i];
-            if (!r[0]) continue;
-            const type = r[0].trim(), name = (r[2]||'').trim();
-            if (!name) continue;
-            if (type === 'classic' || type === 'other') {
-                coffeeData.push({ type, name, price: parseInt(r[8])||0 });
-            } else if (type === 'single') {
-                const status = (r[12]||'').trim();
-                coffeeData.push({
-                    id: parseInt(r[1])||i, type, name,
-                    origin: (r[3]||'').trim(), process: (r[4]||'').trim(),
-                    roast:  (r[5]||'lr').trim(), roastName:(r[6]||'淺焙').trim(),
-                    flavor: (r[7]||'').trim(),
-                    take:  parseInt(r[8])||0, stay: parseInt(r[9])||0,
-                    pound: parseInt(r[10])||0, drip: parseInt(r[11])||0,
-                    available: status === '1' || status === '上架'
-                });
-            }
-        }
-        render();
-    } catch {
-        document.getElementById('beanGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:#a44a3f;font-size:0.85em;">⚠️ 讀取失敗</div>';
-    }
-}
-
-function esc(s) { return s.replace(/'/g,"\\'"); }
-
-function render() {
-    // 義式飲品
-    document.getElementById('classicList').innerHTML = coffeeData
-        .filter(d => d.type === 'classic')
-        .map(item => `
-            <div class="menu-item" onclick="addToCart('${esc(item.name)}',${item.price},'義式')">
-                <span class="mi-name">${item.name}</span>
-                <span class="mi-price">${item.price}</span>
-            </div>
-        `).join('');
-
-    // 其他品項
-    document.getElementById('otherList').innerHTML = coffeeData
-        .filter(d => d.type === 'other')
-        .map(item => `
-            <div class="menu-item" onclick="addToCart('${esc(item.name)}',${item.price},'其他')">
-                <span class="mi-name">${item.name}</span>
-                <span class="mi-price">${item.price}</span>
-            </div>
-        `).join('');
-
-    // 單品咖啡豆
-    const singles = coffeeData.filter(d => d.type === 'single' && d.available);
-    document.getElementById('beanGrid').innerHTML = singles.length === 0
-        ? '<div style="grid-column:1/-1;text-align:center;padding:20px;color:#bbb;font-size:0.85em;">無供應單品豆</div>'
-        : singles.map(item => `
-            <div class="bean-card" onclick="openSpecSheet(${item.id})">
-                <span class="bean-badge ${item.roast}">${item.roastName}</span>
-                <div class="bean-name">${item.name}</div>
-                ${item.origin ? `<div class="bean-tag">${item.origin}</div>` : ''}
-            </div>
-        `).join('');
-}
-
-function openSpecSheet(id) {
-    const item = coffeeData.find(c => c.id === id);
-    if (!item) return;
-    document.getElementById('specName').textContent = '🫘 ' + item.name;
-    document.getElementById('specSub').textContent  = [item.roastName, item.origin, item.process].filter(Boolean).join(' · ');
-    const specs = [
-        { label:'外帶', price:item.take },
-        { label:'內用', price:item.stay },
-        { label:'濾掛', price:item.drip },
-        { label:'半磅', price:item.pound }
-    ].filter(s => s.price > 0);
-    document.getElementById('specGrid').innerHTML = specs.map(s => `
-        <button class="spec-btn" onclick="addToCart('${esc(item.name)}',${s.price},'${s.label}');closeSpecSheet();">
-            <span class="spec-label">${s.label}</span>
-            <span class="spec-price">${s.price}</span>
-        </button>
-    `).join('');
-    document.getElementById('specOverlay').classList.add('open');
-}
-function closeSpecSheet() { document.getElementById('specOverlay').classList.remove('open'); }
-function handleSpecOverlayClick(e) { if (e.target === document.getElementById('specOverlay')) closeSpecSheet(); }
-
-function addToCart(name, price, subText) {
-    const key = `${name}-${subText}`;
-    if (cart[key]) {
-        cart[key].qty += 1;
-    } else {
-        cart[key] = { name, subText, price, qty:1, temp:'冰' };
-    }
-    updateCartUI();
-}
-function toggleTemp(k)   { if (cart[k]) { cart[k].temp = cart[k].temp==='冰'?'熱':'冰'; updateCartUI(); } }
-function changeQty(k, d) { if (!cart[k]) return; cart[k].qty += d; if (cart[k].qty <= 0) delete cart[k]; updateCartUI(); }
-function clearCart()     { cart = {}; document.getElementById('cashReceived').value=''; updateCartUI(); }
-function setFastCash(n)  { document.getElementById('cashReceived').value = n; calculateChange(); }
-
-function calculateChange() {
-    const total = Object.values(cart).reduce((s,i) => s + i.price * i.qty, 0);
-    const cash  = parseInt(document.getElementById('cashReceived').value) || 0;
-    const change = cash >= total ? cash - total : 0;
-    document.getElementById('calcChange').textContent = change;
-}
-
-function updateCartUI() {
-    const total = Object.values(cart).reduce((s,i) => s + i.price * i.qty, 0);
-    const count = Object.values(cart).reduce((s,i) => s + i.qty, 0);
-
-    document.getElementById('topbarCount').textContent = count + ' 品項';
-    document.getElementById('calcTotal').textContent   = total;
-
-    const keys = Object.keys(cart);
-    if (keys.length === 0) {
-        document.getElementById('cartList').innerHTML = '<div class="cart-empty"><div class="cart-empty-icon">🛒</div><span>無品項</span></div>';
-        calculateChange();
-        return;
-    }
-    
-    document.getElementById('cartList').innerHTML = keys.map(k => {
-        const item = cart[k];
-        const showTemp = item.subText === '內用' || item.subText === '外帶';
-        return `
-            <div class="cart-row">
-                <div class="cart-info">
-                    <div class="cart-name">${item.name}</div>
-                    <div class="cart-meta">${item.subText}${showTemp ? ' · ' + item.temp : ''} &nbsp;·&nbsp; $${item.price}</div>
-                </div>
-                <div class="cart-controls">
-                    ${showTemp ? `<button class="temp-btn" onclick="toggleTemp('${k}')">${item.temp}</button>` : ''}
-                    <button class="qty-btn" onclick="changeQty('${k}',-1)">−</button>
-                    <span class="qty-num">${item.qty}</span>
-                    <button class="qty-btn" onclick="changeQty('${k}',1)">+</button>
-                </div>
-            </div>`;
-    }).join('');
-    calculateChange();
-}
-
-function openAdminPanel()  { document.getElementById('adminOverlay').classList.add('open'); renderAdminTab(); }
-function closeAdminPanel() { document.getElementById('adminOverlay').classList.remove('open'); }
-function handleAdminOverlayClick(e) { if (e.target === document.getElementById('adminOverlay')) closeAdminPanel(); }
-function switchAdminTab(tab) {
-    currentAdminTab = tab;
-    document.getElementById('tabStatus').classList.toggle('active', tab === 'status');
-    document.getElementById('tabAdd').classList.toggle('active', tab === 'add');
-    renderAdminTab();
-}
-
-function renderAdminTab() {
-    const body = document.getElementById('adminBody');
-    if (currentAdminTab === 'status') {
-        const singles = coffeeData.filter(c => c.type === 'single');
-        if (!singles.length) { body.innerHTML = '<div style="text-align:center;color:#bbb;padding:30px;">尚無單品豆資料</div>'; return; }
-        body.innerHTML = `
-            <div class="batch-row">
-                <button class="batch-btn" style="background:#4a3728;color:#fff;" onclick="batchUpdate(true)">✅ 全數上架</button>
-                <button class="batch-btn" style="background:#bbb;color:#fff;" onclick="batchUpdate(false)">❌ 全數下架</button>
-            </div>
-            ${singles.map(item => `
-                <div class="status-item">
-                    <div><div class="si-name">${item.name}</div><div class="si-sub">${item.origin} · ${item.roastName}</div></div>
-                    <label class="toggle">
-                        <input type="checkbox" id="tog_${item.id}" ${item.available?'checked':''} onchange="toggleStatus(${item.id},this.checked)">
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>`).join('')}`;
-    } else {
-        body.innerHTML = `
-            <div class="form-note" style="margin-bottom:12px;">填寫後點「新增」，自動寫入試算表並設為上架。</div>
-            <div class="success-msg" id="addSuccessMsg">✅ 已寫入試算表！</div>
-            <div class="add-form">
-                <div class="form-group full"><label class="form-label">豆子名稱 *</label><input class="form-input" id="f_name" placeholder="例：肯亞 AA 日曬" type="text"></div>
-                <div class="form-grid-2">
-                    <div class="form-group"><label class="form-label">產地</label><input class="form-input" id="f_origin" placeholder="例：肯亞" type="text"></div>
-                    <div class="form-group"><label class="form-label">處理法</label><input class="form-input" id="f_process" placeholder="例：日曬" type="text"></div>
-                    <div class="form-group"><label class="form-label">烘焙度</label>
-                        <select class="form-select" id="f_roast"><option value="lr">淺焙</option><option value="mr">中焙</option><option value="dr">深焙</option></select>
-                    </div>
-                    <div class="form-group"><label class="form-label">風味描述</label><input class="form-input" id="f_flavor" placeholder="例：藍莓、甜感" type="text"></div>
-                </div>
-                <div class="form-label" style="margin-top:2px;">價格設定</div>
-                <div class="form-grid-2">
-                    <div class="form-group"><label class="form-label">外帶 $</label><input class="form-input" id="f_take" type="number" placeholder="150" inputmode="numeric"></div>
-                    <div class="form-group"><label class="form-label">內用 $</label><input class="form-input" id="f_stay" type="number" placeholder="160" inputmode="numeric"></div>
-                    <div class="form-group"><label class="form-label">半磅 $</label><input class="form-input" id="f_pound" type="number" placeholder="350" inputmode="numeric"></div>
-                    <div class="form-group"><label class="form-label">濾掛 $</label><input class="form-input" id="f_drip" type="number" placeholder="80" inputmode="numeric"></div>
-                </div>
-                <button class="submit-btn" onclick="submitNewBean()">＋ 新增單品豆</button>
-            </div>`;
-    }
-}
-
-async function callGAS(payload) {
-    const res = await fetch(GAS_URL, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(payload) });
-    return res.json();
-}
-
-async function toggleStatus(id, checked) {
-    const item = coffeeData.find(c => c.id === id);
-    if (!item) return;
-    item.available = checked; render();
-    const cb = document.getElementById('tog_' + id);
-    if (cb) cb.disabled = true;
-    try {
-        const r = await callGAS({ action:'updateStatus', id, status:checked });
-        if (!r.ok) throw new Error();
-    } catch {
-        alert('⚠️ 試算表同步失敗，請確認網路或 Apps Script 設定。');
-        item.available = !checked; render();
-    } finally {
-        if (cb) cb.disabled = false;
-    }
-}
-
-async function batchUpdate(status) {
-    coffeeData.filter(c => c.type==='single').forEach(c => c.available = status);
-    render(); renderAdminTab();
-    try { await callGAS({ action:'batchUpdateStatus', status }); }
-    catch { alert('⚠️ 批次同步失敗。'); }
-}
-
-async function submitNewBean() {
-    const name = document.getElementById('f_name').value.trim();
-    if (!name) { alert('請填寫豆子名稱'); return; }
-    const rv = document.getElementById('f_roast').value;
-    const bean = {
-        name, origin:document.getElementById('f_origin').value.trim(),
-        process:document.getElementById('f_process').value.trim(),
-        roast:rv, roastName:{lr:'淺焙',mr:'中焙',dr:'深焙'}[rv],
-        flavor:document.getElementById('f_flavor').value.trim(),
-        take:parseInt(document.getElementById('f_take').value)||0,
-        stay:parseInt(document.getElementById('f_stay').value)||0,
-        pound:parseInt(document.getElementById('f_pound').value)||0,
-        drip:parseInt(document.getElementById('f_drip').value)||0,
-    };
-    const btn = document.querySelector('.submit-btn');
-    btn.textContent = '⏳ 寫入中…'; btn.disabled = true;
-    try {
-        const r = await callGAS({ action:'addBean', bean });
-        coffeeData.push({ ...bean, id:r.newId, type:'single', available:true });
-        render();
-        const msg = document.getElementById('addSuccessMsg');
-        if (msg) { msg.style.display='block'; setTimeout(()=>msg.style.display='none', 3000); }
-        ['f_name','f_origin','f_process','f_flavor','f_take','f_stay','f_pound','f_drip'].forEach(id=>document.getElementById(id).value='');
-        setTimeout(()=>switchAdminTab('status'), 1200);
-    } catch { alert('⚠️ 寫入失敗，請確認網路或 Apps Script 設定。'); }
-    finally { btn.textContent='＋ 新增單品豆'; btn.disabled=false; }
-}
-
-fetchMenuData();
-updateCartUI();
-</script>
+<script src="been.js"></script>
 </body>
 </html>
