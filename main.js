@@ -135,8 +135,20 @@ function startAutoSync() {
     }, 15000); 
 }
 
-// 將雲端最新的完成/缺席狀態覆蓋至本地
+// 每次點擊時記錄「本地操作時間戳」，防止雲端輪詢在 grace period 內覆蓋
+const LOCAL_WRITE_GRACE_MS = 8000; // 8 秒內不讓雲端覆蓋本地剛寫的狀態
+let lastLocalWriteTime = 0;
+
+function markLocalWrite() {
+    lastLocalWriteTime = Date.now();
+}
+
+// 將雲端最新的完成/缺席狀態覆蓋至本地（Grace Period 內不覆蓋）
 function syncCloudToLocal() {
+    const now = Date.now();
+    const inGrace = (now - lastLocalWriteTime) < LOCAL_WRITE_GRACE_MS;
+    if (inGrace) return; // 剛剛本地有寫入，跳過雲端覆蓋，防止閃爍
+
     customers.forEach(c => {
         const count = c.count || 1;
         for (let i = 0; i < count; i++) {
@@ -216,11 +228,11 @@ async function sendStatusToCloud(action, groupId, index, value) {
         clearInterval(syncInterval);
         await fetch(GAS_WEB_APP_URL, {
             method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'text/plain' },
             body: JSON.stringify({ action: action, groupId: groupId, index: index, value: value })
         });
-        setTimeout(startAutoSync, 2000);
+        // 雲端寫入後等 4 秒再輪詢，避免立刻拉回舊資料
+        setTimeout(startAutoSync, 4000);
     } catch (err) {
         console.error('同步至雲端失敗:', err);
         startAutoSync();
@@ -239,6 +251,7 @@ function toggleDone(name, item, loc, index, groupId) {
         localStorage.setItem(key, 'true');
         newValue = true;
     }
+    markLocalWrite(); // 記錄本地寫入時間，防止輪詢閃爍
     renderOrders();
     if (groupId) sendStatusToCloud('toggleDone', groupId, index, newValue);
 }
@@ -256,6 +269,7 @@ function toggleAbsence(name, item, loc, index, groupId) {
         localStorage.removeItem(getStorageKey(name, item, loc, index));
         if (groupId) sendStatusToCloud('toggleDone', groupId, index, false);
     }
+    markLocalWrite(); // 記錄本地寫入時間，防止輪詢閃爍
     renderOrders();
     if (groupId) sendStatusToCloud('toggleAbsence', groupId, index, newAbsentValue);
 }
