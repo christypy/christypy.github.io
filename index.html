@@ -17,7 +17,6 @@
     <button class="fab-btn" style="background-color: #e91e63; color: white;" onclick="openEditModal()">修改攤販</button>
     <button class="fab-btn" onclick="document.getElementById('menuReference').scrollIntoView({ behavior: 'smooth' })">價格</button>
     <button class="fab-btn" onclick="window.location.href='https://christypy.github.io/menu.html'">菜單</button>
-
     <button class="fab-btn" onclick="window.location.href='https://christypy.github.io/been.html?mode=admin'">結帳</button>
     <button class="fab-btn" onclick="document.getElementById('method').scrollIntoView({ behavior: 'smooth' })">作法</button>
 </div>
@@ -75,8 +74,6 @@
             <div class="cloud-loading-mini">同步雲端品項中...</div>
         </div>
     </div>
-
-    <!-- 單品咖啡豆 -->
     <div class="compact-menu-section single-beans-section">
         <div class="compact-grid-title">🫘 單品咖啡豆</div>
         <div class="single-beans-grid-container" id="singleBeansGrid">
@@ -165,46 +162,76 @@
 </div>
 
 <script>
-// ── 雲端 CSV 價目表 URL ───────────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+// 雲端價目表設定
+// 攤販訂單用 gid=0（第一個 sheet）
+// 單品豆選單用 gid=250388087
+// ══════════════════════════════════════════════════════════════
+
+// ✅ 修正：攤販訂單 sheet（gid=0）
+const CLOUD_VENDOR_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSEiSHdIF1FlVgrSp5r8DhCDnTKAVhfRjXPIizNQ_d5kK_FFUQJfQKhQG1YXe3ViIdExAiUnAPlKCO-/pub?gid=0&single=true&output=csv";
+
+// ✅ 單品豆 sheet（gid=250388087）
 const CLOUD_MENU_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSEiSHdIF1FlVgrSp5r8DhCDnTKAVhfRjXPIizNQ_d5kK_FFUQJfQKhQG1YXe3ViIdExAiUnAPlKCO-/pub?gid=250388087&single=true&output=csv";
 
-// 焙度文字 → CSS class / 顯示文字對照
+// 正確解析 CSV（支援欄位內含逗號的引號格式）
+function parseCSV(text) {
+    const rows = [];
+    const lines = text.split(/\r?\n/);
+    for (const line of lines) {
+        if (!line.trim()) continue;
+        const row = [];
+        let current = '';
+        let inQuote = false;
+        for (let i = 0; i < line.length; i++) {
+            const ch = line[i];
+            if (ch === '"') {
+                if (inQuote && line[i+1] === '"') { current += '"'; i++; }
+                else inQuote = !inQuote;
+            } else if (ch === ',' && !inQuote) {
+                row.push(current.trim());
+                current = '';
+            } else {
+                current += ch;
+            }
+        }
+        row.push(current.trim());
+        rows.push(row);
+    }
+    return rows;
+}
+
+// 焙度文字 → CSS class
 function getRoastInfo(raw) {
     if (!raw) return null;
     const r = raw.trim();
     if (!r) return null;
     const lower = r.toLowerCase();
-    if (lower.includes('light') || lower.includes('淺')) return { label: '淺焙', cls: 'roast-light' };
-    if (lower.includes('dark') || lower.includes('深')) return { label: '深焙', cls: 'roast-dark' };
-    if (lower.includes('medium') || lower.includes('中')) return { label: '中焙', cls: 'roast-medium' };
-    // 有值但不在已知分類 → 直接顯示原文
+    if (lower.includes('light') || lower.includes('淺') || r === 'lr') return { label: '淺焙', cls: 'roast-light' };
+    if (lower.includes('dark')  || lower.includes('深') || r === 'dr') return { label: '深焙',  cls: 'roast-dark'  };
+    if (lower.includes('medium')|| lower.includes('中') || r === 'mr') return { label: '中焙',  cls: 'roast-medium'};
     return { label: r, cls: 'roast-default' };
 }
 
+// ── 讀取單品豆選單（加時間戳防快取）──
 async function fetchCloudMenu() {
     try {
-        const response = await fetch(CLOUD_MENU_URL);
-        if (!response.ok) throw new Error("價目表連線失敗");
-        const csvText = await response.text();
+        const res = await fetch(CLOUD_MENU_URL + '&t=' + Date.now());
+        if (!res.ok) throw new Error('價目表連線失敗');
+        const csvText = await res.text();
+        const lines = parseCSV(csvText);
 
-        // 解析 CSV（簡易版，處理欄位中含逗號需引號的情形請視資料決定）
-        const lines = csvText.split(/\r?\n/).map(line => {
-            // 簡易 CSV split，不含引號跳脫
-            return line.split(',');
-        });
-
-        let classicHTML = "";
-        let otherHTML = "";
-        let singleHTML = "";
+        let classicHTML = '', otherHTML = '', singleHTML = '';
 
         for (let i = 1; i < lines.length; i++) {
             const row = lines[i];
             if (!row || row.length < 3 || !row[0]) continue;
 
-            const type       = row[0]  ? row[0].trim()  : "";
-            const name       = row[2]  ? row[2].trim()  : "";
-            const takePrice  = row[8]  ? row[8].trim()  : "";
-            const roastRaw   = row[12] ? row[12].trim() : ""; // ← 第13欄為焙度
+            const type      = row[0].trim();
+            const name      = (row[2] || '').trim();
+            const takePrice = (row[8] || '').trim();
+            // 欄位說明（單品豆 sheet）：[5]=roast class [6]=roastName [12]=status（注意：這個sheet的第13欄是status）
+            const statusRaw = (row[12] || '').trim();
 
             if (type === 'classic') {
                 classicHTML += `
@@ -219,14 +246,17 @@ async function fetchCloudMenu() {
                         <span class="p-cost">$${takePrice || '0'}</span>
                     </div>`;
             } else if (type === 'single') {
-                const stayPrice  = row[9]  ? row[9].trim()  : "";
-                const poundPrice = row[10] ? row[10].trim() : "";
-                const dripPrice  = row[11] ? row[11].trim() : "";
+                // 只顯示上架的單品豆
+                if (statusRaw !== '1' && statusRaw !== '上架') continue;
+
+                const stayPrice  = (row[9]  || '').trim();
+                const poundPrice = (row[10] || '').trim();
+                const dripPrice  = (row[11] || '').trim();
+                const roastRaw   = (row[5]  || '').trim(); // 烘焙度 class
 
                 const roastInfo  = getRoastInfo(roastRaw);
                 const roastBadge = roastInfo
-                    ? `<span class="roast-badge ${roastInfo.cls}">${roastInfo.label}</span>`
-                    : '';
+                    ? `<span class="roast-badge ${roastInfo.cls}">${roastInfo.label}</span>` : '';
 
                 singleHTML += `
                     <div class="bean-compact-card">
@@ -244,12 +274,12 @@ async function fetchCloudMenu() {
             }
         }
 
-        document.getElementById('baseDrinksContainer').innerHTML  = classicHTML || '<div class="cloud-loading-mini">暫無品項</div>';
-        document.getElementById('otherItemsContainer').innerHTML  = otherHTML   || '<div class="cloud-loading-mini">暫無品項</div>';
-        document.getElementById('singleBeansGrid').innerHTML      = singleHTML  || '<div class="cloud-loading-mini">暫無單品供應</div>';
+        document.getElementById('baseDrinksContainer').innerHTML = classicHTML || '<div class="cloud-loading-mini">暫無品項</div>';
+        document.getElementById('otherItemsContainer').innerHTML = otherHTML   || '<div class="cloud-loading-mini">暫無品項</div>';
+        document.getElementById('singleBeansGrid').innerHTML     = singleHTML  || '<div class="cloud-loading-mini">暫無單品供應</div>';
 
-    } catch (error) {
-        console.error("雲端選單同步錯誤:", error);
+    } catch (err) {
+        console.error('雲端選單同步錯誤:', err);
         document.getElementById('baseDrinksContainer').innerHTML = '<div class="cloud-loading-mini" style="color:red;">連線失敗，請重新整理</div>';
         document.getElementById('otherItemsContainer').innerHTML = '<div class="cloud-loading-mini" style="color:red;">連線失敗</div>';
         document.getElementById('singleBeansGrid').innerHTML     = '<div class="cloud-loading-mini" style="color:red;">單品豆載入失敗</div>';

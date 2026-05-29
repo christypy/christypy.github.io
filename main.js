@@ -70,8 +70,8 @@ async function initData(isBackgroundSync = false) {
         // 檢查時間是否需要自動發動中午 12:30 的大清空
         await checkAndExecuteAutoClear();
 
-        // 遠端抓取 Google 試算表最新 JSON 資料 (加上時間戳記防止瀏覽器快取舊資料)
-        const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&v=${new Date().getTime()}`;
+        // 遠端抓取 Google 試算表最新 JSON 資料 (gid=0 攤販訂單 sheet，加時間戳記防快取)
+        const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=Sheet1&v=${new Date().getTime()}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error('無法連線至雲端試算表');
         
@@ -127,12 +127,12 @@ async function initData(isBackgroundSync = false) {
     }
 }
 
-// 🚀 建立自動同步監聽器（每 5 秒鐘自動檢查一次雲端變更）
+// 🚀 建立自動同步監聽器（每 15 秒鐘自動檢查一次雲端變更，避免過頻請求造成卡頓）
 function startAutoSync() {
     if (syncInterval) clearInterval(syncInterval);
     syncInterval = setInterval(() => {
         initData(true); // 傳入 true 代表背景默默同步
-    }, 5000); 
+    }, 15000); 
 }
 
 // 將雲端最新的完成/缺席狀態覆蓋至本地

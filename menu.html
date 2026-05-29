@@ -32,12 +32,25 @@
         }
 
         .container { max-width: 1000px; margin: 0 auto; }
-        
-        /* 區塊標題（在同網頁內區隔經典與其他） */
-        .section-title { font-size: 1.1em; font-weight: 700; color: var(--secondary); margin: 20px 0 12px; display: flex; align-items: center; gap: 10px; }
-        .section-title::before { content: ''; width: 4px; height: 16px; background: var(--secondary); border-radius: 2px; }
 
-        /* 置頂分頁導覽列 */
+        .section-title {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: var(--secondary);
+            margin: 20px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 16px;
+            background: var(--secondary);
+            border-radius: 2px;
+        }
+
+        /* 分頁導覽列 */
         .tab-container {
             display: flex;
             position: sticky;
@@ -52,7 +65,7 @@
         .tab-btn {
             flex: 1;
             padding: 12px 5px;
-            background: rgba(255, 255, 255, 0.6);
+            background: rgba(255,255,255,0.6);
             border: 1px solid var(--border);
             border-radius: 25px;
             color: var(--primary);
@@ -61,47 +74,47 @@
             cursor: pointer;
             text-align: center;
             transition: all 0.3s;
+            font-family: var(--font-main);
         }
-        .tab-btn.active {
-            background: var(--primary);
-            color: #fff;
-            border-color: var(--primary);
-        }
+        .tab-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 
-        /* 控制內容顯示/隱藏 */
         .menu-section { display: none; }
         .menu-section.active { display: block; }
 
-        /* 經典與其他列表 */
+        /* 列表 */
         .simple-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
         .menu-item { background: rgba(255,255,255,0.6); padding: 14px 16px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); }
         .item-name { font-weight: 600; color: var(--primary); }
         .item-price { font-weight: 800; color: var(--price); }
         .item-price::before { content: '$'; font-size: 0.8em; }
 
-        /* 單品豆區 */
+        /* 單品豆卡片 */
         #singleGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
         .card { background: var(--card-bg); border-radius: 14px; border: 1px solid var(--border); padding: 16px; display: flex; flex-direction: column; box-shadow: 0 2px 10px rgba(61,43,31,0.04); }
         .roast-badge { align-self: flex-end; font-size: 0.65em; padding: 2px 7px; color: #fff; font-weight: bold; border-radius: 6px; }
-        .lr { background: var(--light-roast); } .mr { background: var(--med-roast); } .dr { background: var(--dark-roast); }
+        .lr { background: var(--light-roast); color: #5a3e2b !important; }
+        .mr { background: var(--med-roast); }
+        .dr { background: var(--dark-roast); }
         .theme-word { font-family: "DM Serif Display", serif; font-size: 1.8em; color: var(--primary); text-align: center; margin: 5px 0; }
         .origin { font-size: 0.85em; font-weight: 700; color: var(--secondary); text-align: center; }
-        .process { background: #fdf1e6; color: #9d6b42; font-size: 0.7em; padding: 2px 8px; border-radius: 4px; width: fit-content; margin: 5px auto; }
+        .process { background: #fdf1e6; color: #9d6b42; font-size: 0.7em; padding: 2px 8px; border-radius: 4px; width: fit-content; margin: 5px auto; font-weight: 700; }
         .flavor { font-size: 0.85em; color: #666; text-align: center; margin: 8px 0 15px; flex-grow: 1; line-height: 1.4; }
-        
-        /* 2x2 價格網格 */
+
+        /* 2×2 價格網格 */
         .price-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border-top: 1px solid #eee; padding-top: 10px; text-align: center; }
         .price-item { background: #faf8f5; padding: 6px; border-radius: 6px; }
         .p-unit { font-size: 0.75em; color: #888; margin-bottom: 2px; }
         .p-val { font-weight: 800; color: var(--price); font-size: 0.95em; }
+
+        /* 載入中文字 */
+        .loading-text { text-align: center; color: #aaa; padding: 40px 20px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1 style="text-align: center; color: var(--primary); margin: 15px 0 10px; font-size: 1.8em;">☕ 咖啡選單</h1>
-    
-    <!-- 分頁按鈕調整為兩個 -->
+    <h1 style="text-align:center;color:var(--primary);margin:15px 0 10px;font-size:1.8em;">☕ 咖啡選單</h1>
+
     <div class="tab-container">
         <button class="tab-btn active" onclick="switchTab('drinks')">經典與飲品</button>
         <button class="tab-btn" onclick="switchTab('single')">單品咖啡豆</button>
@@ -110,80 +123,125 @@
     <!-- 第一頁：經典飲品 + 其他品項 -->
     <div id="drinks-section" class="menu-section active">
         <div class="section-title">經典飲品</div>
-        <div class="simple-list" id="classicList"></div>
+        <div class="simple-list" id="classicList"><div class="loading-text">讀取中…</div></div>
 
         <div class="section-title">其他品項</div>
-        <div class="simple-list" id="otherList"></div>
+        <div class="simple-list" id="otherList"><div class="loading-text">讀取中…</div></div>
     </div>
 
     <!-- 第二頁：單品豆 -->
     <div id="single-section" class="menu-section">
-        <div id="singleGrid"></div>
+        <div id="singleGrid"><div class="loading-text">☕ 讀取單品豆資料中…</div></div>
     </div>
 </div>
 
 <script>
-    const SPREADSHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSEiSHdIF1FlVgrSp5r8DhCDnTKAVhfRjXPIizNQ_d5kK_FFUQJfQKhQG1YXe3ViIdExAiUnAPlKCO-/pub?gid=250388087&single=true&output=csv";
+// 單品豆選單 Sheet (gid=250388087)
+const SPREADSHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSEiSHdIF1FlVgrSp5r8DhCDnTKAVhfRjXPIizNQ_d5kK_FFUQJfQKhQG1YXe3ViIdExAiUnAPlKCO-/pub?gid=250388087&single=true&output=csv";
 
-    function switchTab(tabName) {
-        // 切換按鈕狀態
-        document.querySelectorAll('.tab-btn').forEach((btn, index) => {
-            if((tabName === 'drinks' && index === 0) || (tabName === 'single' && index === 1)) {
-                btn.classList.add('active');
+// 正確解析 CSV（支援欄位內含逗號的引號格式）
+function parseCSV(text) {
+    const rows = [];
+    const lines = text.split(/\r?\n/);
+    for (const line of lines) {
+        if (!line.trim()) continue;
+        const row = [];
+        let current = '';
+        let inQuote = false;
+        for (let i = 0; i < line.length; i++) {
+            const ch = line[i];
+            if (ch === '"') {
+                if (inQuote && line[i+1] === '"') { current += '"'; i++; }
+                else inQuote = !inQuote;
+            } else if (ch === ',' && !inQuote) {
+                row.push(current.trim());
+                current = '';
             } else {
-                btn.classList.remove('active');
+                current += ch;
             }
-        });
-
-        // 切換內容顯示
-        document.querySelectorAll('.menu-section').forEach(section => {
-            section.classList.remove('active');
-        });
-        document.getElementById(`${tabName}-section`).classList.add('active');
-        
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        row.push(current.trim());
+        rows.push(row);
     }
+    return rows;
+}
 
-    async function fetchMenu() {
-        const response = await fetch(SPREADSHEET_CSV_URL);
-        const data = await response.text();
-        const rows = data.split('\n').map(r => r.split(','));
-        
+function switchTab(tabName) {
+    document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+        btn.classList.toggle('active', (tabName === 'drinks' && i === 0) || (tabName === 'single' && i === 1));
+    });
+    document.querySelectorAll('.menu-section').forEach(s => s.classList.remove('active'));
+    document.getElementById(`${tabName}-section`).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function fetchMenu() {
+    try {
+        // 加上時間戳防快取
+        const response = await fetch(SPREADSHEET_CSV_URL + '&t=' + Date.now());
+        if (!response.ok) throw new Error('CSV 讀取失敗');
+        const text = await response.text();
+        const rows = parseCSV(text);
+
         let classicHTML = '', otherHTML = '', singleHTML = '';
 
         for (let i = 1; i < rows.length; i++) {
             const r = rows[i];
-            if (!r[0]) continue;
-            
-            if (r[0].trim() === 'classic') {
-                classicHTML += `<div class="menu-item"><span class="item-name">${r[2]}</span><span class="item-price">${r[8]}</span></div>`;
-            } else if (r[0].trim() === 'other') {
-                otherHTML += `<div class="menu-item"><span class="item-name">${r[2]}</span><span class="item-price">${r[8]}</span></div>`;
-            } else if (r[0].trim() === 'single') {
-                // 讀第 13 欄（index 12）status：1 或「上架」才顯示
-                const status = r[12] ? r[12].trim() : '';
+            if (!r[0] || !r[2]) continue;
+            const type = r[0].trim();
+            const name = r[2].trim();
+
+            if (type === 'classic') {
+                classicHTML += `
+                    <div class="menu-item">
+                        <span class="item-name">${name}</span>
+                        <span class="item-price">${r[8] || '0'}</span>
+                    </div>`;
+            } else if (type === 'other') {
+                otherHTML += `
+                    <div class="menu-item">
+                        <span class="item-name">${name}</span>
+                        <span class="item-price">${r[8] || '0'}</span>
+                    </div>`;
+            } else if (type === 'single') {
+                // status 欄（index 12）：1 或「上架」才顯示
+                const status = (r[12] || '').trim();
                 if (status !== '1' && status !== '上架') continue;
+
+                const roast = (r[5] || 'lr').trim();
+                const roastName = (r[6] || '淺焙').trim();
+                const process = (r[4] || '').trim();
+
                 singleHTML += `
                     <div class="card">
-                        <span class="roast-badge ${r[5]}">${r[6]}</span>
-                        <div class="theme-word">${r[2]}</div>
-                        <div class="origin">${r[3]}</div>
-                        <div class="process">${r[4]}</div>
-                        <div class="flavor">${r[7]}</div>
+                        <span class="roast-badge ${roast}">${roastName}</span>
+                        <div class="theme-word">${name}</div>
+                        <div class="origin">${(r[3] || '').trim()}</div>
+                        ${process ? `<div class="process">${process}</div>` : ''}
+                        <div class="flavor">${(r[7] || '').trim()}</div>
                         <div class="price-row">
-                            <div class="price-item"><div class="p-unit">外帶</div><div class="p-val">$${r[8]}</div></div>
-                            <div class="price-item"><div class="p-unit">內用</div><div class="p-val">$${r[9]}</div></div>
-                            <div class="price-item"><div class="p-unit">濾掛</div><div class="p-val">$${r[11]}</div></div>
-                            <div class="price-item"><div class="p-unit">半磅</div><div class="p-val">$${r[10]}</div></div>
+                            <div class="price-item"><div class="p-unit">外帶</div><div class="p-val">$${r[8] || '-'}</div></div>
+                            <div class="price-item"><div class="p-unit">內用</div><div class="p-val">$${r[9] || '-'}</div></div>
+                            <div class="price-item"><div class="p-unit">濾掛</div><div class="p-val">$${r[11] || '-'}</div></div>
+                            <div class="price-item"><div class="p-unit">半磅</div><div class="p-val">$${r[10] || '-'}</div></div>
                         </div>
                     </div>`;
             }
         }
-        document.getElementById('classicList').innerHTML = classicHTML;
-        document.getElementById('otherList').innerHTML = otherHTML;
-        document.getElementById('singleGrid').innerHTML = singleHTML;
+
+        document.getElementById('classicList').innerHTML = classicHTML || '<div class="loading-text">暫無品項</div>';
+        document.getElementById('otherList').innerHTML   = otherHTML   || '<div class="loading-text">暫無品項</div>';
+        document.getElementById('singleGrid').innerHTML  = singleHTML  || '<div class="loading-text">目前無供應單品豆</div>';
+
+    } catch (err) {
+        console.error('讀取選單失敗:', err);
+        document.getElementById('classicList').innerHTML = '<div class="loading-text" style="color:red;">讀取失敗，請重新整理</div>';
+        document.getElementById('otherList').innerHTML   = '<div class="loading-text" style="color:red;">讀取失敗</div>';
+        document.getElementById('singleGrid').innerHTML  = '<div class="loading-text" style="color:red;">讀取失敗</div>';
     }
-    fetchMenu();
+}
+
+fetchMenu();
 </script>
 </body>
 </html>

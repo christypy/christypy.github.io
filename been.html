@@ -39,15 +39,9 @@
             overflow: hidden;
         }
 
-        /* ─── 主體容器 ─── */
-        .layout {
-            flex: 1;
-            display: flex;
-            overflow: hidden;
-            height: 100dvh;
-        }
+        .layout { flex: 1; display: flex; overflow: hidden; height: 100dvh; }
 
-        /* ─── 左欄：菜單清單 ─── */
+        /* 左欄：菜單清單 */
         .col-menu {
             width: var(--menu-col-w);
             min-width: var(--menu-col-w);
@@ -57,20 +51,16 @@
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            gap: 0;
             scrollbar-width: thin;
             scrollbar-color: rgba(141,110,99,0.3) transparent;
         }
         .col-menu::-webkit-scrollbar { width: 4px; }
         .col-menu::-webkit-scrollbar-thumb { background: rgba(141,110,99,0.3); border-radius: 4px; }
 
-        .col-section {
-            padding: 20px 16px 16px;
-            border-bottom: 1px solid var(--border);
-        }
+        .col-section { padding: 20px 16px 16px; border-bottom: 1px solid var(--border); }
         .col-section:last-child { border-bottom: none; padding-bottom: 80px; }
 
-        /* ─── 中間：單品豆區 ─── */
+        /* 中間：單品豆區 */
         .col-beans {
             flex: 1;
             height: 100dvh;
@@ -83,7 +73,7 @@
         .col-beans::-webkit-scrollbar { width: 4px; }
         .col-beans::-webkit-scrollbar-thumb { background: rgba(141,110,99,0.3); border-radius: 4px; }
 
-        /* ─── 右欄：收銀台 ─── */
+        /* 右欄：收銀台 */
         .col-cashier {
             width: var(--cashier-w);
             min-width: var(--cashier-w);
@@ -96,7 +86,6 @@
             z-index: 10;
         }
 
-        /* ─── 區塊標題 ─── */
         .section-title {
             font-size: 0.72em;
             font-weight: 700;
@@ -118,7 +107,6 @@
             flex-shrink: 0;
         }
 
-        /* ─── 菜單項目 ─── */
         .menu-list { list-style: none; padding: 0; margin: 0; }
         .menu-item {
             display: flex;
@@ -132,36 +120,14 @@
         }
         .menu-item:hover { background: #fdf8f1; }
         .menu-item:active { background: #f5eedf; transform: scale(0.99); }
-        .item-name {
-            font-weight: 600;
-            color: var(--primary);
-            font-size: 0.88em;
-            line-height: 1.4;
-        }
-        .item-price {
-            font-weight: 800;
-            color: var(--price);
-            font-size: 0.95em;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
+        .item-name { font-weight: 600; color: var(--primary); font-size: 0.88em; line-height: 1.4; }
+        .item-price { font-weight: 800; color: var(--price); font-size: 0.95em; white-space: nowrap; flex-shrink: 0; }
         .item-price::before { content: '$'; font-size: 0.78em; }
 
-        /* ─── 分隔線 ─── */
-        .divider {
-            height: 1px;
-            background: linear-gradient(to right, transparent, rgba(141,110,99,0.15), transparent);
-            margin: 2px 8px;
-        }
+        .divider { height: 1px; background: linear-gradient(to right, transparent, rgba(141,110,99,0.15), transparent); margin: 2px 8px; }
 
-        /* ─── 單品豆 Grid ─── */
-        #singleGrid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 12px;
-        }
+        #singleGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
 
-        /* ─── 豆子卡片 ─── */
         .card {
             background: var(--card-bg);
             border-radius: 14px;
@@ -186,7 +152,7 @@
             border-radius: 6px;
             letter-spacing: 1px;
         }
-        .lr { background: var(--light-roast); }
+        .lr { background: var(--light-roast); color: #5a3e2b !important; }
         .mr { background: var(--med-roast); }
         .dr { background: var(--dark-roast); }
 
@@ -199,44 +165,11 @@
             margin: 4px 0 2px;
             line-height: 1.1;
         }
-        .origin {
-            font-size: 0.82em;
-            font-weight: 700;
-            text-align: center;
-            color: var(--secondary);
-            margin-bottom: 4px;
-        }
-        .process {
-            background: #fdf1e6;
-            color: #9d6b42;
-            font-size: 0.72em;
-            text-align: center;
-            padding: 2px 8px;
-            border-radius: 4px;
-            width: fit-content;
-            margin: 0 auto 8px;
-            font-weight: 700;
-        }
-        .flavor {
-            font-size: 0.8em;
-            color: #888;
-            text-align: center;
-            line-height: 1.6;
-            margin-bottom: 12px;
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        .origin { font-size: 0.82em; font-weight: 700; text-align: center; color: var(--secondary); margin-bottom: 4px; }
+        .process { background: #fdf1e6; color: #9d6b42; font-size: 0.72em; text-align: center; padding: 2px 8px; border-radius: 4px; width: fit-content; margin: 0 auto 8px; font-weight: 700; }
+        .flavor { font-size: 0.8em; color: #888; text-align: center; line-height: 1.6; margin-bottom: 12px; flex-grow: 1; display: flex; align-items: center; justify-content: center; }
 
-        /* ─── 四宮格按鈕 ─── */
-        .price-box {
-            border-top: 1px solid #f0ede8;
-            padding-top: 10px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 5px;
-        }
+        .price-box { border-top: 1px solid #f0ede8; padding-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
         .price-btn {
             display: flex;
             justify-content: space-between;
@@ -255,22 +188,7 @@
         .p-val { font-weight: 800; color: var(--price); }
         .p-val::before { content: '$'; font-size: 0.8em; }
 
-        .status-toggle {
-            margin-top: 8px;
-            padding: 5px;
-            border-radius: 6px;
-            border: 1px solid #ddd;
-            background: #fff;
-            font-weight: bold;
-            display: none;
-            cursor: pointer;
-            font-size: 0.72em;
-            text-align: center;
-            width: 100%;
-        }
-        .admin-mode .status-toggle { display: block; }
-
-        /* ─── 收銀台 ─── */
+        /* 收銀台 */
         .cashier-header {
             background: var(--primary);
             color: #fff;
@@ -283,946 +201,599 @@
             border-bottom: 2px solid var(--secondary);
             flex-shrink: 0;
         }
-        .cashier-badge {
-            font-size: 0.78em;
-            background: rgba(255,255,255,0.18);
-            padding: 2px 8px;
-            border-radius: 10px;
-        }
-
-        .cart-items-list {
-            flex: 1;
-            padding: 10px;
-            overflow-y: auto;
-            background: #faf8f5;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(141,110,99,0.3) transparent;
-        }
+        .cashier-badge { font-size: 0.78em; background: rgba(255,255,255,0.18); padding: 2px 8px; border-radius: 10px; }
+        .cart-items-list { flex: 1; padding: 10px; overflow-y: auto; background: #faf8f5; scrollbar-width: thin; scrollbar-color: rgba(141,110,99,0.3) transparent; }
         .cart-items-list::-webkit-scrollbar { width: 3px; }
         .cart-items-list::-webkit-scrollbar-thumb { background: rgba(141,110,99,0.3); border-radius: 4px; }
-
-        .cart-empty {
-            text-align: center;
-            color: #bbb;
-            margin-top: 40px;
-            font-size: 0.85em;
-            line-height: 2;
-        }
-
-        .cart-item-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #fff;
-            padding: 9px 10px;
-            border-radius: 8px;
-            margin-bottom: 6px;
-            border: 1px solid rgba(0,0,0,0.03);
-            box-shadow: 0 1px 4px rgba(0,0,0,0.02);
-            gap: 6px;
-        }
+        .cart-empty { text-align: center; color: #bbb; margin-top: 40px; font-size: 0.85em; line-height: 2; }
+        .cart-item-row { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 9px 10px; border-radius: 8px; margin-bottom: 6px; border: 1px solid rgba(0,0,0,0.03); box-shadow: 0 1px 4px rgba(0,0,0,0.02); gap: 6px; }
         .cart-item-info { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
-        .cart-item-name {
-            font-weight: bold;
-            color: var(--primary);
-            font-size: 0.88em;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+        .cart-item-name { font-weight: bold; color: var(--primary); font-size: 0.88em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .cart-item-meta { font-size: 0.75em; color: var(--secondary); }
-
         .qty-controls { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-        .qty-btn {
-            width: 24px; height: 24px;
-            border-radius: 50%;
-            border: 1px solid #e0d8d0;
-            background: #fff;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.9em;
-            color: var(--primary);
-            transition: background 0.12s;
-        }
+        .qty-btn { width: 24px; height: 24px; border-radius: 50%; border: 1px solid #e0d8d0; background: #fff; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9em; color: var(--primary); transition: background 0.12s; }
         .qty-btn:hover { background: #f5eedf; }
         .qty-btn:active { background: #e8ddc0; }
         .qty-val { font-weight: bold; min-width: 14px; text-align: center; font-size: 0.88em; }
 
-        /* ─── 收銀計算區 ─── */
-        .cashier-bill {
-            background: #fff;
-            border-top: 2px solid #ece8e2;
-            padding: 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            flex-shrink: 0;
-        }
-        .calc-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        .cashier-bill { background: #fff; border-top: 2px solid #ece8e2; padding: 14px; display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; }
+        .calc-row { display: flex; justify-content: space-between; align-items: center; }
         .calc-label { color: #666; font-weight: 600; font-size: 0.88em; }
         .calc-value { font-weight: 800; font-size: 1.15em; color: #333; }
         .calc-value.total { color: var(--price); font-size: 1.4em; }
         .calc-value.change { color: #2e7d32; font-size: 1.4em; }
 
-        .cash-input {
-            width: 100px;
-            padding: 5px 8px;
-            border: 1.5px solid var(--secondary);
-            border-radius: 6px;
-            font-size: 1em;
-            font-weight: bold;
-            text-align: right;
-            color: var(--primary);
-            font-family: var(--font-main);
-            background: #fdfaf6;
-        }
+        .cash-input { width: 100px; padding: 5px 8px; border: 1.5px solid var(--secondary); border-radius: 6px; font-size: 1em; font-weight: bold; text-align: right; color: var(--primary); font-family: var(--font-main); background: #fdfaf6; }
         .cash-input:focus { outline: none; border-color: var(--med-roast); box-shadow: 0 0 0 2px rgba(188,108,37,0.1); }
-
         .fast-cash-tags { display: flex; gap: 4px; justify-content: flex-end; margin-top: 4px; }
-        .cash-tag {
-            padding: 3px 7px;
-            background: #f0ebe4;
-            border-radius: 4px;
-            font-size: 0.75em;
-            font-weight: bold;
-            cursor: pointer;
-            border: none;
-            color: var(--primary);
-            transition: background 0.12s;
-        }
+        .cash-tag { padding: 3px 7px; background: #f0ebe4; border-radius: 4px; font-size: 0.75em; font-weight: bold; cursor: pointer; border: none; color: var(--primary); transition: background 0.12s; }
         .cash-tag:hover { background: #e8ddc8; }
-
-        .clear-btn {
-            background: #f8f5f1;
-            color: #888;
-            border: 1px solid #e8e0d8;
-            padding: 8px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 0.82em;
-            text-align: center;
-            transition: background 0.12s;
-            width: 100%;
-        }
+        .clear-btn { background: #f8f5f1; color: #888; border: 1px solid #e8e0d8; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.82em; text-align: center; transition: background 0.12s; width: 100%; }
         .clear-btn:hover { background: #f0ebe2; color: #666; }
+        .dashed-divider { border: none; border-top: 1px dashed #e8e0d8; }
 
-        .dashed-divider {
-            border: none;
-            border-top: 1px dashed #e8e0d8;
-        }
-
-        /* ─── FAB 浮鈕 → 改為嵌入收銀台頂部下方按鈕列 ─── */
-        .fab-container {
-            display: flex;
-            flex-direction: row;
-            gap: 6px;
-            padding: 8px 10px;
-            background: #f7f4f0;
-            border-bottom: 1px solid var(--border);
-            flex-shrink: 0;
-        }
-        .fab {
-            flex: 1;
-            height: 32px;
-            padding: 0 8px;
-            background: #fff;
-            border: 1px solid rgba(61, 43, 31, 0.15);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 0.75em;
-            cursor: pointer;
-            transition: all 0.15s;
-            font-family: var(--font-main);
-            gap: 4px;
-        }
+        .fab-container { display: flex; flex-direction: row; gap: 6px; padding: 8px 10px; background: #f7f4f0; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+        .fab { flex: 1; height: 32px; padding: 0 8px; background: #fff; border: 1px solid rgba(61,43,31,0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--primary); text-decoration: none; font-weight: bold; font-size: 0.75em; cursor: pointer; transition: all 0.15s; font-family: var(--font-main); gap: 4px; }
         .fab:hover { background: #f5eedf; }
         .fab.admin-active { background: var(--dark-roast); color: #fff; border-color: transparent; }
 
-        /* ─── 上架管理 Modal ─── */
-        .admin-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.45);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-        }
+        /* 上架管理 Modal */
+        .admin-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 2000; align-items: center; justify-content: center; padding: 16px; }
         .admin-overlay.open { display: flex; }
-        .admin-panel {
-            background: var(--card-bg);
-            border-radius: 16px;
-            width: 100%;
-            max-width: 520px;
-            max-height: 90dvh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(61,43,31,0.2);
-        }
-        .admin-panel-header {
-            background: var(--primary);
-            color: #fff;
-            padding: 14px 18px;
-            font-weight: bold;
-            font-size: 0.95em;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
-        }
-        .admin-close-btn {
-            background: rgba(255,255,255,0.18);
-            border: none;
-            color: #fff;
-            width: 28px; height: 28px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1em;
-            display: flex; align-items: center; justify-content: center;
-        }
+        .admin-panel { background: var(--card-bg); border-radius: 16px; width: 100%; max-width: 520px; max-height: 90dvh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 60px rgba(61,43,31,0.2); }
+        .admin-panel-header { background: var(--primary); color: #fff; padding: 14px 18px; font-weight: bold; font-size: 0.95em; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .admin-close-btn { background: rgba(255,255,255,0.18); border: none; color: #fff; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 1em; display: flex; align-items: center; justify-content: center; }
         .admin-close-btn:hover { background: rgba(255,255,255,0.3); }
-        .admin-tabs {
-            display: flex;
-            border-bottom: 1px solid var(--border);
-            background: #faf8f5;
-            flex-shrink: 0;
-        }
-        .admin-tab {
-            flex: 1;
-            padding: 10px;
-            text-align: center;
-            font-size: 0.8em;
-            font-weight: 700;
-            cursor: pointer;
-            color: var(--secondary);
-            border-bottom: 2px solid transparent;
-            transition: all 0.15s;
-        }
+        .admin-tabs { display: flex; border-bottom: 1px solid var(--border); background: #faf8f5; flex-shrink: 0; }
+        .admin-tab { flex: 1; padding: 10px; text-align: center; font-size: 0.8em; font-weight: 700; cursor: pointer; color: var(--secondary); border-bottom: 2px solid transparent; transition: all 0.15s; }
         .admin-tab.active { color: var(--primary); border-bottom-color: var(--med-roast); background: #fff; }
         .admin-body { flex: 1; overflow-y: auto; padding: 16px; }
 
-        /* 上架狀態清單 */
-        .status-list-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            margin-bottom: 8px;
-            background: #fff;
-        }
+        .status-list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 8px; background: #fff; }
         .status-item-name { font-weight: 600; font-size: 0.88em; color: var(--primary); }
         .status-item-origin { font-size: 0.75em; color: var(--secondary); }
-        .toggle-switch {
-            position: relative;
-            width: 42px; height: 22px;
-            flex-shrink: 0;
-        }
+        .toggle-switch { position: relative; width: 42px; height: 22px; flex-shrink: 0; }
         .toggle-switch input { display: none; }
-        .toggle-slider {
-            position: absolute;
-            inset: 0;
-            background: #ccc;
-            border-radius: 22px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .toggle-slider::before {
-            content: '';
-            position: absolute;
-            left: 3px; top: 3px;
-            width: 16px; height: 16px;
-            background: #fff;
-            border-radius: 50%;
-            transition: transform 0.2s;
-        }
+        .toggle-slider { position: absolute; inset: 0; background: #ccc; border-radius: 22px; cursor: pointer; transition: background 0.2s; }
+        .toggle-slider::before { content: ''; position: absolute; left: 3px; top: 3px; width: 16px; height: 16px; background: #fff; border-radius: 50%; transition: transform 0.2s; }
         .toggle-switch input:checked + .toggle-slider { background: var(--med-roast); }
         .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
 
-        /* 新增單品豆表單 */
         .add-form { display: flex; flex-direction: column; gap: 10px; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .form-group { display: flex; flex-direction: column; gap: 4px; }
         .form-group.full { grid-column: 1 / -1; }
         .form-label { font-size: 0.75em; font-weight: 700; color: var(--secondary); }
-        .form-input, .form-select {
-            padding: 7px 10px;
-            border: 1.5px solid #e8e0d8;
-            border-radius: 7px;
-            font-family: var(--font-main);
-            font-size: 0.85em;
-            color: var(--primary);
-            background: #fdfaf6;
-            transition: border-color 0.15s;
-        }
+        .form-input, .form-select { padding: 7px 10px; border: 1.5px solid #e8e0d8; border-radius: 7px; font-family: var(--font-main); font-size: 0.85em; color: var(--primary); background: #fdfaf6; transition: border-color 0.15s; }
         .form-input:focus, .form-select:focus { outline: none; border-color: var(--med-roast); }
         .price-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .submit-btn {
-            background: var(--med-roast);
-            color: #fff;
-            border: none;
-            padding: 10px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 0.9em;
-            cursor: pointer;
-            font-family: var(--font-main);
-            transition: background 0.15s;
-            margin-top: 4px;
-        }
+        .submit-btn { background: var(--med-roast); color: #fff; border: none; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 0.9em; cursor: pointer; font-family: var(--font-main); transition: background 0.15s; margin-top: 4px; }
         .submit-btn:hover { background: var(--dark-roast); }
-        .form-note {
-            font-size: 0.75em;
-            color: #999;
-            background: #fdf8f1;
-            padding: 8px 10px;
-            border-radius: 6px;
-            border-left: 3px solid var(--light-roast);
-            line-height: 1.6;
-        }
-        .add-success-msg {
-            display: none;
-            background: #e8f5e9;
-            color: #2e7d32;
-            padding: 10px 12px;
-            border-radius: 8px;
-            font-size: 0.82em;
-            font-weight: 600;
-            text-align: center;
-        }
+        .form-note { font-size: 0.75em; color: #999; background: #fdf8f1; padding: 8px 10px; border-radius: 6px; border-left: 3px solid var(--light-roast); line-height: 1.6; }
+        .add-success-msg { display: none; background: #e8f5e9; color: #2e7d32; padding: 10px 12px; border-radius: 8px; font-size: 0.82em; font-weight: 600; text-align: center; }
 
-/* ═══════════════════════════
-           📱 手機版 (≤ 768px) 修正：維持左右佈局
-        ═══════════════════════════ */
+        /* 手機版 */
         @media (max-width: 768px) {
-            body { 
-                flex-direction: row; /* 確保主體是左右 */
-                height: 100dvh;
-                overflow: hidden;
-            }
-
-            /* 重新調配手機版的欄位寬度比例 */
-            :root {
-                --menu-col-w: 110px;  /* 左欄經典選單縮窄，剛好放得下品名 */
-                --cashier-w: 130px;   /* 右欄收銀台縮窄，手機端精簡顯示 */
-            }
-
-            .layout {
-                flex: 1;
-                flex-direction: row; /* 強制左右並排 */
-                height: 100dvh;
-                overflow: hidden;
-            }
-
-            /* 左欄：經典 + 其他 */
-            .col-menu {
-                width: var(--menu-col-w);
-                min-width: var(--menu-col-w);
-                height: 100dvh;
-                overflow-y: auto;
-                border-right: 1px solid var(--border);
-                border-bottom: none;
-                flex-direction: column; /* 恢復上下滾動 */
-                flex-wrap: nowrap;
-                padding: 0;
-            }
-            .col-section {
-                padding: 12px 8px;
-                min-width: unset;
-                border-right: none;
-                border-bottom: 1px solid var(--border);
-            }
-            .menu-item {
-                padding: 8px 4px;
-                flex-direction: column; /* 手機版品名與價格上下排，省空間 */
-                align-items: flex-start;
-                gap: 2px;
-            }
+            body { flex-direction: row; height: 100dvh; overflow: hidden; }
+            :root { --menu-col-w: 110px; --cashier-w: 130px; }
+            .layout { flex: 1; flex-direction: row; height: 100dvh; overflow: hidden; }
+            .col-menu { width: var(--menu-col-w); min-width: var(--menu-col-w); height: 100dvh; overflow-y: auto; border-right: 1px solid var(--border); flex-direction: column; flex-wrap: nowrap; padding: 0; }
+            .col-section { padding: 12px 8px; min-width: unset; border-right: none; border-bottom: 1px solid var(--border); }
+            .menu-item { padding: 8px 4px; flex-direction: column; align-items: flex-start; gap: 2px; }
             .item-name { font-size: 0.78em; }
             .item-price { font-size: 0.8em; }
-
-            /* 中間：單品豆區（給予最大彈性空間） */
-            .col-beans {
-                flex: 1;
-                height: 100dvh;
-                overflow-y: auto;
-                padding: 12px 8px 4px;
-            }
-            #singleGrid {
-                /* 手機版單品豆改為一列一個，或寬度足夠時自動填滿 */
-                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-                gap: 8px;
-            }
-            .card {
-                padding: 10px 8px 8px;
-                border-radius: 10px;
-            }
+            .col-beans { flex: 1; height: 100dvh; overflow-y: auto; padding: 12px 8px 4px; }
+            #singleGrid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
+            .card { padding: 10px 8px 8px; border-radius: 10px; }
             .theme-word { font-size: 1.3em; }
-            .price-box { grid-template-columns: 1fr; gap: 4px; } /* 四宮格按鈕改為上下依序排，避免按鈕擠壓 */
+            .price-box { grid-template-columns: 1fr; gap: 4px; }
             .price-btn { padding: 4px 6px; }
-
-            /* 右欄：收銀台 */
-            .col-cashier {
-                width: var(--cashier-w);
-                min-width: var(--cashier-w);
-                height: 100dvh;
-                max-height: none;
-                border-left: 1px solid var(--border);
-                border-top: none;
-                position: relative;
-                bottom: unset;
-            }
+            .col-cashier { width: var(--cashier-w); min-width: var(--cashier-w); height: 100dvh; max-height: none; border-left: 1px solid var(--border); position: relative; bottom: unset; }
             .cashier-header { padding: 10px 6px; font-size: 0.85em; }
-            .cart-item-row { 
-                flex-direction: column; /* 購物車項目改垂直排列，防擠壓 */
-                align-items: flex-start; 
-                padding: 6px;
-            }
+            .cart-item-row { flex-direction: column; align-items: flex-start; padding: 6px; }
             .qty-controls { width: 100%; justify-content: space-between; margin-top: 4px; }
             .cash-input { width: 70px; font-size: 0.9em; }
-            .fast-cash-tags { display: none; } /* 手機版隱藏快選快捷鍵，節省空間 */
+            .fast-cash-tags { display: none; }
             .cashier-bill { padding: 8px; gap: 6px; }
             .calc-value.total { font-size: 1.1em; }
             .calc-value.change { font-size: 1.1em; }
         }
 
-        /* ═══════════════════════════
-           📟 平板版 (769px ~ 1100px)
-        ═══════════════════════════ */
         @media (min-width: 769px) and (max-width: 1100px) {
-            :root {
-                --cashier-w: 260px;
-                --menu-col-w: 220px;
-            }
-            #singleGrid {
-                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            }
+            :root { --cashier-w: 260px; --menu-col-w: 220px; }
+            #singleGrid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
         }
 
-        /* ═══════════════════════════
-           🖥 大螢幕
-        ═══════════════════════════ */
         @media (min-width: 1400px) {
             :root { --menu-col-w: 280px; --cashier-w: 320px; }
             #singleGrid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
         }
     </style>
 </head>
-
 <body>
 
-    <!-- 主體選單區 -->
-    <div class="layout">
-
-        <!-- 左欄：經典 + 其他 -->
-        <div class="col-menu">
-            <div class="col-section">
-                <div class="section-title">經典飲品</div>
-                <ul class="menu-list" id="classicListContainer"></ul>
-            </div>
-            <div class="col-section">
-                <div class="section-title">其他品項</div>
-                <ul class="menu-list" id="otherListContainer"></ul>
-            </div>
+<div class="layout">
+    <!-- 左欄：經典 + 其他 -->
+    <div class="col-menu">
+        <div class="col-section">
+            <div class="section-title">經典飲品</div>
+            <ul class="menu-list" id="classicListContainer"></ul>
         </div>
-
-        <!-- 中間：單品豆 -->
-        <div class="col-beans">
-            <div class="section-title" style="margin-bottom:14px;">單品咖啡豆</div>
-            <div id="singleGrid">
-                <div style="text-align: center; padding: 40px; color: #aaa; width: 100%;">☕ 正在讀取雲端選單…</div>
-            </div>
+        <div class="col-section">
+            <div class="section-title">其他品項</div>
+            <ul class="menu-list" id="otherListContainer"></ul>
         </div>
-
     </div>
 
-    <!-- 右欄：收銀台 -->
-    <div class="col-cashier">
-        <div class="cashier-header">
-            <span>🛒 點單收銀台</span>
-            <span class="cashier-badge">共 <span id="headerCount">0</span> 品項</span>
+    <!-- 中間：單品豆 -->
+    <div class="col-beans">
+        <div class="section-title" style="margin-bottom:14px;">單品咖啡豆</div>
+        <div id="singleGrid">
+            <div style="text-align:center;padding:40px;color:#aaa;width:100%;">☕ 正在讀取雲端選單…</div>
         </div>
+    </div>
+</div>
 
-        <!-- 功能按鈕列（原 FAB，移入此處避免遮擋） -->
-        <div class="fab-container">
-            <a href="https://christypy.github.io/" class="fab">🏠 首頁</a>
-            <div class="fab" id="adminBtn" onclick="openAdminPanel()">⚙️ 上架管理</div>
+<!-- 右欄：收銀台 -->
+<div class="col-cashier">
+    <div class="cashier-header">
+        <span>🛒 點單收銀台</span>
+        <span class="cashier-badge">共 <span id="headerCount">0</span> 品項</span>
+    </div>
+
+    <div class="fab-container">
+        <a href="https://christypy.github.io/" class="fab">🏠 首頁</a>
+        <div class="fab" id="adminBtn" onclick="openAdminPanel()">⚙️ 上架管理</div>
+    </div>
+
+    <div class="cart-items-list" id="cartItemsContainer">
+        <div class="cart-empty">🛒<br>收銀台空空如也</div>
+    </div>
+
+    <div class="cashier-bill">
+        <div class="calc-row">
+            <span class="calc-label">應收總計</span>
+            <span class="calc-value total">$<span id="calcTotal">0</span></span>
         </div>
-
-        <div class="cart-items-list" id="cartItemsContainer">
-            <div class="cart-empty">🛒<br>收銀台空空如也</div>
-        </div>
-
-        <div class="cashier-bill">
-            <div class="calc-row">
-                <span class="calc-label">應收總計</span>
-                <span class="calc-value total">$<span id="calcTotal">0</span></span>
+        <hr class="dashed-divider">
+        <div class="calc-row">
+            <span class="calc-label">實收金額</span>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;">
+                <input type="number" id="cashReceived" class="cash-input" placeholder="0" oninput="calculateChange()" pattern="\d*" inputmode="numeric">
+                <div class="fast-cash-tags">
+                    <button class="cash-tag" onclick="setFastCash(100)">100</button>
+                    <button class="cash-tag" onclick="setFastCash(500)">500</button>
+                    <button class="cash-tag" onclick="setFastCash(1000)">1000</button>
+                </div>
             </div>
+        </div>
+        <div class="calc-row">
+            <span class="calc-label">應找零錢</span>
+            <span class="calc-value change">$<span id="calcChange">0</span></span>
+        </div>
+        <button class="clear-btn" onclick="clearCart()">🧹 清空收銀台</button>
+    </div>
+</div>
 
-            <hr class="dashed-divider">
+<!-- 上架管理 Modal -->
+<div class="admin-overlay" id="adminOverlay" onclick="handleOverlayClick(event)">
+    <div class="admin-panel">
+        <div class="admin-panel-header">
+            <span>⚙️ 上架管理</span>
+            <button class="admin-close-btn" onclick="closeAdminPanel()">✕</button>
+        </div>
+        <div class="admin-tabs">
+            <div class="admin-tab active" id="tabStatus" onclick="switchAdminTab('status')">📋 上架狀態</div>
+            <div class="admin-tab" id="tabAdd" onclick="switchAdminTab('add')">➕ 新增單品豆</div>
+        </div>
+        <div class="admin-body" id="adminBody"></div>
+    </div>
+</div>
 
-            <div class="calc-row">
-                <span class="calc-label">實收金額</span>
-                <div style="display:flex;flex-direction:column;align-items:flex-end;">
-                    <input type="number" id="cashReceived" class="cash-input" placeholder="0" oninput="calculateChange()" pattern="\d*" inputmode="numeric">
-                    <div class="fast-cash-tags">
-                        <button class="cash-tag" onclick="setFastCash(100)">100</button>
-                        <button class="cash-tag" onclick="setFastCash(500)">500</button>
-                        <button class="cash-tag" onclick="setFastCash(1000)">1000</button>
+<script>
+// ══════════════════════════════════════════════════
+// ⚙️ 設定區 — 只需修改這兩個 URL
+// ══════════════════════════════════════════════════
+
+// 單品豆選單 Sheet (gid=250388087)
+const MENU_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSEiSHdIF1FlVgrSp5r8DhCDnTKAVhfRjXPIizNQ_d5kK_FFUQJfQKhQG1YXe3ViIdExAiUnAPlKCO-/pub?gid=250388087&single=true&output=csv";
+
+// Google Apps Script 端點
+const GAS_URL = "https://script.google.com/macros/s/AKfycbyAXTwhXOZfmICm1QjOd0tq5qJKYH0rMql4dWc_1SxlCkBmF8nD-1NEDrHLKzzLo481lQ/exec";
+
+// ══════════════════════════════════════════════════
+
+let coffeeData = [];
+let cart = {};
+let currentAdminTab = 'status';
+
+// ── 正確的 CSV 解析（支援欄位內含逗號的引號格式）──
+function parseCSV(text) {
+    const rows = [];
+    const lines = text.split(/\r?\n/);
+    for (const line of lines) {
+        if (!line.trim()) continue;
+        const row = [];
+        let current = '';
+        let inQuote = false;
+        for (let i = 0; i < line.length; i++) {
+            const ch = line[i];
+            if (ch === '"') {
+                if (inQuote && line[i+1] === '"') { current += '"'; i++; }
+                else { inQuote = !inQuote; }
+            } else if (ch === ',' && !inQuote) {
+                row.push(current.trim());
+                current = '';
+            } else {
+                current += ch;
+            }
+        }
+        row.push(current.trim());
+        rows.push(row);
+    }
+    return rows;
+}
+
+// ── 讀取試算表（加上防快取時間戳）──
+// 欄位：[0]type [1]id [2]name [3]origin [4]process [5]roast [6]roastName [7]flavor
+//       [8]take [9]stay [10]pound [11]drip [12]status
+async function fetchMenuData() {
+    try {
+        const res = await fetch(MENU_CSV_URL + '&t=' + Date.now());
+        if (!res.ok) throw new Error('CSV 讀取失敗');
+        const text = await res.text();
+        const rows = parseCSV(text);
+
+        let parsed = [];
+        for (let i = 1; i < rows.length; i++) {
+            const r = rows[i];
+            if (!r[0]) continue;
+            const type = r[0].trim();
+            const name = (r[2] || '').trim();
+            if (!name) continue;
+
+            if (type === 'classic') {
+                parsed.push({ type: 'classic', name, price: parseInt(r[8]) || 0 });
+            } else if (type === 'other') {
+                parsed.push({ type: 'other', name, price: parseInt(r[8]) || 0 });
+            } else if (type === 'single') {
+                const id = parseInt(r[1]) || i;
+                const status = (r[12] || '').trim();
+                const available = (status === '1' || status === '上架');
+                parsed.push({
+                    id, type: 'single', name,
+                    origin:   (r[3] || '').trim(),
+                    process:  (r[4] || '').trim(),
+                    roast:    (r[5] || 'lr').trim(),
+                    roastName:(r[6] || '淺焙').trim(),
+                    flavor:   (r[7] || '').trim(),
+                    take:  parseInt(r[8])  || 0,
+                    stay:  parseInt(r[9])  || 0,
+                    pound: parseInt(r[10]) || 0,
+                    drip:  parseInt(r[11]) || 0,
+                    available
+                });
+            }
+        }
+        coffeeData = parsed;
+        render();
+    } catch (err) {
+        console.error('讀取選單失敗', err);
+        document.getElementById('singleGrid').innerHTML =
+            '<div style="text-align:center;padding:40px;color:#a44a3f;width:100%;">⚠️ 讀取雲端選單失敗，請重新整理。</div>';
+    }
+}
+
+// ── 渲染選單 ──
+function render() {
+    // 經典飲品
+    document.getElementById('classicListContainer').innerHTML = coffeeData
+        .filter(d => d.type === 'classic')
+        .map((item, idx, arr) => `
+            <li class="menu-item" onclick="addToCart('${esc(item.name)}', ${item.price}, '義式')">
+                <span class="item-name">${item.name}</span>
+                <span class="item-price">${item.price}</span>
+            </li>
+            ${idx < arr.length - 1 ? '<div class="divider"></div>' : ''}
+        `).join('');
+
+    // 其他品項
+    document.getElementById('otherListContainer').innerHTML = coffeeData
+        .filter(d => d.type === 'other')
+        .map((item, idx, arr) => `
+            <li class="menu-item" onclick="addToCart('${esc(item.name)}', ${item.price}, '其他')">
+                <span class="item-name">${item.name}</span>
+                <span class="item-price">${item.price}</span>
+            </li>
+            ${idx < arr.length - 1 ? '<div class="divider"></div>' : ''}
+        `).join('');
+
+    // 單品豆（只顯示上架）
+    const singles = coffeeData.filter(d => d.type === 'single' && d.available);
+    document.getElementById('singleGrid').innerHTML = singles.length === 0
+        ? '<div style="text-align:center;color:#bbb;width:100%;padding:30px;">目前無供應單品豆</div>'
+        : singles.map(item => `
+            <div class="card">
+                <span class="roast-badge ${item.roast}">${item.roastName}</span>
+                <div class="theme-word">${item.name}</div>
+                <div class="origin">${item.origin}</div>
+                ${item.process ? `<div class="process">${item.process}</div>` : ''}
+                <div class="flavor">${item.flavor}</div>
+                <div class="price-box">
+                    <div class="price-btn" onclick="addToCart('${esc(item.name)}', ${item.take}, '外帶')">
+                        <span class="p-label">外帶</span><span class="p-val">${item.take}</span>
+                    </div>
+                    <div class="price-btn" onclick="addToCart('${esc(item.name)}', ${item.stay}, '內用')">
+                        <span class="p-label">內用</span><span class="p-val">${item.stay}</span>
+                    </div>
+                    <div class="price-btn" onclick="addToCart('${esc(item.name)}', ${item.drip}, '濾掛')">
+                        <span class="p-label">濾掛</span><span class="p-val">${item.drip}</span>
+                    </div>
+                    <div class="price-btn" onclick="addToCart('${esc(item.name)}', ${item.pound}, '半磅')">
+                        <span class="p-label">半磅</span><span class="p-val">${item.pound}</span>
                     </div>
                 </div>
             </div>
+        `).join('');
+}
 
-            <div class="calc-row">
-                <span class="calc-label">應找零錢</span>
-                <span class="calc-value change">$<span id="calcChange">0</span></span>
-            </div>
+function esc(s) { return s.replace(/'/g, "\\'"); }
 
-            <button class="clear-btn" onclick="clearCart()">🧹 清空收銀台</button>
-        </div>
-    </div>
+// ── 購物車 ──
+function addToCart(name, price, subText) {
+    const key = `${name}-${subText}-${Date.now()}`;
+    cart[key] = { name, subText, price, qty: 1, temp: '冰' };
+    updateCartUI();
+}
+function toggleTemp(k) {
+    if (!cart[k]) return;
+    cart[k].temp = cart[k].temp === '冰' ? '熱' : '冰';
+    updateCartUI();
+}
+function changeQty(k, d) {
+    if (!cart[k]) return;
+    cart[k].qty += d;
+    if (cart[k].qty <= 0) delete cart[k];
+    updateCartUI();
+}
+function clearCart() {
+    cart = {};
+    document.getElementById('cashReceived').value = '';
+    updateCartUI();
+}
+function setFastCash(n) {
+    document.getElementById('cashReceived').value = n;
+    calculateChange();
+}
+function calculateChange() {
+    const total = Object.values(cart).reduce((s, i) => s + i.price * i.qty, 0);
+    const cash = parseInt(document.getElementById('cashReceived').value) || 0;
+    document.getElementById('calcChange').textContent = cash >= total ? cash - total : 0;
+}
+function updateCartUI() {
+    const container = document.getElementById('cartItemsContainer');
+    const keys = Object.keys(cart);
+    const items = keys.map(k => cart[k]);
+    const totalCount = items.reduce((s, i) => s + i.qty, 0);
+    const totalPrice = items.reduce((s, i) => s + i.price * i.qty, 0);
+    document.getElementById('headerCount').textContent = totalCount;
+    document.getElementById('calcTotal').textContent = totalPrice;
 
-
-    <!-- 上架管理 Modal -->
-    <div class="admin-overlay" id="adminOverlay" onclick="handleOverlayClick(event)">
-        <div class="admin-panel">
-            <div class="admin-panel-header">
-                <span>⚙️ 上架管理</span>
-                <button class="admin-close-btn" onclick="closeAdminPanel()">✕</button>
-            </div>
-            <div class="admin-tabs">
-                <div class="admin-tab active" id="tabStatus" onclick="switchTab('status')">📋 上架狀態</div>
-                <div class="admin-tab" id="tabAdd" onclick="switchTab('add')">➕ 新增單品豆</div>
-            </div>
-            <div class="admin-body" id="adminBody">
-                <!-- 動態填入 -->
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const SPREADSHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSEiSHdIF1FlVgrSp5r8DhCDnTKAVhfRjXPIizNQ_d5kK_FFUQJfQKhQG1YXe3ViIdExAiUnAPlKCO-/pub?gid=250388087&single=true&output=csv";
-
-let coffeeData = [];
-        let isAdminActive = false;
-        let cart = {};
-        let currentAdminTab = 'status';
-
-        // ── 讀取試算表 ──
-        // 欄位順序：[0]type [1]id [2]name [3]origin [4]process [5]roast [6]roastName [7]flavor
-        //           [8]take [9]stay [10]pound [11]drip [12]status
-        // status: "1" 或 "上架" = 上架；空白/"0"/"下架" = 下架
-
-        async function fetchGoogleSheetsData() {
-            try {
-                const response = await fetch(SPREADSHEET_CSV_URL);
-                if (!response.ok) throw new Error("無法讀取試算表");
-                const csvText = await response.text();
-
-                const lines = csvText.split(/\r?\n/).map(line => line.split(','));
-                if (lines.length <= 1) return;
-
-                // localStorage 備援（本機手動覆蓋）
-                const localOverride = JSON.parse(localStorage.getItem('statusOverride') || '{}');
-                let parsedData = [];
-
-                for (let i = 1; i < lines.length; i++) {
-                    const row = lines[i];
-                    if (!row || row.length < 3 || !row[0]) continue;
-
-                    const type = row[0].trim();
-                    const name = row[2].trim();
-
-                    if (type === 'classic') {
-                        const price = parseInt(row[8]) || 0;
-                        parsedData.push({ type: "classic", name: name, price: price });
-                    } else if (type === 'other') {
-                        const price = parseInt(row[8]) || 0;
-                        parsedData.push({ type: "other", name: name, price: price });
-                    } else if (type === 'single') {
-                        const id = parseInt(row[1]) || i;
-                        // 讀試算表 status 欄（第13欄，index 12）
-                        const sheetStatus = row[12] ? row[12].trim() : '';
-                        // 試算表 status "1" 或 "上架" = 上架，其他 = 下架
-                        // 若有 localStorage 覆蓋則優先用本機設定
-                        let available;
-                        if (localOverride.hasOwnProperty(id)) {
-                            available = !!localOverride[id];
-                        } else {
-                            available = (sheetStatus === '1' || sheetStatus === '上架');
-                        }
-                        parsedData.push({
-                            id: id,
-                            type: "single",
-                            name: name,
-                            origin: row[3] ? row[3].trim() : "",
-                            process: row[4] ? row[4].trim() : "",
-                            roast: row[5] ? row[5].trim() : "lr",
-                            roastName: row[6] ? row[6].trim() : "淺焙",
-                            flavor: row[7] ? row[7].trim() : "",
-                            take: parseInt(row[8]) || 0,
-                            stay: parseInt(row[9]) || 0,
-                            pound: parseInt(row[10]) || 0,
-                            drip: parseInt(row[11]) || 0,
-                            available: available
-                        });
-                    }
-                }
-
-                coffeeData = parsedData;
-                render();
-            } catch (error) {
-                console.error(error);
-                document.getElementById('singleGrid').innerHTML = `<div style="text-align:center;padding:40px;color:#a44a3f;width:100%;">⚠️ 讀取雲端選單失敗。</div>`;
-            }
-        }
-
-        // ── 上架管理 Modal ──
-        function openAdminPanel() {
-            document.getElementById('adminOverlay').classList.add('open');
-            renderAdminTab();
-        }
-        function closeAdminPanel() {
-            document.getElementById('adminOverlay').classList.remove('open');
-        }
-        function handleOverlayClick(e) {
-            if (e.target === document.getElementById('adminOverlay')) closeAdminPanel();
-        }
-        function switchTab(tab) {
-            currentAdminTab = tab;
-            document.getElementById('tabStatus').classList.toggle('active', tab === 'status');
-            document.getElementById('tabAdd').classList.toggle('active', tab === 'add');
-            renderAdminTab();
-        }
-
-        function renderAdminTab() {
-            const body = document.getElementById('adminBody');
-            if (currentAdminTab === 'status') {
-                const singles = coffeeData.filter(c => c.type === 'single');
-                if (singles.length === 0) {
-                    body.innerHTML = '<div style="text-align:center;color:#bbb;padding:30px;">尚無單品豆資料</div>';
-                    return;
-                }
-                body.innerHTML = singles.map(item => `
-                    <div class="status-list-item">
-                        <div>
-                            <div class="status-item-name">${item.name}</div>
-                            <div class="status-item-origin">${item.origin} · ${item.roastName}</div>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" ${item.available ? 'checked' : ''} onchange="toggleStatus(${item.id}, this.checked)">
-                            <span class="toggle-slider"></span>
-                        </label>
+    if (items.length === 0) {
+        container.innerHTML = '<div class="cart-empty">🛒<br>收銀台空空如也</div>';
+    } else {
+        container.innerHTML = keys.map((k, idx) => {
+            const item = cart[k];
+            const showTemp = item.subText === '內用' || item.subText === '外帶';
+            return `
+                <div class="cart-item-row">
+                    <div class="cart-item-info">
+                        <span class="cart-item-name">${item.name}</span>
+                        <span class="cart-item-meta">${item.subText}${showTemp ? ' · ' + item.temp : ''} · $${item.price}</span>
                     </div>
-                `).join('');
-            } else {
-                body.innerHTML = `
-                    <div class="form-note" style="margin-bottom:12px;">
-                        ✏️ 填寫後點「新增」，資料會直接寫入 Google 試算表「點單品項」sheet，status 自動設為 <strong>1（上架）</strong>。
+                    <div class="qty-controls">
+                        ${showTemp ? `<button class="qty-btn" style="width:38px;border-radius:6px;margin-right:4px;font-size:0.75em;" onclick="toggleTemp('${k}')">${item.temp}</button>` : ''}
+                        <button class="qty-btn" onclick="changeQty('${k}', -1)">−</button>
+                        <span class="qty-val">${item.qty}</span>
+                        <button class="qty-btn" onclick="changeQty('${k}', 1)">+</button>
                     </div>
-                    <div class="add-success-msg" id="addSuccessMsg">✅ 已寫入試算表！</div>
-                    <div class="add-form">
-                        <div class="form-row">
-                            <div class="form-group full">
-                                <label class="form-label">豆子名稱 *</label>
-                                <input class="form-input" id="f_name" placeholder="例：肯亞 AA 日曬" type="text">
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">產地</label>
-                                <input class="form-input" id="f_origin" placeholder="例：肯亞" type="text">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">處理法</label>
-                                <input class="form-input" id="f_process" placeholder="例：日曬" type="text">
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">烘焙度</label>
-                                <select class="form-select" id="f_roast">
-                                    <option value="lr">淺焙</option>
-                                    <option value="mr">中焙</option>
-                                    <option value="dr">深焙</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">風味描述</label>
-                                <input class="form-input" id="f_flavor" placeholder="例：藍莓、莓果、甜感" type="text">
-                            </div>
-                        </div>
-                        <div class="form-label" style="margin-top:4px;">價格設定</div>
-                        <div class="price-grid">
-                            <div class="form-group">
-                                <label class="form-label">外帶 $</label>
-                                <input class="form-input" id="f_take" type="number" placeholder="150" inputmode="numeric">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">內用 $</label>
-                                <input class="form-input" id="f_stay" type="number" placeholder="160" inputmode="numeric">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">半磅 $</label>
-                                <input class="form-input" id="f_pound" type="number" placeholder="350" inputmode="numeric">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">濾掛 $</label>
-                                <input class="form-input" id="f_drip" type="number" placeholder="80" inputmode="numeric">
-                            </div>
-                        </div>
-                        <button class="submit-btn" onclick="submitNewBean()">＋ 新增單品豆</button>
+                </div>`;
+        }).join('');
+    }
+    calculateChange();
+}
+
+// ── 上架管理 Modal ──
+function openAdminPanel() {
+    document.getElementById('adminOverlay').classList.add('open');
+    renderAdminTab();
+}
+function closeAdminPanel() {
+    document.getElementById('adminOverlay').classList.remove('open');
+}
+function handleOverlayClick(e) {
+    if (e.target === document.getElementById('adminOverlay')) closeAdminPanel();
+}
+function switchAdminTab(tab) {
+    currentAdminTab = tab;
+    document.getElementById('tabStatus').classList.toggle('active', tab === 'status');
+    document.getElementById('tabAdd').classList.toggle('active', tab === 'add');
+    renderAdminTab();
+}
+
+function renderAdminTab() {
+    const body = document.getElementById('adminBody');
+    if (currentAdminTab === 'status') {
+        const singles = coffeeData.filter(c => c.type === 'single');
+        if (singles.length === 0) {
+            body.innerHTML = '<div style="text-align:center;color:#bbb;padding:30px;">尚無單品豆資料</div>';
+            return;
+        }
+        body.innerHTML = `
+            <div style="display:flex;gap:10px;margin-bottom:15px;padding-bottom:10px;border-bottom:1px solid #eee;">
+                <button class="submit-btn" style="flex:1;background:#4a3728;" onclick="batchUpdate(true)">✅ 全數上架</button>
+                <button class="submit-btn" style="flex:1;background:#888;" onclick="batchUpdate(false)">❌ 全數下架</button>
+            </div>
+            ${singles.map(item => `
+                <div class="status-list-item">
+                    <div>
+                        <div class="status-item-name">${item.name}</div>
+                        <div class="status-item-origin">${item.origin} · ${item.roastName}</div>
                     </div>
-                `;
-            }
-        }
-
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbyAXTwhXOZfmICm1QjOd0tq5qJKYH0rMql4dWc_1SxlCkBmF8nD-1NEDrHLKzzLo481lQ/exec";
-
-        async function callGAS(payload) {
-            const res = await fetch(GAS_URL, {
-                method: 'POST',
-                body: JSON.stringify(payload)
-            });
-            return res.json();
-        }
-
-        async function toggleStatus(id, checked) {
-            console.log('toggleStatus called:', id, checked); // 加這行
-
-            const item = coffeeData.find(c => c.id === id);
-            if (!item) return;
-
-            // 立即更新 UI，不等待網路
-            item.available = checked;
-            render();
-
-            // 找到 toggle 元素，顯示 loading 狀態
-            const checkbox = document.querySelector(`input[onchange="toggleStatus(${id}, this.checked)"]`);
-            if (checkbox) checkbox.disabled = true;
-
-            try {
-                const result = await callGAS({ action: 'updateStatus', id: id, status: checked });
-                if (!result.ok) throw new Error('GAS 回傳失敗');
-                // 清除 localStorage 覆蓋（試算表已是真實來源）
-                const localOverride = JSON.parse(localStorage.getItem('statusOverride') || '{}');
-                delete localOverride[id];
-                localStorage.setItem('statusOverride', JSON.stringify(localOverride));
-            } catch (err) {
-                console.error('寫入試算表失敗，改存本機備援', err);
-                // 寫入失敗時降級為 localStorage
-                const localOverride = JSON.parse(localStorage.getItem('statusOverride') || '{}');
-                localOverride[id] = checked;
-                localStorage.setItem('statusOverride', JSON.stringify(localOverride));
-            } finally {
-                if (checkbox) checkbox.disabled = false;
-            }
-        }
-
-        async function submitNewBean() {
-            const name = document.getElementById('f_name').value.trim();
-            if (!name) { alert('請填寫豆子名稱'); return; }
-            const roastVal = document.getElementById('f_roast').value;
-            const roastNameMap = { lr: '淺焙', mr: '中焙', dr: '深焙' };
-
-            const bean = {
-                name: name,
-                origin: document.getElementById('f_origin').value.trim(),
-                process: document.getElementById('f_process').value.trim(),
-                roast: roastVal,
-                roastName: roastNameMap[roastVal],
-                flavor: document.getElementById('f_flavor').value.trim(),
-                take: parseInt(document.getElementById('f_take').value) || 0,
-                stay: parseInt(document.getElementById('f_stay').value) || 0,
-                pound: parseInt(document.getElementById('f_pound').value) || 0,
-                drip: parseInt(document.getElementById('f_drip').value) || 0,
-            };
-
-            // 按鈕 loading 狀態
-            const btn = document.querySelector('.submit-btn');
-            btn.textContent = '⏳ 寫入試算表中…';
-            btn.disabled = true;
-
-            try {
-                const result = await callGAS({ action: 'addBean', bean: bean });
-                // if (!result.ok) throw new Error('GAS 回傳失敗');
-
-                // 用試算表回傳的真實 id 加入本機資料
-                const newItem = { ...bean, id: result.newId, type: 'single', available: true };
-                coffeeData.push(newItem);
-                render();
-
-                const msg = document.getElementById('addSuccessMsg');
-                msg.textContent = '✅ 已寫入試算表！';
-                msg.style.display = 'block';
-                setTimeout(() => { msg.style.display = 'none'; }, 3000);
-
-                // 清空表單
-                ['f_name','f_origin','f_process','f_flavor','f_take','f_stay','f_pound','f_drip'].forEach(fid => {
-                    document.getElementById(fid).value = '';
-                });
-                setTimeout(() => switchTab('status'), 1200);
-
-            } catch (err) {
-                alert('⚠️ 寫入試算表失敗，請確認網路或 Apps Script 設定。\n' + err.message);
-            } finally {
-                btn.textContent = '＋ 新增單品豆';
-                btn.disabled = false;
-            }
-        }
-
-        // 修改：加入購物車時初始化 temp
-        function addToCart(name, price, subText = '') {
-            if (isAdminActive) return;
-            const cartKey = `${name}-${subText}-${Date.now()}`; // 使用唯一 Key 防止同名不同項被合併
-            cart[cartKey] = { name: name, subText: subText, price: price, qty: 1, temp: '冰' };
-            updateCartUI();
-        }
-
-        // 修改：切換冰熱
-        function toggleTemp(cartKey) {
-            if (!cart[cartKey]) return;
-            cart[cartKey].temp = (cart[cartKey].temp === '冰') ? '熱' : '冰';
-            updateCartUI();
-        }
-
-        function changeQty(cartKey, delta) {
-            if (!cart[cartKey]) return;
-            cart[cartKey].qty += delta;
-            if (cart[cartKey].qty <= 0) delete cart[cartKey];
-            updateCartUI();
-        }
-
-        function clearCart() {
-            cart = {};
-            document.getElementById('cashReceived').value = '';
-            updateCartUI();
-        }
-
-        function setFastCash(amount) {
-            document.getElementById('cashReceived').value = amount;
-            calculateChange();
-        }
-
-        function calculateChange() {
-            const total = Object.values(cart).reduce((sum, item) => sum + (item.price * item.qty), 0);
-            const cash = parseInt(document.getElementById('cashReceived').value) || 0;
-            document.getElementById('calcChange').textContent = cash >= total ? cash - total : 0;
-        }
-
-        function updateCartUI() {
-            const container = document.getElementById('cartItemsContainer');
-            const items = Object.values(cart);
-            // 獲取所有鍵值，確保能對應到正確的 cart 物件
-            const keys = Object.keys(cart);
-
-            // 更新總件數與總金額
-            const totalCount = items.reduce((sum, i) => sum + i.qty, 0);
-            const totalPrice = items.reduce((sum, i) => sum + (i.price * i.qty), 0);
-            
-            document.getElementById('headerCount').textContent = totalCount;
-            document.getElementById('calcTotal').textContent = totalPrice;
-
-            if (items.length === 0) {
-                container.innerHTML = `<div class="cart-empty">🛒<br>收銀台空空如也</div>`;
-            } else {
-                // 使用 map 結合 index 來對應正確的 key
-                container.innerHTML = items.map((item, index) => {
-                    const currentKey = keys[index];
-                    const showTempBtn = (item.subText === '內用' || item.subText === '外帶');
-                    
-                    return `
-                        <div class="cart-item-row">
-                            <div class="cart-item-info">
-                                <span class="cart-item-name">${item.name}</span>
-                                <span class="cart-item-meta">${item.subText} ${showTempBtn ? '· ' + item.temp : ''} · $${item.price}</span>
-                            </div>
-                            <div class="qty-controls">
-                                ${showTempBtn ? `<button class="qty-btn" style="width:38px; border-radius:6px; margin-right:4px; font-size:0.75em;" onclick="toggleTemp('${currentKey}')">${item.temp}</button>` : ''}
-                                <button class="qty-btn" onclick="changeQty('${currentKey}', -1)">−</button>
-                                <span class="qty-val">${item.qty}</span>
-                                <button class="qty-btn" onclick="changeQty('${currentKey}', 1)">+</button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            }
-            calculateChange();
-        }
-
-        function render() {
-            // 經典飲品
-            document.getElementById('classicListContainer').innerHTML = coffeeData
-                .filter(item => item.type === 'classic')
-                .map((item, idx, arr) => `
-                    <li class="menu-item" onclick="addToCart('${item.name}', ${item.price}, '義式')">
-                        <span class="item-name">${item.name}</span>
-                        <span class="item-price">${item.price}</span>
-                    </li>
-                    ${idx < arr.length - 1 ? '<div class="divider"></div>' : ''}
-                `).join('');
-
-            // 其他品項
-            document.getElementById('otherListContainer').innerHTML = coffeeData
-                .filter(item => item.type === 'other')
-                .map((item, idx, arr) => `
-                    <li class="menu-item" onclick="addToCart('${item.name}', ${item.price}, '其他')">
-                        <span class="item-name">${item.name}</span>
-                        <span class="item-price">${item.price}</span>
-                    </li>
-                    ${idx < arr.length - 1 ? '<div class="divider"></div>' : ''}
-                `).join('');
-
-            // 單品豆（一律顯示，上架狀態以卡片樣式區分）
-            const singleItems = coffeeData.filter(item => item.type === 'single');
-
-            if (singleItems.length === 0) {
-                document.getElementById('singleGrid').innerHTML = `<div style="text-align:center;color:#bbb;width:100%;padding:30px;">目前無供應單品豆</div>`;
-            } else {
-                document.getElementById('singleGrid').innerHTML = singleItems
-                    .filter(item => item.available)
-                    .map(item => `
-                    <div class="card">
-                        <span class="roast-badge ${item.roast}">${item.roastName}</span>
-                        <div class="theme-word">${item.name}</div>
-                        <div class="origin">${item.origin}</div>
-                        <div class="process">${item.process}</div>
-                        <div class="flavor">${item.flavor}</div>
-                        <div class="price-box">
-                            <div class="price-btn" onclick="addToCart('${item.name}', ${item.take}, '外帶')">
-                                <span class="p-label">外帶</span><span class="p-val">${item.take}</span>
-                            </div>
-                            <div class="price-btn" onclick="addToCart('${item.name}', ${item.stay}, '內用')">
-                                <span class="p-label">內用</span><span class="p-val">${item.stay}</span>
-                            </div>
-                            <div class="price-btn" onclick="addToCart('${item.name}', ${item.drip}, '濾掛')">
-                                <span class="p-label">濾掛</span><span class="p-val">${item.drip}</span>
-                            </div>
-                            <div class="price-btn" onclick="addToCart('${item.name}', ${item.pound}, '半磅')">
-                                <span class="p-label">半磅</span><span class="p-val">${item.pound}</span>
-                            </div>
-                        </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggle_${item.id}" ${item.available ? 'checked' : ''} onchange="toggleStatus(${item.id}, this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            `).join('')}`;
+    } else {
+        body.innerHTML = `
+            <div class="form-note" style="margin-bottom:12px;">
+                ✏️ 填寫後點「新增」，資料會直接寫入 Google 試算表，status 自動設為 <strong>1（上架）</strong>。
+            </div>
+            <div class="add-success-msg" id="addSuccessMsg">✅ 已寫入試算表！</div>
+            <div class="add-form">
+                <div class="form-row">
+                    <div class="form-group full">
+                        <label class="form-label">豆子名稱 *</label>
+                        <input class="form-input" id="f_name" placeholder="例：肯亞 AA 日曬" type="text">
                     </div>
-                `).join('');
-            }
-        }
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">產地</label>
+                        <input class="form-input" id="f_origin" placeholder="例：肯亞" type="text">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">處理法</label>
+                        <input class="form-input" id="f_process" placeholder="例：日曬" type="text">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">烘焙度</label>
+                        <select class="form-select" id="f_roast">
+                            <option value="lr">淺焙</option>
+                            <option value="mr">中焙</option>
+                            <option value="dr">深焙</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">風味描述</label>
+                        <input class="form-input" id="f_flavor" placeholder="例：藍莓、莓果、甜感" type="text">
+                    </div>
+                </div>
+                <div class="form-label" style="margin-top:4px;">價格設定</div>
+                <div class="price-grid">
+                    <div class="form-group"><label class="form-label">外帶 $</label><input class="form-input" id="f_take" type="number" placeholder="150" inputmode="numeric"></div>
+                    <div class="form-group"><label class="form-label">內用 $</label><input class="form-input" id="f_stay" type="number" placeholder="160" inputmode="numeric"></div>
+                    <div class="form-group"><label class="form-label">半磅 $</label><input class="form-input" id="f_pound" type="number" placeholder="350" inputmode="numeric"></div>
+                    <div class="form-group"><label class="form-label">濾掛 $</label><input class="form-input" id="f_drip" type="number" placeholder="80" inputmode="numeric"></div>
+                </div>
+                <button class="submit-btn" onclick="submitNewBean()">＋ 新增單品豆</button>
+            </div>`;
+    }
+}
 
-        fetchGoogleSheetsData();
-        updateCartUI();
-    </script>
+// ── GAS 呼叫（不使用 no-cors，才能取得回傳值）──
+async function callGAS(payload) {
+    const res = await fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(payload)
+    });
+    return res.json();
+}
+
+// ── 切換單一上架狀態（同步更新試算表）──
+async function toggleStatus(id, checked) {
+    const item = coffeeData.find(c => c.id === id);
+    if (!item) return;
+
+    // 立即更新本地狀態與 UI
+    item.available = checked;
+    render();
+
+    const checkbox = document.getElementById('toggle_' + id);
+    if (checkbox) checkbox.disabled = true;
+
+    try {
+        const result = await callGAS({ action: 'updateStatus', id, status: checked });
+        if (!result.ok) throw new Error('GAS 回傳 ok:false');
+        console.log(`✅ 已同步試算表：${item.name} → ${checked ? '上架' : '下架'}`);
+    } catch (err) {
+        console.error('寫入試算表失敗', err);
+        alert('⚠️ 試算表同步失敗，請確認網路或 Apps Script 設定。本次變更僅存於畫面，重新整理後會還原。');
+        // 還原本地狀態
+        item.available = !checked;
+        render();
+    } finally {
+        if (checkbox) checkbox.disabled = false;
+    }
+}
+
+// ── 全數上架/下架（同步更新試算表）──
+async function batchUpdate(status) {
+    coffeeData.filter(c => c.type === 'single').forEach(c => c.available = status);
+    render();
+    renderAdminTab();
+    try {
+        await callGAS({ action: 'batchUpdateStatus', status });
+        console.log(`✅ 全數${status ? '上架' : '下架'} 已同步試算表`);
+    } catch (err) {
+        console.error('批次同步失敗', err);
+        alert('⚠️ 試算表批次同步失敗，請確認網路或 Apps Script 設定。');
+    }
+}
+
+// ── 新增單品豆 ──
+async function submitNewBean() {
+    const name = document.getElementById('f_name').value.trim();
+    if (!name) { alert('請填寫豆子名稱'); return; }
+    const roastVal = document.getElementById('f_roast').value;
+    const roastNameMap = { lr: '淺焙', mr: '中焙', dr: '深焙' };
+
+    const bean = {
+        name,
+        origin:   document.getElementById('f_origin').value.trim(),
+        process:  document.getElementById('f_process').value.trim(),
+        roast:    roastVal,
+        roastName: roastNameMap[roastVal],
+        flavor:   document.getElementById('f_flavor').value.trim(),
+        take:  parseInt(document.getElementById('f_take').value)  || 0,
+        stay:  parseInt(document.getElementById('f_stay').value)  || 0,
+        pound: parseInt(document.getElementById('f_pound').value) || 0,
+        drip:  parseInt(document.getElementById('f_drip').value)  || 0,
+    };
+
+    const btn = document.querySelector('.submit-btn');
+    btn.textContent = '⏳ 寫入試算表中…';
+    btn.disabled = true;
+
+    try {
+        const result = await callGAS({ action: 'addBean', bean });
+        const newItem = { ...bean, id: result.newId, type: 'single', available: true };
+        coffeeData.push(newItem);
+        render();
+
+        const msg = document.getElementById('addSuccessMsg');
+        if (msg) { msg.textContent = '✅ 已寫入試算表！'; msg.style.display = 'block'; setTimeout(() => { msg.style.display = 'none'; }, 3000); }
+
+        ['f_name','f_origin','f_process','f_flavor','f_take','f_stay','f_pound','f_drip'].forEach(id => {
+            document.getElementById(id).value = '';
+        });
+        setTimeout(() => switchAdminTab('status'), 1200);
+    } catch (err) {
+        alert('⚠️ 寫入試算表失敗，請確認網路或 Apps Script 設定。\n' + err.message);
+    } finally {
+        btn.textContent = '＋ 新增單品豆';
+        btn.disabled = false;
+    }
+}
+
+// ── 啟動 ──
+fetchMenuData();
+updateCartUI();
+</script>
 </body>
 </html>
