@@ -5,142 +5,410 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>咖啡選單</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #3d2b1f;
-            --secondary: #8d6e63;
-            --bg: #f5f2ec;
+            --primary: #2c1e15;
+            --secondary: #8c6a5c;
+            --accent: #b85a4b;
+            --bg: #f9f6f0;
             --card-bg: #ffffff;
-            --light-roast: #e6b37e;
-            --med-roast: #bc6c25;
-            --dark-roast: #4a3728;
-            --price: #a44a3f;
-            --border: rgba(61, 43, 31, 0.1);
-            --font-main: "Noto Serif TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+            --border: rgba(44, 30, 21, 0.08);
+            
+            /* 烘焙度色彩 */
+            --lr: #e3b074;
+            --mr: #a9703c;
+            --dr: #543d2b;
+            
+            --font-main: "Noto Serif TC", serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
             background: var(--bg);
-            background-image: radial-gradient(#ddd9d3 0.5px, transparent 0.5px);
-            background-size: 18px 18px;
-            color: #444;
+            background-image: radial-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            color: #333;
             margin: 0;
             font-family: var(--font-main);
             min-height: 100vh;
-            padding: 15px;
+            padding: 16px 16px 30px 16px;
+            padding-bottom: 90px; /* 留出底部導覽列空間 */
+            line-height: 1.6;
         }
 
-        .container { max-width: 1000px; margin: 0 auto; }
+        .container { 
+            max-width: 1100px; 
+            margin: 0 auto; 
+        }
 
-        .section-title {
-            font-size: 1.1em;
-            font-weight: 700;
-            color: var(--secondary);
-            margin: 20px 0 12px;
+        /* ☕ 標頭設計 */
+        .header {
+            text-align: center;
+            margin: 24px 0 32px;
+        }
+        .header h1 {
+            font-size: 1.8em;
+            color: var(--primary);
+            margin: 0 0 8px 0;
+            letter-spacing: 2px;
+        }
+        .header::after {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 2px;
+            background: var(--secondary);
+            margin: 12px auto 0;
+            opacity: 0.5;
+        }
+
+        /* 📱 底部現代感分段導覽列 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999;
+            background: rgba(44, 30, 21, 0.95);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 40px;
+            padding: 6px 10px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 4px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            width: calc(100% - 32px);
+            max-width: 480px;
         }
-        .section-title::before {
-            content: '';
-            width: 4px;
-            height: 16px;
-            background: var(--secondary);
-            border-radius: 2px;
-        }
-
-        /* 分頁導覽列 */
-        .tab-container {
-            display: flex;
-            position: sticky;
-            top: 0;
-            background: var(--bg);
-            padding: 10px 0;
-            z-index: 100;
-            gap: 10px;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 15px;
-        }
-        .tab-btn {
+        
+        .nav-btn {
             flex: 1;
-            padding: 12px 5px;
-            background: rgba(255,255,255,0.6);
-            border: 1px solid var(--border);
-            border-radius: 25px;
-            color: var(--primary);
-            font-weight: 700;
-            font-size: 1em;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 10px 4px;
+            font-size: 0.85em;
+            font-family: var(--font-main);
+            font-weight: 500;
             cursor: pointer;
             text-align: center;
-            transition: all 0.3s;
-            font-family: var(--font-main);
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            border-radius: 30px;
         }
-        .tab-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        
+        .nav-btn:active, .nav-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .nav-btn.home-spec {
+            background: var(--accent);
+            color: #fff;
+            font-weight: 700;
+        }
 
-        .menu-section { display: none; }
-        .menu-section.active { display: block; }
+        /* 統一的區塊大標題 */
+        .section-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0 0 16px 0;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .scroll-section {
+            scroll-margin-top: 20px;
+            margin-top: 32px;
+        }
 
-        /* 列表 */
-        .simple-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
-        .menu-item { background: rgba(255,255,255,0.6); padding: 14px 16px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); }
-        .item-name { font-weight: 600; color: var(--primary); }
-        .item-price { font-weight: 800; color: var(--price); }
-        .item-price::before { content: '$'; font-size: 0.8em; }
+        /* 📌 響應式排版架構 */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 32px;
+        }
 
-        /* 單品豆卡片 */
-        #singleGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
-        .card { background: var(--card-bg); border-radius: 14px; border: 1px solid var(--border); padding: 16px; display: flex; flex-direction: column; box-shadow: 0 2px 10px rgba(61,43,31,0.04); }
-        .roast-badge { align-self: flex-end; font-size: 0.65em; padding: 2px 7px; color: #fff; font-weight: bold; border-radius: 6px; }
-        .lr { background: var(--light-roast); color: #5a3e2b !important; }
-        .mr { background: var(--med-roast); }
-        .dr { background: var(--dark-roast); }
-        .theme-word { font-family: "DM Serif Display", serif; font-size: 1.8em; color: var(--primary); text-align: center; margin: 5px 0; }
-        .origin { font-size: 0.85em; font-weight: 700; color: var(--secondary); text-align: center; }
-        .process { background: #fdf1e6; color: #9d6b42; font-size: 0.7em; padding: 2px 8px; border-radius: 4px; width: fit-content; margin: 5px auto; font-weight: 700; }
-        .flavor { font-size: 0.85em; color: #666; text-align: center; margin: 8px 0 15px; flex-grow: 1; line-height: 1.4; }
+        @media (min-width: 992px) {
+            .main-layout {
+                grid-template-columns: 38% 62%; 
+                gap: 40px;
+            }
+        }
 
-        /* 2×2 價格網格 */
-        .price-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border-top: 1px solid #eee; padding-top: 10px; text-align: center; }
-        .price-item { background: #faf8f5; padding: 6px; border-radius: 6px; }
-        .p-unit { font-size: 0.75em; color: #888; margin-bottom: 2px; }
-        .p-val { font-weight: 800; color: var(--price); font-size: 0.95em; }
+        /* 📌 篩選器樣式設計 (烘焙度與處理法) */
+        .filter-container {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(44,30,21,0.01);
+        }
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .filter-label {
+            font-size: 0.8em;
+            font-weight: 700;
+            color: var(--secondary);
+            min-width: 45px;
+        }
+        .filter-btn {
+            background: #f4f0ea;
+            border: 1px solid transparent;
+            color: #555;
+            padding: 4px 12px;
+            font-size: 0.8em;
+            font-family: var(--font-main);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .filter-btn:hover {
+            background: #ebe4da;
+        }
+        .filter-btn.active {
+            background: var(--primary);
+            color: #fff;
+            font-weight: 700;
+        }
 
-        /* 載入中文字 */
-        .loading-text { text-align: center; color: #aaa; padding: 40px 20px; }
+        /* 📌 經典飲品排版 */
+        .menu-list-classic {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(44,30,21,0.02);
+            border: 1px solid var(--border);
+        }
+
+        .menu-item { 
+            display: flex; 
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .item-name { 
+            font-weight: 500; 
+            color: var(--primary); 
+            font-size: 0.95em; 
+        }
+        .item-line {
+            flex-grow: 1;
+            border-bottom: 1px dotted rgba(44, 30, 21, 0.2);
+            margin-bottom: 5px;
+        }
+        .item-price { 
+            font-weight: 700; 
+            color: var(--accent); 
+            font-size: 1em; 
+            font-family: 'Playfair Display', serif;
+        }
+        .item-price::before { content: '$'; font-size: 0.9em; margin-right: 1px; }
+
+        /* 📌 單品豆網格 */
+        .single-grid { 
+            display: grid;
+            grid-template-columns: 1fr; 
+            gap: 16px; 
+        }
+        @media (min-width: 576px) {
+            .single-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* 單品豆精緻卡片 */
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 12px; 
+            border: 1px solid var(--border); 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 0 4px 16px rgba(44,30,21,0.02);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        /* 篩選隱藏時的動畫過渡效果 */
+        .card.hidden {
+            display: none !important;
+        }
+
+        .badge-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .badge {
+            font-size: 0.75em; 
+            padding: 3px 8px; 
+            color: #fff; 
+            font-weight: 700; 
+            border-radius: 4px;
+        }
+        .badge.lr { background: var(--lr); color: #4a2e10 !important; }
+        .badge.mr { background: var(--mr); }
+        .badge.dr { background: var(--dr); }
+        
+        .badge.process { 
+            background: #fcf4ec; 
+            color: #a06d44; 
+            border: 1px solid rgba(160,109,68,0.15);
+        }
+
+        .theme-word { 
+            font-size: 1.25em; 
+            font-weight: 700;
+            color: var(--primary); 
+            margin: 0 0 4px 0; 
+            line-height: 1.3;
+        }
+        .origin { 
+            font-size: 0.85em; 
+            color: var(--secondary); 
+            margin-bottom: 12px;
+        }
+
+        .flavor { 
+            font-size: 0.9em; 
+            color: #555; 
+            margin: 0 0 16px 0; 
+            flex-grow: 1; 
+            line-height: 1.5;
+            padding: 10px;
+            background: #faf8f5;
+            border-radius: 6px;
+            border-left: 2px solid rgba(140, 106, 92, 0.2);
+        }
+
+        /* 📌 價格矩陣 */
+        .price-matrix { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 8px; 
+            border-top: 1px dashed var(--border); 
+            padding-top: 14px; 
+        }
+        .price-box { 
+            background: #fff;
+            border: 1px solid rgba(44, 30, 21, 0.04);
+            padding: 6px 10px; 
+            border-radius: 6px; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .p-label { font-size: 0.8em; color: #777; }
+        .p-amount { 
+            font-weight: 700; 
+            color: var(--accent); 
+            font-size: 0.95em; 
+            font-family: 'Playfair Display', serif;
+        }
+        .p-amount::before { content: '$'; font-size: 0.85em; margin-right: 1px; }
+
+        .loading-text { text-align: center; color: #999; padding: 30px; font-size: 0.9em; }
+        .no-match-text { text-align: center; color: #aaa; padding: 40px 10px; font-size: 0.9em; grid-column: 1 / -1; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1 style="text-align:center;color:var(--primary);margin:15px 0 10px;font-size:1.8em;">☕ 咖啡選單</h1>
-
-    <div class="tab-container">
-        <button class="tab-btn" onclick="window.location.href='https://christypy.github.io/'" style="flex:0 0 auto;padding:12px 16px;">🏠</button>
-        <button class="tab-btn active" onclick="switchTab('drinks')">經典與飲品</button>
-        <button class="tab-btn" onclick="switchTab('single')">單品咖啡豆</button>
+    <div class="header">
+        <h1>☕ 咖啡選單</h1>
     </div>
 
-    <!-- 第一頁：經典飲品 + 其他品項 -->
-    <div id="drinks-section" class="menu-section active">
-        <div class="section-title">經典飲品</div>
-        <div class="simple-list" id="classicList"><div class="loading-text">讀取中…</div></div>
+    <div class="bottom-nav">
+        <button class="nav-btn home-spec" onclick="window.location.href='https://christypy.github.io/'">🏠 首頁</button>
+        <button class="nav-btn" onclick="scrollToSection('classic-sec')">經典飲品</button>
+        <button class="nav-btn" onclick="scrollToSection('single-sec')">單品豆</button>
+        <button class="nav-btn" onclick="scrollToSection('other-sec')">其他品項</button>
+    </div>
 
+    <div class="main-layout">
+        
+        <div id="classic-sec" class="drinks-column scroll-section">
+            <div class="section-title">經典飲品</div>
+            <div class="menu-list-classic" id="classicList">
+                <div class="loading-text">讀取中…</div>
+            </div>
+        </div>
+
+        <div id="single-sec" class="single-column scroll-section">
+            <div class="section-title">單品咖啡豆</div>
+            
+            <div class="filter-container">
+                <div class="filter-group">
+                    <span class="filter-label">烘焙度</span>
+                    <button class="filter-btn active" data-type="roast" data-val="all">全部</button>
+                    <button class="filter-btn" data-type="roast" data-val="lr">淺焙</button>
+                    <button class="filter-btn" data-type="roast" data-val="mr">中焙</button>
+                    <button class="filter-btn" data-type="roast" data-val="dr">深焙</button>
+                </div>
+                <div class="filter-group">
+                    <span class="filter-label">處理法</span>
+                    <button class="filter-btn active" data-type="process" data-val="all">全部</button>
+                    <button class="filter-btn" data-type="process" data-val="washed">水洗</button>
+                    <button class="filter-btn" data-type="process" data-val="natural">日曬</button>
+                    <button class="filter-btn" data-type="process" data-val="honey">蜜處理/其他</button>
+                </div>
+            </div>
+
+            <div class="single-grid" id="singleGrid">
+                <div class="loading-text">☕ 讀取單品豆中…</div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="other-sec" class="bottom-layout scroll-section">
         <div class="section-title">其他品項</div>
-        <div class="simple-list" id="otherList"><div class="loading-text">讀取中…</div></div>
-    </div>
-
-    <!-- 第二頁：單品豆 -->
-    <div id="single-section" class="menu-section">
-        <div id="singleGrid"><div class="loading-text">☕ 讀取單品豆資料中…</div></div>
+        <div class="menu-list-classic" id="otherList">
+            <div class="loading-text">讀取中…</div>
+        </div>
     </div>
 </div>
 
 <script>
-// 單品豆選單 Sheet (gid=250388087)
 const SPREADSHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSEiSHdIF1FlVgrSp5r8DhCDnTKAVhfRjXPIizNQ_d5kK_FFUQJfQKhQG1YXe3ViIdExAiUnAPlKCO-/pub?gid=250388087&single=true&output=csv";
 
-// 正確解析 CSV（支援欄位內含逗號的引號格式）
+// 全局變數儲存篩選狀態
+let currentRoastFilter = 'all';
+let currentProcessFilter = 'all';
+
+function scrollToSection(id) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
 function parseCSV(text) {
     const rows = [];
     const lines = text.split(/\r?\n/);
@@ -167,24 +435,87 @@ function parseCSV(text) {
     return rows;
 }
 
-function switchTab(tabName) {
-    document.querySelectorAll('.tab-btn').forEach((btn, i) => {
-        btn.classList.toggle('active', (tabName === 'drinks' && i === 0) || (tabName === 'single' && i === 1));
+// 🚀 核心篩選邏輯
+function applyFilters() {
+    const cards = document.querySelectorAll('#singleGrid .card');
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+        const roast = card.getAttribute('data-roast');
+        const processStr = card.getAttribute('data-process'); // 原始處理法中文字
+
+        // 1. 檢查烘焙度
+        const matchRoast = (currentRoastFilter === 'all' || roast === currentRoastFilter);
+
+        // 2. 檢查處理法
+        let matchProcess = false;
+        if (currentProcessFilter === 'all') {
+            matchProcess = true;
+        } else if (currentProcessFilter === 'washed') {
+            matchProcess = processStr.includes('水洗');
+        } else if (currentProcessFilter === 'natural') {
+            matchProcess = processStr.includes('日曬');
+        } else if (currentProcessFilter === 'honey') {
+            // 不是水洗也不是日曬，歸類為蜜處理或其他特殊處理
+            matchProcess = !processStr.includes('水洗') && !processStr.includes('日曬');
+        }
+
+        // 3. 同時滿足則顯示，否則隱藏
+        if (matchRoast && matchProcess) {
+            card.classList.remove('hidden');
+            visibleCount++;
+        } else {
+            card.classList.add('hidden');
+        }
     });
-    document.querySelectorAll('.menu-section').forEach(s => s.classList.remove('active'));
-    document.getElementById(`${tabName}-section`).classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // 處理如果完全沒有符合的豆子時的提示
+    const existingNoMatch = document.getElementById('no-match-msg');
+    if (visibleCount === 0) {
+        if (!existingNoMatch) {
+            const msg = document.createElement('div');
+            msg.id = 'no-match-msg';
+            msg.className = 'no-match-text';
+            msg.innerText = ' 沒有符合目前篩選條件的單品豆';
+            document.getElementById('singleGrid').appendChild(msg);
+        }
+    } else if (existingNoMatch) {
+        existingNoMatch.remove();
+    }
+}
+
+// 初始化篩選按鈕點擊監聽
+function initFilterEvents() {
+    const buttons = document.querySelectorAll('.filter-btn');
+    buttons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // 切換同組按鈕的 active 狀態
+            const parent = this.parentElement;
+            parent.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+
+            // 更新篩選變數
+            const type = this.getAttribute('data-type');
+            const val = this.getAttribute('data-val');
+
+            if (type === 'roast') currentRoastFilter = val;
+            if (type === 'process') currentProcessFilter = val;
+
+            // 執行篩選
+            applyFilters();
+        });
+    });
 }
 
 async function fetchMenu() {
     try {
-        // 加上時間戳防快取
         const response = await fetch(SPREADSHEET_CSV_URL + '&t=' + Date.now());
         if (!response.ok) throw new Error('CSV 讀取失敗');
         const text = await response.text();
         const rows = parseCSV(text);
 
-        let classicHTML = '', otherHTML = '', singleHTML = '';
+        let classicHTML = '', otherHTML = '';
+        let singleBeans = [];
 
         for (let i = 1; i < rows.length; i++) {
             const r = rows[i];
@@ -196,47 +527,85 @@ async function fetchMenu() {
                 classicHTML += `
                     <div class="menu-item">
                         <span class="item-name">${name}</span>
+                        <div class="item-line"></div>
                         <span class="item-price">${r[8] || '0'}</span>
                     </div>`;
             } else if (type === 'other') {
                 otherHTML += `
                     <div class="menu-item">
                         <span class="item-name">${name}</span>
+                        <div class="item-line"></div>
                         <span class="item-price">${r[8] || '0'}</span>
                     </div>`;
             } else if (type === 'single') {
-                // status 欄（index 12）：1 或「上架」才顯示
                 const status = (r[12] || '').trim();
                 if (status !== '1' && status !== '上架') continue;
 
-                const roast = (r[5] || 'lr').trim();
-                const roastName = (r[6] || '淺焙').trim();
-                const process = (r[4] || '').trim();
-
-                singleHTML += `
-                    <div class="card">
-                        <span class="roast-badge ${roast}">${roastName}</span>
-                        <div class="theme-word">${name}</div>
-                        <div class="origin">${(r[3] || '').trim()}</div>
-                        ${process ? `<div class="process">${process}</div>` : ''}
-                        <div class="flavor">${(r[7] || '').trim()}</div>
-                        <div class="price-row">
-                            <div class="price-item"><div class="p-unit">外帶</div><div class="p-val">$${r[8] || '-'}</div></div>
-                            <div class="price-item"><div class="p-unit">內用</div><div class="p-val">$${r[9] || '-'}</div></div>
-                            <div class="price-item"><div class="p-unit">濾掛</div><div class="p-val">$${r[11] || '-'}</div></div>
-                            <div class="price-item"><div class="p-unit">半磅</div><div class="p-val">$${r[10] || '-'}</div></div>
-                        </div>
-                    </div>`;
+                singleBeans.push({
+                    name: name,
+                    origin: (r[3] || '').trim(),
+                    process: (r[4] || '').trim(),
+                    roast: (r[5] || 'lr').trim(),
+                    roastName: (r[6] || '淺焙').trim(),
+                    flavor: (r[7] || '').trim(),
+                    pTakeout: parseFloat(r[8]) || 0,
+                    pInhouse: r[9] || '-',
+                    pBeans: r[10] || '-',
+                    pDrip: r[11] || '-'
+                });
             }
+        }
+
+        singleBeans.sort((a, b) => {
+            const roastOrder = { 'lr': 1, 'mr': 2, 'dr': 3 };
+            const aRoast = roastOrder[a.roast] || 99;
+            const bRoast = roastOrder[b.roast] || 99;
+            if (aRoast !== bRoast) return aRoast - bRoast;
+
+            function getProcessWeight(p) {
+                if (p.includes('日曬')) return 1;
+                if (p.includes('水洗')) return 2;
+                return 3;
+            }
+            const aProc = getProcessWeight(a.process);
+            const bProc = getProcessWeight(b.process);
+            if (aProc !== bProc) return aProc - bProc;
+
+            return b.pTakeout - a.pTakeout;
+        });
+
+        // 🛠 在生成的 HTML 卡片加入 data-roast 與 data-process 屬性供 JS 篩選
+        let singleHTML = '';
+        for (const b of singleBeans) {
+            singleHTML += `
+                <div class="card" data-roast="${b.roast}" data-process="${b.process}">
+                    <div class="badge-row">
+                        <span class="badge ${b.roast}">${b.roastName}</span>
+                        ${b.process ? `<span class="badge process">${b.process}</span>` : ''}
+                    </div>
+                    <h3 class="theme-word">${b.name}</h3>
+                    <div class="origin">${b.origin}</div>
+                    <div class="flavor">${b.flavor || '風味內洽'}</div>
+                    <div class="price-matrix">
+                        <div class="price-box"><span class="p-label">外帶</span><span class="p-amount">${b.pTakeout || '-'}</span></div>
+                        <div class="price-box"><span class="p-label">內用</span><span class="p-amount">${b.pInhouse}</span></div>
+                        <div class="price-box"><span class="p-label">濾掛</span><span class="p-amount">${b.pDrip}</span></div>
+                        <div class="price-box"><span class="p-label">半磅</span><span class="p-amount">${b.pBeans}</span></div>
+                    </div>
+                </div>`;
         }
 
         document.getElementById('classicList').innerHTML = classicHTML || '<div class="loading-text">暫無品項</div>';
         document.getElementById('otherList').innerHTML   = otherHTML   || '<div class="loading-text">暫無品項</div>';
         document.getElementById('singleGrid').innerHTML  = singleHTML  || '<div class="loading-text">目前無供應單品豆</div>';
 
+        // 資料載入完成後，初始化監聽並執行一次篩選(確保初始狀態正確)
+        initFilterEvents();
+        applyFilters();
+
     } catch (err) {
-        console.error('讀取選單失敗:', err);
-        document.getElementById('classicList').innerHTML = '<div class="loading-text" style="color:red;">讀取失敗，請重新整理</div>';
+        console.error('選單載入失敗:', err);
+        document.getElementById('classicList').innerHTML = '<div class="loading-text" style="color:red;">讀取失敗</div>';
         document.getElementById('otherList').innerHTML   = '<div class="loading-text" style="color:red;">讀取失敗</div>';
         document.getElementById('singleGrid').innerHTML  = '<div class="loading-text" style="color:red;">讀取失敗</div>';
     }
