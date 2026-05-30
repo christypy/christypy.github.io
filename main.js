@@ -461,11 +461,15 @@ function renderDashboard(todaysOrders) {
     let itemCounts = {};
 
     todaysOrders.forEach(c => {
+        // --- 🚀 新增修改：若地點為「當日問」，直接跳過不計入統計 ---
+        if (c.loc === "當日問") return; 
+        
         const count = c.count || 1;
         for (let i = 0; i < count; i++) {
             let isAbsent = isItemAbsent(c.name, c.item, c.loc, i);
             let isDone = isItemDone(c.name, c.item, c.loc, i);
             
+            // 排除缺席與已完成項目
             if (!isAbsent && !isDone) {
                 const itemName = c.item || "未定品項";
                 itemCounts[itemName] = (itemCounts[itemName] || 0) + 1;
